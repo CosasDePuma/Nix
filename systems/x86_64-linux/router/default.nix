@@ -410,7 +410,7 @@
     users."router" = {
       isNormalUser = true;
       description = "Router management user";
-      initialPassword = null;
+      initialPassword = "router.audea.corp";
       home = "/home/users/router";
       uid = 1000;
       group = "users";

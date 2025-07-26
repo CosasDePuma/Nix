@@ -13,8 +13,8 @@ table inet filter {
             "vl254.dmz"
         } counter accept comment "Allow VLANs to access the router";
 
+        iifname "eth0" tcp dport 443 counter accept comment "Allow HTTPs connections";
         iifname "eth0" tcp dport 64022 counter accept comment "Allow SSH connections (custom port)";
-        iifname "eth0" tcp dport 64443 counter accept comment "Allow Headscale connections";
         iifname "eth0" ct state { established, related } counter accept comment "Allow established Internet traffic back";
         iifname "eth0" drop comment "Drop all other Internet traffic";
     }
