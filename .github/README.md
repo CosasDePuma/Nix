@@ -44,7 +44,7 @@ nix develop github:cosasdepuma/nix/audea
 │   ├───aarch64-darwin: package 'nixfmt-tree'
 │   └───x86_64-linux: package 'nixfmt-tree'
 ├───nixosConfigurations
-│   └───e-corp: NixOS configuration
+│   └───router: NixOS configuration
 └───templates
     └───shell: template: Shell template for development environments
 ```

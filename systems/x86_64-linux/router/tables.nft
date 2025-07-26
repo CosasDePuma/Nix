@@ -1,0 +1,62 @@
+table inet filter {
+    chain output {
+        type filter hook output priority 100; policy accept;
+    }
+    chain input {
+        type filter hook input priority filter; policy drop;
+
+        iifname "lo" accept comment "Allow loopback traffic";
+
+        iifname {
+            "vl10.corp",
+            "vl20.redteam",
+            "vl254.dmz"
+        } counter accept comment "Allow VLANs to access the router";
+
+        iifname "eth0" tcp dport 64022 counter accept comment "Allow SSH connections (custom port)";
+        iifname "eth0" tcp dport 64443 counter accept comment "Allow Headscale connections";
+        iifname "eth0" ct state { established, related } counter accept comment "Allow established Internet traffic back";
+        iifname "eth0" drop comment "Drop all other Internet traffic";
+    }
+    chain forward {
+        type filter hook forward priority filter; policy drop;
+
+        iifname {
+            "vl10.corp",
+            "vl20.redteam",
+            "vl254.dmz"
+        } oifname "eth0" counter accept comment "Allow VLANs access to the Internet";
+
+        iifname "eth0" oifname {
+            "vl10.corp",
+            "vl20.redteam", 
+            "vl254.dmz"
+        } ct state established,related counter accept comment "Allow Internet traffic back to VLANs";
+
+        iifname "vl10.corp" oifname "vl10.corp" counter accept comment "Allow intra-VLAN traffic for Corporative VLAN";
+        iifname "vl10.corp" oifname {
+            "vl20.redteam",
+            "vl254.dmz"
+        } counter drop comment "Block Corporative VLAN from other VLANs";
+
+        iifname "vl20.redteam" oifname "vl20.redteam" counter accept comment "Allow intra-VLAN traffic for Red Team VLAN";
+        iifname "vl20.redteam" oifname {
+            "vl10.corp",
+            "vl254.dmz"
+        } counter drop comment "Block Red Team VLAN from other VLANs";
+
+        iifname "vl254.dmz" oifname {
+            "vl10.corp",
+            "vl20.redteam"
+        } counter drop comment "Block DMZ VLAN from other VLANs";
+    }
+}
+table ip nat {
+    chain prerouting {
+        type nat hook prerouting priority filter; policy accept;
+    }
+    chain postrouting {
+        type nat hook postrouting priority filter; policy accept;
+        oifname "eth0" masquerade comment "NAT for Internet access";
+    }
+}

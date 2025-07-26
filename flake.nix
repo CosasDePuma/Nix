@@ -11,6 +11,7 @@
       ];
       extraArgs = {
         inherit inputs lib;
+        publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN9Dt0O0OJokuV6x1jcejmHvJiGT8ZEubd5/aHGYEyUi audea";
         stateVersion = "25.05";
       };
       forEachSystem =
@@ -25,6 +26,17 @@
             };
           }
         );
+      nixosConfiguration =
+        nixosSystem:
+        lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            inputs.disko.nixosModules.default
+            inputs.agenix.nixosModules.default
+            nixosSystem
+          ];
+          specialArgs = extraArgs;
+        };
     in
     {
 
@@ -47,6 +59,8 @@
       # +--------------- nixos systems ----------------+
 
       nixosConfigurations = {
+        router = nixosConfiguration ./systems/x86_64-linux/router;
+
         e-corp = import ./systems/x86_64-linux/e-corp extraArgs;
       };
 
