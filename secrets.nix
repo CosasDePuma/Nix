@@ -1,23 +1,20 @@
 let
   nixos = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP9RzisL6wVQK3scDyEPEpFgrcdFYkW9LssnWlORGXof nixos";
-  vm-wonderland = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE8BS7ZkNLC4EpAfTDzFi2XVyqHtbw0w/G/keAxq9NAW @wonderland";
+  vm-router = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMH4o2Q4cwq9GvJ2+MgErC5Odtf+WPbvz3H7KbOyOhoA @router";
+
+  all = [
+    nixos
+    vm-router
+  ];
 in
 {
-  # arkham
-  "systems/x86_64-linux/wonderland/secrets/acme.env.age".publicKeys = [
+  # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  # ┃                   Router                  ┃
+  # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  "systems/x86_64-linux/router/wireguard.key.age".publicKeys = [
     nixos
-    vm-wonderland
+    vm-router
   ];
-  "systems/x86_64-linux/wonderland/secrets/ddclient.token.age".publicKeys = [
-    nixos
-    vm-wonderland
-  ];
-  "systems/x86_64-linux/wonderland/secrets/smb-credentials.age".publicKeys = [
-    nixos
-    vm-wonderland
-  ];
-  "systems/x86_64-linux/wonderland/secrets/vaultwarden-passwd.age".publicKeys = [
-    nixos
-    vm-wonderland
-  ];
+  "systems/x86_64-linux/router/wireguard-profiles/puma.conf.age".publicKeys = [ nixos ];
 }
