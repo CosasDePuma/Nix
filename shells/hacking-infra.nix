@@ -8,10 +8,27 @@ with pkgs;
 mkShell {
   name = "hacking-infra";
   buildInputs = [
-    metasploit # penetration testing framework
-    nmap # port scanner
+    # connection
+    openvpn
+
+    # recon
+    fping
+    hping
+    nmap
+    rustscan
+
+    # frameworks
+    metasploit
     nuclei
-    ssh-audit # ssh auditing tool
-    terrapin-scanner # cve-2023-48795
+
+    # smb
+    enum4linux-ng
+    polenum
+    samba
+    smbmap
+
+    # ssh
+    ssh-audit
+    terrapin-scanner
   ];
 }

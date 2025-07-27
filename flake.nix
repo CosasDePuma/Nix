@@ -25,6 +25,17 @@
             };
           }
         );
+      nixosConfiguration =
+        nixosSystem:
+        lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            inputs.disko.nixosModules.default
+            inputs.agenix.nixosModules.default
+            nixosSystem
+          ];
+          specialArgs = extraArgs;
+        };
     in
     {
       # +--------------- darwin systems ---------------+
@@ -53,7 +64,8 @@
       # +--------------- nixos systems ----------------+
 
       nixosConfigurations = {
-        wonderland = import ./systems/x86_64-linux/wonderland extraArgs;
+        router = nixosConfiguration ./systems/x86_64-linux/dmz/router;
+        vulnerability = nixosConfiguration ./systems/x86_64-linux/hacking/vulnerability;
       };
 
       # +----------------- templates ------------------+
