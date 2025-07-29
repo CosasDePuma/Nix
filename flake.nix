@@ -59,9 +59,9 @@
       # +--------------- nixos systems ----------------+
 
       nixosConfigurations = {
-        router = nixosConfiguration ./systems/x86_64-linux/router;
-
-        e-corp = import ./systems/x86_64-linux/e-corp extraArgs;
+        router = nixosConfiguration ./systems/x86_64-linux/dmz/router;
+        mobile = nixosConfiguration ./systems/x86_64-linux/redteam/03.mobile;
+        vulnerability = nixosConfiguration ./systems/x86_64-linux/redteam/02.vulnerability;
       };
 
       # +----------------- templates ------------------+

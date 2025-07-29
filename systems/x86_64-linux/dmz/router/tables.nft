@@ -10,11 +10,12 @@ table inet filter {
         iifname {
             "vl10.corp",
             "vl20.redteam",
-            "vl254.dmz"
-        } counter accept comment "Allow VLANs to access the router";
+            "vl254.dmz",
+            "wireguard"
+        } counter accept comment "Allow VLANs and VPN to access the router";
 
-        iifname "eth0" tcp dport 443 counter accept comment "Allow HTTPs connections";
         iifname "eth0" tcp dport 64022 counter accept comment "Allow SSH connections (custom port)";
+        iifname "eth0" udp dport 51820 counter accept comment "Allow WireGuard connections";
         iifname "eth0" ct state { established, related } counter accept comment "Allow established Internet traffic back";
         iifname "eth0" drop comment "Drop all other Internet traffic";
     }
@@ -24,14 +25,29 @@ table inet filter {
         iifname {
             "vl10.corp",
             "vl20.redteam",
-            "vl254.dmz"
-        } oifname "eth0" counter accept comment "Allow VLANs access to the Internet";
+            "vl254.dmz",
+            "wireguard"
+        } oifname "eth0" counter accept comment "Allow VLANs and VPN access to the Internet";
 
         iifname "eth0" oifname {
             "vl10.corp",
-            "vl20.redteam", 
+            "vl20.redteam",
+            "vl254.dmz",
+            "wireguard"
+        } ct state established,related counter accept comment "Allow Internet traffic back to VLANs and VPN";
+
+        iifname "wireguard" oifname {
+            "vl10.corp",
+            "vl20.redteam",
             "vl254.dmz"
-        } ct state established,related counter accept comment "Allow Internet traffic back to VLANs";
+        } counter accept comment "Allow WireGuard access to all VLANs";
+
+        iifname {
+            "vl10.corp",
+            "vl20.redteam",
+            "vl254.dmz",
+            "wireguard"
+        } oifname "wireguard" ct state established,related counter accept comment "Allow VLANs and VPN traffic back to WireGuard";
 
         iifname "vl10.corp" oifname "vl10.corp" counter accept comment "Allow intra-VLAN traffic for Corporative VLAN";
         iifname "vl10.corp" oifname {
@@ -49,6 +65,9 @@ table inet filter {
             "vl10.corp",
             "vl20.redteam"
         } counter drop comment "Block DMZ VLAN from other VLANs";
+
+        iifname "wireguard" oifname "wireguard" ip daddr 10.10.10.254 counter accept comment "Allow WireGuard traffic to WireGuard router";
+        iifname "wireguard" oifname "wireguard" counter drop comment "Block intra-WireGuard traffic for WireGuard";
     }
 }
 table ip nat {
