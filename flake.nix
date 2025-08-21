@@ -50,6 +50,7 @@
         { system, ... }@args:
         {
           default = self.devShells.${system}.nixos;
+          hacking = import ./shells/hacking.nix (args // extraArgs);
           hacking-infra = import ./shells/hacking-infra.nix (args // extraArgs);
           nixos = import ./shells/nixos.nix (args // extraArgs);
         }
@@ -64,8 +65,9 @@
       # +--------------- nixos systems ----------------+
 
       nixosConfigurations = {
+        media = nixosConfiguration ./systems/x86_64-linux/homelab/media;
+        proxy = nixosConfiguration ./systems/x86_64-linux/homelab/proxy;
         router = nixosConfiguration ./systems/x86_64-linux/dmz/router;
-        vulnerability = nixosConfiguration ./systems/x86_64-linux/hacking/vulnerability;
       };
 
       # +----------------- templates ------------------+
