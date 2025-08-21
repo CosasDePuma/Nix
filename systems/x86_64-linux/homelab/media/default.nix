@@ -13,16 +13,6 @@
   boot = {
     # --- loader
     loader.grub.enable = true;
-    # --- kernel
-    kernel.sysctl = {
-      "net.ipv4.conf.all.forwarding" = true;
-      "net.ipv6.conf.all.forwarding" = true;
-      "net.ipv6.conf.all.accept_ra" = 0;
-      "net.ipv6.conf.all.autoconf" = 0;
-      "net.ipv6.conf.all.use_tempaddr" = 0;
-      "net.ipv6.conf.eth0.accept_ra" = 2;
-      "net.ipv6.conf.eth0.autoconf" = 1;
-    };
     # --- nix store
     readOnlyNixStore = true;
   };
@@ -32,10 +22,27 @@
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
   environment.systemPackages = with pkgs; [
-    dig
-    iperf
-    tcpdump
+    cifs-utils
   ];
+
+  # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  # ┃                FileSystems                ┃
+  # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  fileSystems = {
+    "/mnt/media" = {
+      device = "//192.168.1.3/media";
+      fsType = "cifs";
+      options = [
+        "credentials=${config.age.secrets."samba.creds".path}"
+        "noauto"
+        "x-systemd.automount"
+        "x-systemd.device-timeout=5s"
+        "x-systemd.idle-timeout=60"
+        "x-systemd.mount-timeout=5s"
+      ];
+    };
+  };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                 Hardware                  ┃
@@ -50,7 +57,7 @@
   age = {
     identityPaths = builtins.map (key: key.path) config.services.openssh.hostKeys;
     secrets = {
-      "wireguard.key".file = ./wireguard.key.age;
+      "samba.creds".file = ./samba.creds.age;
     };
   };
 
@@ -86,15 +93,7 @@
         };
       };
     };
-    nodev = {
-      "/tmp" = {
-        fsType = "tmpfs";
-        mountOptions = [
-          "noexec"
-          "size=1G"
-        ];
-      };
-    };
+    nodev."/tmp".fsType = "tmpfs";
   };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -103,7 +102,7 @@
 
   networking = {
     # --- host
-    hostName = "router";
+    hostName = "media";
     hostId = builtins.substring 0 8 (builtins.hashString "md5" config.networking.hostName);
     # --- interfaces
     usePredictableInterfaceNames = false;
@@ -113,76 +112,25 @@
         useDHCP = false;
         ipv4.addresses = [
           {
-            address = "192.168.1.254";
+            address = "10.0.10.3";
             prefixLength = 24;
           }
         ];
       };
-      "eth1".useDHCP = false;
-      # --- virtual interfaces
-      "vl10.homelab".ipv4.addresses = [
-        {
-          address = "10.0.10.254";
-          prefixLength = 24;
-        }
-      ];
     };
     # --- gateway
     defaultGateway = {
       interface = "eth0";
-      address = "192.168.1.1";
-    };
-    # --- vlans
-    vlans = {
-      "vl10.homelab" = {
-        id = 10;
-        interface = "eth1";
-      };
-    };
-    # --- wireguard
-    wireguard = {
-      enable = true;
-      interfaces."wireguard" = {
-        ips = [ "10.10.10.254/24" ];
-        listenPort = 51820;
-        privateKeyFile = config.age.secrets."wireguard.key".path;
-        peers =
-          let
-            users = [
-              {
-                name = "pumita-macbook";
-                publicKey = "09SUz/zGOFkZKnV8e8k+MJ4ul97EAvFEm8MN2rjztkQ=";
-              }
-              {
-                name = "pumita-iphone";
-                publicKey = "fLlRUveH+pYk6efVANQh+g3MJXMvG3rAsY4Z1aAff20=";
-              }
-              {
-                name = "pumita-tv";
-                publicKey = "gL2M1YR+FjO9Wq5DjIBcBOtcxw/eyvo6HGv17Q43o2g=";
-              }
-            ];
-          in
-          lib.lists.imap1 (i: user: {
-            inherit (user) name publicKey;
-            allowedIPs = [ "10.10.10.${builtins.toString i}/32" ];
-            persistentKeepalive = 25;
-          }) users;
-      };
+      address = "10.0.10.254";
     };
     # --- dns
     domain = "home";
     search = [ "home" ];
-    nameservers = [
-      "1.1.1.1"
-      "8.8.8.8"
-    ];
+    nameservers = [ "10.0.10.254" ];
     # --- firewall
-    nat.enable = false;
-    firewall.enable = false;
-    nftables = {
+    firewall = {
       enable = true;
-      ruleset = builtins.readFile ./tables.nft;
+      allowedTCPPorts = [ 64022 config.services.komga.settings.server.port ];
     };
   };
 
@@ -231,50 +179,16 @@
   services = {
 
     # ┌──────────────────────────────────────┐
-    # │                DNSmasq               │
+    # │                 Komga                │
     # └──────────────────────────────────────┘
 
-    dnsmasq = {
+    komga = {
       enable = true;
-      resolveLocalQueries = false;
       settings = {
-        address = [ "/kike.wtf/10.0.10.1" ];
-        bind-dynamic = true;
-        interface = [
-          "vl10.homelab"
-          "wireguard"
-        ];
-        dhcp-range = [
-          "vl10.homelab,10.0.10.100,10.0.10.200,255.255.255.0,24h"
-        ];
-        dhcp-option = [
-          "vl10.homelab,option:router,${
-            (builtins.head config.networking.interfaces."vl10.homelab".ipv4.addresses).address
-          }"
-          "vl10.homelab,option:dns-server,${
-            (builtins.head config.networking.interfaces."vl10.homelab".ipv4.addresses).address
-          }"
-          "wireguard,option:router,${
-            builtins.head (
-              lib.strings.splitString "/" (builtins.head (config.networking.wireguard.interfaces."wireguard".ips))
-            )
-          }"
-          "wireguard,option:dns-server,${
-            builtins.head (
-              lib.strings.splitString "/" (builtins.head (config.networking.wireguard.interfaces."wireguard".ips))
-            )
-          }"
-        ];
-        cache-size = 1000;
-        domain-needed = true;
-        bogus-priv = true;
-        no-hosts = true;
-        no-resolv = true;
-        no-poll = true;
-        server = [
-          "1.1.1.1"
-          "8.8.8.8"
-        ];
+        server.port = 25600;
+        servlet.session.timeout = "7d";
+        delete-empty-collections = true;
+        delete-empty-read-lists = true;
       };
     };
 
@@ -385,11 +299,11 @@
       "users" = { };
     };
     # --- users
-    users."router" = {
+    users."media" = {
       isNormalUser = true;
-      description = "Router management user";
+      description = "Media management user";
       initialPassword = null;
-      home = "/home/users/router";
+      home = "/home/users/media";
       uid = 1000;
       group = "users";
       useDefaultShell = true;

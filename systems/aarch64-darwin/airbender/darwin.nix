@@ -143,7 +143,7 @@
       builtins.concatLists [
         (organize "Artificial Intelligence" [
           "claude"
-          "ollama"
+          "ollama-app"
           "lm-studio"
         ])
         (organize "Communication" [
@@ -161,8 +161,8 @@
           "steam"
         ])
         (organize "Hacking" [
-          "burp-suite"
-          "cyberduck"
+          "burp-suite-professional"
+          "firefox"
           "obsidian"
         ])
         (organize "HomeLab" [
