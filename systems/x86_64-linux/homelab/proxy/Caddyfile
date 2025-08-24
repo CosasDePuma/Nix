@@ -20,6 +20,12 @@
         >x-poweredby "Pumas, unicorns and rainbows </3"
     }
 }
+(logs) {
+    log {
+        output file /var/log/caddy/{args[0]}.log
+        format console
+    }
+}
 (security-headers) {
     header {
         >cross-origin-embedder-policy "require-corp"
@@ -51,17 +57,55 @@
 }
 
 {
+    admin off
     auto_https disable_redirects
 }
 
 books.kike.wtf:443 {
     import defaults
+    import logs komga
     reverse_proxy http://10.0.10.3:25600
     request_body {
         max_size 100MB
     }
-    log {
-        output file /var/log/caddy/komga.log
-        format console
+}
+magnet.kike.wtf:443 {
+    import defaults
+    import logs deluge
+    reverse_proxy http://10.0.10.3:8112
+}
+requester.kike.wtf:443 {
+    import defaults
+    import logs arr
+
+    @movies path_regexp /movies(/.*)?$
+    handle @movies {
+        reverse_proxy http://10.0.10.3:7878
     }
+
+    @series path_regexp /series(/.*)?$
+    handle @series {
+        reverse_proxy http://10.0.10.3:8989
+    }
+
+    @torrents path_regexp ^/torrents(/.*)?$
+    handle @torrents {
+        reverse_proxy http://10.0.10.3:9696
+    }
+
+    handle {
+        abort
+    }
+}
+streaming.kike.wtf:443 {
+    import defaults
+    import logs jellyfin
+    reverse_proxy http://10.0.10.3:8096
+    request_body {
+        max_size 100MB
+    }
+}
+
+:443 {
+    abort
 }

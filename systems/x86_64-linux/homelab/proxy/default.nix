@@ -136,7 +136,7 @@
       experimental-features = nix-command flakes
     '';
     gc = {
-      automatic = true;
+      automatic = false; # FIXME: This is breaking the machines!
       dates = "weekly";
       options = "--delete-older-than 7d";
       persistent = true;

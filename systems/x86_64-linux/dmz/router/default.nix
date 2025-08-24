@@ -161,6 +161,14 @@
                 name = "pumita-tv";
                 publicKey = "gL2M1YR+FjO9Wq5DjIBcBOtcxw/eyvo6HGv17Q43o2g=";
               }
+              {
+                name = "family-tv";
+                publicKey = "ByqsQxP2YMKzYob5S0Uq9m8+jORNxcaZAApcSc5oQy0=";
+              }
+              {
+                name = "family-david";
+                publicKey = "ojqm9Pk4bWfAkoIwvEXRKf+bmxrra1C81HHxltsUhEU=";
+              }
             ];
           in
           lib.lists.imap1 (i: user: {

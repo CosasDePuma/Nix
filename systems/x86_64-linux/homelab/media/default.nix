@@ -23,6 +23,10 @@
 
   environment.systemPackages = with pkgs; [
     cifs-utils
+    mediainfo
+    jellyfin-web
+    jellyfin-ffmpeg
+    wget
   ];
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -130,7 +134,14 @@
     # --- firewall
     firewall = {
       enable = true;
-      allowedTCPPorts = [ 64022 config.services.komga.settings.server.port ];
+      allowedTCPPorts = [
+        8096
+        64022
+        config.services.deluge.web.port
+        config.services.komga.settings.server.port
+        config.services.prowlarr.settings.server.port
+        config.services.sonarr.settings.server.port
+      ];
     };
   };
 
@@ -177,6 +188,27 @@
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
   services = {
+
+    # ┌──────────────────────────────────────┐
+    # |                Deluge                │
+    # └──────────────────────────────────────┘
+
+    deluge = {
+      enable = true;
+      user = "root";
+      web = {
+        enable = true;
+        port = 8112;
+      };
+    };
+
+    # ┌──────────────────────────────────────┐
+    # │               Jellyfin               │
+    # └──────────────────────────────────────┘
+
+    jellyfin = {
+      enable = true;
+    };
 
     # ┌──────────────────────────────────────┐
     # │                 Komga                │
@@ -263,6 +295,44 @@
         );
       };
     };
+
+    # ┌──────────────────────────────────────┐
+    # │               Prowlarr               │
+    # └──────────────────────────────────────┘
+
+    prowlarr = {
+      enable = true;
+      settings.server = {
+        urlbase = "/torrents";
+        port = 9696;
+      };
+    };
+
+    # ┌──────────────────────────────────────┐
+    # │                Radarr                │
+    # └──────────────────────────────────────┘
+
+    radarr = {
+      enable = true;
+      user = "root";
+      settings.server = {
+        urlbase = "/movies";
+        port = 7878;
+      };
+    };
+
+    # ┌──────────────────────────────────────┐
+    # │                Sonarr                │
+    # └──────────────────────────────────────┘
+
+    sonarr = {
+      enable = true;
+      user = "root";
+      settings.server = {
+        urlbase = "/series";
+        port = 8989;
+      };
+    };
   };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -273,7 +343,7 @@
     inherit stateVersion;
 
     autoUpgrade = {
-      enable = true;
+      enable = false; # TODO: Check why this is not working well!
       flake = "github:cosasdepuma/nix";
       dates = "daily";
       operation = "switch";
