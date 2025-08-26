@@ -65,6 +65,7 @@
       # +--------------- nixos systems ----------------+
 
       nixosConfigurations = {
+        automation = nixosConfiguration ./systems/x86_64-linux/homelab/automation;
         media = nixosConfiguration ./systems/x86_64-linux/homelab/media;
         proxy = nixosConfiguration ./systems/x86_64-linux/homelab/proxy;
         router = nixosConfiguration ./systems/x86_64-linux/dmz/router;
