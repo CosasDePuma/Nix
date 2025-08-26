@@ -23,8 +23,6 @@
       "net.ipv6.conf.eth0.accept_ra" = 2;
       "net.ipv6.conf.eth0.autoconf" = 1;
     };
-    # --- nix store
-    readOnlyNixStore = true;
   };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -126,6 +124,12 @@
           prefixLength = 24;
         }
       ];
+      "vl20.gaming".ipv4.addresses = [
+        {
+          address = "10.0.20.254";
+          prefixLength = 24;
+        }
+      ];
     };
     # --- gateway
     defaultGateway = {
@@ -136,6 +140,10 @@
     vlans = {
       "vl10.homelab" = {
         id = 10;
+        interface = "eth1";
+      };
+      "vl20.gaming" = {
+        id = 20;
         interface = "eth1";
       };
     };
@@ -168,6 +176,10 @@
               {
                 name = "family-david";
                 publicKey = "ojqm9Pk4bWfAkoIwvEXRKf+bmxrra1C81HHxltsUhEU=";
+              }
+              {
+                name = "friends-carolina";
+                publicKey = "cdTNp+I3u7jpKWPrjg1QsfzQhLAdPZmJMxd1IXd9pFY=";
               }
             ];
           in
@@ -250,10 +262,12 @@
         bind-dynamic = true;
         interface = [
           "vl10.homelab"
+          "vl20.gaming"
           "wireguard"
         ];
         dhcp-range = [
           "vl10.homelab,10.0.10.100,10.0.10.200,255.255.255.0,24h"
+          "vl20.gaming,10.0.20.100,10.0.20.200,255.255.255.0,24h"
         ];
         dhcp-option = [
           "vl10.homelab,option:router,${
@@ -261,6 +275,12 @@
           }"
           "vl10.homelab,option:dns-server,${
             (builtins.head config.networking.interfaces."vl10.homelab".ipv4.addresses).address
+          }"
+          "vl20.gaming,option:router,${
+            (builtins.head config.networking.interfaces."vl20.gaming".ipv4.addresses).address
+          }"
+          "vl20.gaming,option:dns-server,${
+            (builtins.head config.networking.interfaces."vl20.gaming".ipv4.addresses).address
           }"
           "wireguard,option:router,${
             builtins.head (

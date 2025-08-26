@@ -10,12 +10,7 @@
   # ┃                   Boot                    ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-  boot = {
-    # --- loader
-    loader.grub.enable = true;
-    # --- nix store
-    readOnlyNixStore = true;
-  };
+  boot.loader.grub.enable = true;
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                Environment                ┃
@@ -137,10 +132,15 @@
       allowedTCPPorts = [
         8096
         64022
-        config.services.deluge.web.port
         config.services.komga.settings.server.port
         config.services.prowlarr.settings.server.port
+        config.services.qbittorrent.webuiPort
+        config.services.qbittorrent.torrentingPort
+        config.services.radarr.settings.server.port
         config.services.sonarr.settings.server.port
+      ];
+      allowedUDPPorts = [
+        config.services.qbittorrent.torrentingPort
       ];
     };
   };
@@ -188,19 +188,6 @@
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
   services = {
-
-    # ┌──────────────────────────────────────┐
-    # |                Deluge                │
-    # └──────────────────────────────────────┘
-
-    deluge = {
-      enable = true;
-      user = "root";
-      web = {
-        enable = true;
-        port = 8112;
-      };
-    };
 
     # ┌──────────────────────────────────────┐
     # │               Jellyfin               │
@@ -309,6 +296,27 @@
     };
 
     # ┌──────────────────────────────────────┐
+    # |              qBitTorrent             │
+    # └──────────────────────────────────────┘
+
+    qbittorrent = {
+      enable = true;
+      user = "root";
+      webuiPort = 8080;
+      torrentingPort = 61640;
+      serverConfig = {
+        LegalNotice.Accepted = true;
+        Preferences = {
+          WebUI = {
+            Username = "user";
+            Password_PBKDF2 = "@ByteArray(+rg1RhvMUar4o8t10fvXgw==:EezNM70+FoG2R88DGjP9STsVT4LrjoySmyRmS6W2sWJRtQvHsE9sydYMJwSeQ+rs7HWwsg5+syC2KcfzzB0i+Q==)";
+          };
+          General.Locale = "en";
+        };
+      };
+    };
+
+    # ┌──────────────────────────────────────┐
     # │                Radarr                │
     # └──────────────────────────────────────┘
 
@@ -343,7 +351,7 @@
     inherit stateVersion;
 
     autoUpgrade = {
-      enable = false; # TODO: Check why this is not working well!
+      enable = true;
       flake = "github:cosasdepuma/nix";
       dates = "daily";
       operation = "switch";

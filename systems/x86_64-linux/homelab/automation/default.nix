@@ -17,9 +17,40 @@
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
   environment.systemPackages = with pkgs; [
-    curl
-    openssl
+    cifs-utils
+    rsync
   ];
+
+  # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  # ┃                FileSystems                ┃
+  # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  fileSystems = {
+    "/mnt/backups" = {
+      device = "//192.168.1.3/backups";
+      fsType = "cifs";
+      options = [
+        "credentials=${config.age.secrets."samba.creds".path}"
+        "noauto"
+        "x-systemd.automount"
+        "x-systemd.device-timeout=5s"
+        "x-systemd.idle-timeout=60"
+        "x-systemd.mount-timeout=5s"
+      ];
+    };
+    "/mnt/media" = {
+      device = "//192.168.1.3/media";
+      fsType = "cifs";
+      options = [
+        "credentials=${config.age.secrets."samba.creds".path}"
+        "noauto"
+        "x-systemd.automount"
+        "x-systemd.device-timeout=5s"
+        "x-systemd.idle-timeout=60"
+        "x-systemd.mount-timeout=5s"
+      ];
+    };
+  };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                 Hardware                  ┃
@@ -34,7 +65,7 @@
   age = {
     identityPaths = builtins.map (key: key.path) config.services.openssh.hostKeys;
     secrets = {
-      "acme.env".file = ./acme.env.age;
+      "samba.creds".file = ./samba.creds.age;
     };
   };
 
@@ -70,15 +101,7 @@
         };
       };
     };
-    nodev = {
-      "/tmp" = {
-        fsType = "tmpfs";
-        mountOptions = [
-          "noexec"
-          "size=1G"
-        ];
-      };
-    };
+    nodev."/tmp".fsType = "tmpfs";
   };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -87,7 +110,7 @@
 
   networking = {
     # --- host
-    hostName = "proxy";
+    hostName = "automation";
     hostId = builtins.substring 0 8 (builtins.hashString "md5" config.networking.hostName);
     # --- interfaces
     usePredictableInterfaceNames = false;
@@ -97,7 +120,7 @@
         useDHCP = false;
         ipv4.addresses = [
           {
-            address = "10.0.10.1";
+            address = "10.0.10.4";
             prefixLength = 24;
           }
         ];
@@ -116,8 +139,8 @@
     firewall = {
       enable = true;
       allowedTCPPorts = [
-        443
-        64022
+        5678    # n8n
+        64022   # SSH
       ];
     };
   };
@@ -143,26 +166,13 @@
   # ┃                  Nixpkgs                  ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-  nixpkgs.config.allowUnfree = false;
+  nixpkgs.config.allowUnfree = true;
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                  Security                 ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
   security = {
-    acme = {
-      acceptTerms = true;
-      certs."kike.wtf" = {
-        domain = "kike.wtf";
-        dnsPropagationCheck = true;
-        dnsProvider = "cloudflare";
-        dnsResolver = "1.1.1.1:53";
-        email = "acme@kike.wtf";
-        environmentFile = config.age.secrets."acme.env".path;
-        extraDomainNames = [ "*.kike.wtf" ];
-        group = config.services.caddy.group;
-      };
-    };
     pam = {
       sshAgentAuth.enable = true;
       services."sudo".sshAgentAuth = true;
@@ -180,14 +190,12 @@
   services = {
 
     # ┌──────────────────────────────────────┐
-    # │                 Caddy                │
+    # |                 n8n                  │
     # └──────────────────────────────────────┘
 
-    caddy = {
+    n8n = {
       enable = true;
-      enableReload = true;
-      logFormat = "level INFO";
-      configFile = ./Caddyfile;
+      webhookUrl = "https://automate.kike.wtf";
     };
 
     # ┌──────────────────────────────────────┐
@@ -297,11 +305,11 @@
       "users" = { };
     };
     # --- users
-    users."proxy" = {
+    users."automation" = {
       isNormalUser = true;
-      description = "Proxy management user";
+      description = "Automation management user";
       initialPassword = null;
-      home = "/home/users/proxy";
+      home = "/home/users/automation";
       uid = 1000;
       group = "users";
       useDefaultShell = true;
