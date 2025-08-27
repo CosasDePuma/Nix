@@ -18,33 +18,26 @@
 
   environment.systemPackages = with pkgs; [
     cifs-utils
-    mediainfo
-    jellyfin-web
-    jellyfin-ffmpeg
-    wget
   ];
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                FileSystems                ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-  fileSystems = builtins.listToAttrs (
-    builtins.map (share: {
-      name = "/mnt/${share}";
-      value = {
-        device = "//192.168.1.3/${share}";
-        fsType = "cifs";
-        options = [
-          "credentials=${config.age.secrets."samba.creds".path}"
-          "noauto"
-          "x-systemd.automount"
-          "x-systemd.device-timeout=5s"
-          "x-systemd.idle-timeout=60"
-          "x-systemd.mount-timeout=5s"
-        ];
-      };
-    }) [ "backups" "media" ]
-  );
+  fileSystems = {
+    "/mnt/backups" = {
+      device = "//192.168.1.3/backups";
+      fsType = "cifs";
+      options = [
+        "credentials=${config.age.secrets."samba.creds".path}"
+        "noauto"
+        "x-systemd.automount"
+        "x-systemd.device-timeout=5s"
+        "x-systemd.idle-timeout=60"
+        "x-systemd.mount-timeout=5s"
+      ];
+    };
+  };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                 Hardware                  ┃
@@ -104,7 +97,7 @@
 
   networking = {
     # --- host
-    hostName = "media";
+    hostName = "wow";
     hostId = builtins.substring 0 8 (builtins.hashString "md5" config.networking.hostName);
     # --- interfaces
     usePredictableInterfaceNames = false;
@@ -114,7 +107,7 @@
         useDHCP = false;
         ipv4.addresses = [
           {
-            address = "10.0.10.3";
+            address = "10.0.20.2";
             prefixLength = 24;
           }
         ];
@@ -123,27 +116,17 @@
     # --- gateway
     defaultGateway = {
       interface = "eth0";
-      address = "10.0.10.254";
+      address = "10.0.20.254";
     };
     # --- dns
     domain = "home";
     search = [ "home" ];
-    nameservers = [ "10.0.10.254" ];
+    nameservers = [ "10.0.20.254" ];
     # --- firewall
     firewall = {
       enable = true;
       allowedTCPPorts = [
-        8096
-        64022
-        config.services.komga.settings.server.port
-        config.services.prowlarr.settings.server.port
-        config.services.qbittorrent.webuiPort
-        config.services.qbittorrent.torrentingPort
-        config.services.radarr.settings.server.port
-        config.services.sonarr.settings.server.port
-      ];
-      allowedUDPPorts = [
-        config.services.qbittorrent.torrentingPort
+        64022   # SSH
       ];
     };
   };
@@ -169,7 +152,7 @@
   # ┃                  Nixpkgs                  ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-  nixpkgs.config.allowUnfree = false;
+  nixpkgs.config.allowUnfree = true;
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                  Security                 ┃
@@ -191,52 +174,6 @@
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
   services = {
-
-    # ┌──────────────────────────────────────┐
-    # │                 Borg                 │
-    # └──────────────────────────────────────┘
-
-    borgbackup.jobs."backup" = {
-      startAt = "daily";
-      encryption.mode = "none";
-      compression = "auto,zstd";
-      paths = [
-        "/var/lib/jellyfi/config"
-        "/var/lib/jellyfi/data"
-        "/var/lib/jellyfi/metadata"
-        "/var/lib/jellyfi/plugins"
-        "/var/lib/jellyfi/root"
-        "/var/lib/komga/database.sqlite"
-      ];
-      prune.keep = {
-        daily = 1;
-        weekly = 1;
-        monthly = 1;
-      };
-      repo = "/mnt/backups/homelab/${config.networking.hostName}";
-    };
-
-    # ┌──────────────────────────────────────┐
-    # │               Jellyfin               │
-    # └──────────────────────────────────────┘
-
-    jellyfin = {
-      enable = true;
-    };
-
-    # ┌──────────────────────────────────────┐
-    # │                 Komga                │
-    # └──────────────────────────────────────┘
-
-    komga = {
-      enable = true;
-      settings = {
-        server.port = 25600;
-        servlet.session.timeout = "7d";
-        delete-empty-collections = true;
-        delete-empty-read-lists = true;
-      };
-    };
 
     # ┌──────────────────────────────────────┐
     # │                OpenSSH               │
@@ -309,65 +246,6 @@
         );
       };
     };
-
-    # ┌──────────────────────────────────────┐
-    # │               Prowlarr               │
-    # └──────────────────────────────────────┘
-
-    prowlarr = {
-      enable = true;
-      settings.server = {
-        urlbase = "/torrents";
-        port = 9696;
-      };
-    };
-
-    # ┌──────────────────────────────────────┐
-    # |              qBitTorrent             │
-    # └──────────────────────────────────────┘
-
-    qbittorrent = {
-      enable = true;
-      user = "root";
-      webuiPort = 8080;
-      torrentingPort = 61640;
-      serverConfig = {
-        LegalNotice.Accepted = true;
-        Preferences = {
-          WebUI = {
-            Username = "user";
-            Password_PBKDF2 = "@ByteArray(+rg1RhvMUar4o8t10fvXgw==:EezNM70+FoG2R88DGjP9STsVT4LrjoySmyRmS6W2sWJRtQvHsE9sydYMJwSeQ+rs7HWwsg5+syC2KcfzzB0i+Q==)";
-          };
-          General.Locale = "en";
-        };
-      };
-    };
-
-    # ┌──────────────────────────────────────┐
-    # │                Radarr                │
-    # └──────────────────────────────────────┘
-
-    radarr = {
-      enable = true;
-      user = "root";
-      settings.server = {
-        urlbase = "/movies";
-        port = 7878;
-      };
-    };
-
-    # ┌──────────────────────────────────────┐
-    # │                Sonarr                │
-    # └──────────────────────────────────────┘
-
-    sonarr = {
-      enable = true;
-      user = "root";
-      settings.server = {
-        urlbase = "/series";
-        port = 8989;
-      };
-    };
   };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -384,6 +262,18 @@
       operation = "switch";
       persistent = true;
     };
+
+    activationScripts = {
+      "oci-containers-networks".text =
+        let
+          inherit (config.virtualisation.oci-containers) backend;
+        in ''
+          #!${pkgs.runtimeShell}
+          # Create the OCI containers networks
+          ${pkgs."${backend}"}/bin/${backend} network inspect public >/dev/null || \
+          ${pkgs."${backend}"}/bin/${backend} network create --subnet=10.200.0.0/24 public
+        '';
+    };
   };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -393,7 +283,7 @@
   time.timeZone = "Europe/Madrid";
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  # ┃                  Users                    ┃
+  # ┃                   Users                   ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
   users = {
@@ -404,19 +294,135 @@
       "users" = { };
     };
     # --- users
-    users."media" = {
+    users."wow" = {
       isNormalUser = true;
-      description = "Media management user";
+      description = "World of Warcraft management user";
       initialPassword = null;
-      home = "/home/users/media";
+      home = "/home/users/wow";
       uid = 1000;
       group = "users";
       useDefaultShell = true;
       extraGroups = [
-        "wheel"
+        "docker"
         "sshuser"
+        "wheel"
       ];
       openssh.authorizedKeys.keys = lib.strings.splitString "\n" (builtins.readFile ./authorized_keys);
+    };
+  };
+
+  # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  # ┃               Virtualisation              ┃
+  # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  virtualisation = {
+    docker = {
+      enable = true;
+      autoPrune = {
+        enable = true;
+        dates = "daily";
+        persistent = true;
+        flags = [ "--all" "--force" "--volumes" ];
+      };
+    };
+
+    oci-containers = {
+      backend = "docker";
+      containers = {
+      #  "database" = {
+      #    hostname = "database";
+      #    image = "mysql:8.4";
+      #    networks = [ "public" ];
+      #    environment = {
+      #      MYSQL_ROOT_PASSWORD = "password";
+      #    };
+      #    volumes = [
+      #      "database:/var/lib/mysql"
+      #    ];
+      #  };
+      #  "client-azerothcore" = {
+      #    hostname = "client-azerothcore";
+      #    image = "acore/ac-wotlk-client-data:master";
+      #    volumes = [
+      #      "azerothcore-data:/azerothcore/env/dist/data"
+      #    ];
+      #  };
+      #  "database-azerothcore" = {
+      #    hostname = "database-azerothcore";
+      #    image = "acore/ac-wotlk-db-import:master";
+      #    networks = [ "public" ];
+      #    environment = {
+      #      AC_DATA_DIR = "/azerothcore/env/dist/data";
+      #      AC_LOGS_DIR = "/azerothcore/env/dist/logs";
+      #      AC_LOGIN_DATABASE_INFO = "database;3306;root;password;acore_auth";
+      #      AC_WORLD_DATABASE_INFO = "database;3306;root;password;acore_world";
+      #      AC_CHARACTER_DATABASE_INFO = "database;3306;root;password;acore_characters";
+      #    };
+      #    volumes = [
+      #      "azerothcore-env:/azerothcore/env/dist/etc"
+      #      "azerothcore-logs:/azerothcore/env/dist/logs:delegated"
+      #    ];
+      #    dependsOn = [
+      #      "database"
+      #    ];
+      #  };
+      #  "auth-azerothcore" = {
+      #    hostname = "auth-azerothcore";
+      #    image = "acore/ac-wotlk-authserver:master";
+      #    networks = [ "public" ];
+      #    ports = [
+      #      "0.0.0.0:3724:3724"
+      #    ];
+      #    environment = {
+      #      USER_CONF_PATH = "/azerothcore/apps/docker/config-docker.sh";
+      #      DATAPATH = "/azerothcore/env/dist/data";
+      #      CTYPE = "RelWithDebInfo";
+      #      CSCRIPTS = "static";
+      #      AC_CCACHE = "true";
+      #      AC_DATA_DIR = "/azerothcore/env/dist/data";
+      #      AC_LOGS_DIR = "/azerothcore/env/dist/logs";
+      #      AC_TEMP_DIR = "/azerothcore/env/dist/temp";
+      #      AC_LOGIN_DATABASE_INFO = "database;3306;root;password;acore_auth";
+      #    };
+      #    volumes = [
+      #      "azerothcore-env:/azerothcore/env/dist/etc"
+      #      "azerothcore-logs:/azerothcore/env/dist/logs:delegated"
+      #    ];
+      #    dependsOn = [
+      #      "database"
+      #    ];
+      #  };
+      #  "world-azerothcore" = {
+      #    hostname = "world-azerothcore";
+      #    image = "acore/ac-wotlk-worldserver:master";
+      #    networks = [ "public" ];
+      #    ports = [
+      #      "0.0.0.0:7878:7878"
+      #      "0.0.0.0:8085:8085"
+      #    ];
+      #    environment = {
+      #      USER_CONF_PATH = "/azerothcore/apps/docker/config-docker.sh";
+      #      DATAPATH = "/azerothcore/env/dist/data";
+      #      CTYPE = "RelWithDebInfo";
+      #      CSCRIPTS = "static";
+      #      AC_CCACHE = "true";
+      #      AC_DATA_DIR = "/azerothcore/env/dist/data";
+      #      AC_LOGS_DIR = "/azerothcore/env/dist/logs";
+      #      AC_LOGIN_DATABASE_INFO = "database;3306;root;password;acore_auth";
+      #      AC_WORLD_DATABASE_INFO = "database;3306;root;password;acore_world";
+      #      AC_CHARACTER_DATABASE_INFO = "database;3306;root;password;acore_characters";
+      #    };
+      #    volumes = [
+      #      "azerothcore-env:/azerothcore/env/dist/etc"
+      #      "azerothcore-logs:/azerothcore/env/dist/logs:delegated"
+      #      "azerothcore-data:/azerothcore/env/dist/data:ro"
+      #    ];
+      #    dependsOn = [
+      #      "client-azerothcore"
+      #      "database"
+      #    ];
+      #  };
+      };
     };
   };
 }

@@ -65,10 +65,13 @@
       # +--------------- nixos systems ----------------+
 
       nixosConfigurations = {
+        router = nixosConfiguration ./systems/x86_64-linux/dmz/router;
+        # --- | Homelab
         automation = nixosConfiguration ./systems/x86_64-linux/homelab/automation;
         media = nixosConfiguration ./systems/x86_64-linux/homelab/media;
         proxy = nixosConfiguration ./systems/x86_64-linux/homelab/proxy;
-        router = nixosConfiguration ./systems/x86_64-linux/dmz/router;
+        # --- | Gaming
+        wow = nixosConfiguration ./systems/x86_64-linux/gaming/wow;
       };
 
       # +----------------- templates ------------------+

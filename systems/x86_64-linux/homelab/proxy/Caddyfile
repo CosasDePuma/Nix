@@ -57,10 +57,14 @@
 }
 
 {
-    admin off
     auto_https disable_redirects
 }
 
+automate.kike.wtf:443 {
+    import defaults
+    import logs n8n
+    reverse_proxy http://10.0.10.4:5678
+}
 books.kike.wtf:443 {
     import defaults
     import logs komga
