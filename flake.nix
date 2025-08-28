@@ -59,8 +59,9 @@
       # +--------------- nixos systems ----------------+
 
       nixosConfigurations = {
-        router = nixosConfiguration ./systems/x86_64-linux/dmz/router;
         mobile = nixosConfiguration ./systems/x86_64-linux/redteam/03.mobile;
+        report = nixosConfiguration ./systems/x86_64-linux/redteam/01.report;
+        router = nixosConfiguration ./systems/x86_64-linux/dmz/router;
         vulnerability = nixosConfiguration ./systems/x86_64-linux/redteam/02.vulnerability;
       };
 

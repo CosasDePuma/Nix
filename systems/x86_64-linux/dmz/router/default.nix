@@ -336,6 +336,7 @@
         |       *** Unauthorized access will be prosecuted ***       |
         |                                                            |
         ==============================================================
+
       '';
       settings = {
         AuthorizedPrincipalsFile = "none";
@@ -419,7 +420,7 @@
     users."router" = {
       isNormalUser = true;
       description = "Router management user";
-      initialPassword = "router.audea.corp";
+      initialPassword = null;
       home = "/home/users/router";
       uid = 1000;
       group = "users";
