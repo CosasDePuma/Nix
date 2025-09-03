@@ -126,7 +126,7 @@
     firewall = {
       enable = true;
       allowedTCPPorts = [
-        64022   # SSH
+        64022 # SSH
       ];
     };
   };
@@ -267,19 +267,19 @@
       "oci-containers-networks".text =
         let
           inherit (config.virtualisation.oci-containers) backend;
-        in ''
+        in
+        ''
           #!${pkgs.runtimeShell}
           # Create the OCI containers networks
           ${pkgs."${backend}"}/bin/${backend} network inspect public 2>&1 >/dev/null || \
           ${pkgs."${backend}"}/bin/${backend} network create --subnet=10.200.0.0/24 public
         '';
-      "habbo-repository".text =
-        ''
-          #!${pkgs.runtimeShell}
-          # Create the OCI containers networks
-          ${pkgs.coreutils}/bin/test -d /srv/havana || \
-            ${pkgs.git}/bin/git clone --depth=1 https://github.com/habboservers/docker-habbo-server /srv
-        '';
+      "habbo-repository".text = ''
+        #!${pkgs.runtimeShell}
+        # Create the OCI containers networks
+        ${pkgs.coreutils}/bin/test -d /srv/havana || \
+          ${pkgs.git}/bin/git clone --depth=1 https://github.com/habboservers/docker-habbo-server /srv
+      '';
     };
   };
 
@@ -329,107 +329,111 @@
         enable = true;
         dates = "daily";
         persistent = true;
-        flags = [ "--all" "--force" "--volumes" ];
+        flags = [
+          "--all"
+          "--force"
+          "--volumes"
+        ];
       };
     };
 
     oci-containers = {
       backend = "docker";
       containers = {
-      #  "database" = {
-      #    hostname = "database";
-      #    image = "mysql:8.4";
-      #    networks = [ "public" ];
-      #    environment = {
-      #      MYSQL_ROOT_PASSWORD = "password";
-      #    };
-      #    volumes = [
-      #      "database:/var/lib/mysql"
-      #    ];
-      #  };
-      #  "client-azerothcore" = {
-      #    hostname = "client-azerothcore";
-      #    image = "acore/ac-wotlk-client-data:master";
-      #    volumes = [
-      #      "azerothcore-data:/azerothcore/env/dist/data"
-      #    ];
-      #  };
-      #  "database-azerothcore" = {
-      #    hostname = "database-azerothcore";
-      #    image = "acore/ac-wotlk-db-import:master";
-      #    networks = [ "public" ];
-      #    environment = {
-      #      AC_DATA_DIR = "/azerothcore/env/dist/data";
-      #      AC_LOGS_DIR = "/azerothcore/env/dist/logs";
-      #      AC_LOGIN_DATABASE_INFO = "database;3306;root;password;acore_auth";
-      #      AC_WORLD_DATABASE_INFO = "database;3306;root;password;acore_world";
-      #      AC_CHARACTER_DATABASE_INFO = "database;3306;root;password;acore_characters";
-      #    };
-      #    volumes = [
-      #      "azerothcore-env:/azerothcore/env/dist/etc"
-      #      "azerothcore-logs:/azerothcore/env/dist/logs:delegated"
-      #    ];
-      #    dependsOn = [
-      #      "database"
-      #    ];
-      #  };
-      #  "auth-azerothcore" = {
-      #    hostname = "auth-azerothcore";
-      #    image = "acore/ac-wotlk-authserver:master";
-      #    networks = [ "public" ];
-      #    ports = [
-      #      "0.0.0.0:3724:3724"
-      #    ];
-      #    environment = {
-      #      USER_CONF_PATH = "/azerothcore/apps/docker/config-docker.sh";
-      #      DATAPATH = "/azerothcore/env/dist/data";
-      #      CTYPE = "RelWithDebInfo";
-      #      CSCRIPTS = "static";
-      #      AC_CCACHE = "true";
-      #      AC_DATA_DIR = "/azerothcore/env/dist/data";
-      #      AC_LOGS_DIR = "/azerothcore/env/dist/logs";
-      #      AC_TEMP_DIR = "/azerothcore/env/dist/temp";
-      #      AC_LOGIN_DATABASE_INFO = "database;3306;root;password;acore_auth";
-      #    };
-      #    volumes = [
-      #      "azerothcore-env:/azerothcore/env/dist/etc"
-      #      "azerothcore-logs:/azerothcore/env/dist/logs:delegated"
-      #    ];
-      #    dependsOn = [
-      #      "database"
-      #    ];
-      #  };
-      #  "world-azerothcore" = {
-      #    hostname = "world-azerothcore";
-      #    image = "acore/ac-wotlk-worldserver:master";
-      #    networks = [ "public" ];
-      #    ports = [
-      #      "0.0.0.0:7878:7878"
-      #      "0.0.0.0:8085:8085"
-      #    ];
-      #    environment = {
-      #      USER_CONF_PATH = "/azerothcore/apps/docker/config-docker.sh";
-      #      DATAPATH = "/azerothcore/env/dist/data";
-      #      CTYPE = "RelWithDebInfo";
-      #      CSCRIPTS = "static";
-      #      AC_CCACHE = "true";
-      #      AC_DATA_DIR = "/azerothcore/env/dist/data";
-      #      AC_LOGS_DIR = "/azerothcore/env/dist/logs";
-      #      AC_LOGIN_DATABASE_INFO = "database;3306;root;password;acore_auth";
-      #      AC_WORLD_DATABASE_INFO = "database;3306;root;password;acore_world";
-      #      AC_CHARACTER_DATABASE_INFO = "database;3306;root;password;acore_characters";
-      #    };
-      #    volumes = [
-      #      "azerothcore-env:/azerothcore/env/dist/etc"
-      #      "azerothcore-logs:/azerothcore/env/dist/logs:delegated"
-      #      "azerothcore-data:/azerothcore/env/dist/data:ro"
-      #    ];
-      #    dependsOn = [
-      #      "client-azerothcore"
-      #      "database"
-      #    ];
-      #  };
-      #};
+        #  "database" = {
+        #    hostname = "database";
+        #    image = "mysql:8.4";
+        #    networks = [ "public" ];
+        #    environment = {
+        #      MYSQL_ROOT_PASSWORD = "password";
+        #    };
+        #    volumes = [
+        #      "database:/var/lib/mysql"
+        #    ];
+        #  };
+        #  "client-azerothcore" = {
+        #    hostname = "client-azerothcore";
+        #    image = "acore/ac-wotlk-client-data:master";
+        #    volumes = [
+        #      "azerothcore-data:/azerothcore/env/dist/data"
+        #    ];
+        #  };
+        #  "database-azerothcore" = {
+        #    hostname = "database-azerothcore";
+        #    image = "acore/ac-wotlk-db-import:master";
+        #    networks = [ "public" ];
+        #    environment = {
+        #      AC_DATA_DIR = "/azerothcore/env/dist/data";
+        #      AC_LOGS_DIR = "/azerothcore/env/dist/logs";
+        #      AC_LOGIN_DATABASE_INFO = "database;3306;root;password;acore_auth";
+        #      AC_WORLD_DATABASE_INFO = "database;3306;root;password;acore_world";
+        #      AC_CHARACTER_DATABASE_INFO = "database;3306;root;password;acore_characters";
+        #    };
+        #    volumes = [
+        #      "azerothcore-env:/azerothcore/env/dist/etc"
+        #      "azerothcore-logs:/azerothcore/env/dist/logs:delegated"
+        #    ];
+        #    dependsOn = [
+        #      "database"
+        #    ];
+        #  };
+        #  "auth-azerothcore" = {
+        #    hostname = "auth-azerothcore";
+        #    image = "acore/ac-wotlk-authserver:master";
+        #    networks = [ "public" ];
+        #    ports = [
+        #      "0.0.0.0:3724:3724"
+        #    ];
+        #    environment = {
+        #      USER_CONF_PATH = "/azerothcore/apps/docker/config-docker.sh";
+        #      DATAPATH = "/azerothcore/env/dist/data";
+        #      CTYPE = "RelWithDebInfo";
+        #      CSCRIPTS = "static";
+        #      AC_CCACHE = "true";
+        #      AC_DATA_DIR = "/azerothcore/env/dist/data";
+        #      AC_LOGS_DIR = "/azerothcore/env/dist/logs";
+        #      AC_TEMP_DIR = "/azerothcore/env/dist/temp";
+        #      AC_LOGIN_DATABASE_INFO = "database;3306;root;password;acore_auth";
+        #    };
+        #    volumes = [
+        #      "azerothcore-env:/azerothcore/env/dist/etc"
+        #      "azerothcore-logs:/azerothcore/env/dist/logs:delegated"
+        #    ];
+        #    dependsOn = [
+        #      "database"
+        #    ];
+        #  };
+        #  "world-azerothcore" = {
+        #    hostname = "world-azerothcore";
+        #    image = "acore/ac-wotlk-worldserver:master";
+        #    networks = [ "public" ];
+        #    ports = [
+        #      "0.0.0.0:7878:7878"
+        #      "0.0.0.0:8085:8085"
+        #    ];
+        #    environment = {
+        #      USER_CONF_PATH = "/azerothcore/apps/docker/config-docker.sh";
+        #      DATAPATH = "/azerothcore/env/dist/data";
+        #      CTYPE = "RelWithDebInfo";
+        #      CSCRIPTS = "static";
+        #      AC_CCACHE = "true";
+        #      AC_DATA_DIR = "/azerothcore/env/dist/data";
+        #      AC_LOGS_DIR = "/azerothcore/env/dist/logs";
+        #      AC_LOGIN_DATABASE_INFO = "database;3306;root;password;acore_auth";
+        #      AC_WORLD_DATABASE_INFO = "database;3306;root;password;acore_world";
+        #      AC_CHARACTER_DATABASE_INFO = "database;3306;root;password;acore_characters";
+        #    };
+        #    volumes = [
+        #      "azerothcore-env:/azerothcore/env/dist/etc"
+        #      "azerothcore-logs:/azerothcore/env/dist/logs:delegated"
+        #      "azerothcore-data:/azerothcore/env/dist/data:ro"
+        #    ];
+        #    dependsOn = [
+        #      "client-azerothcore"
+        #      "database"
+        #    ];
+        #  };
+        #};
         "habbo" = {
           hostname = "habbo";
           image = "vitorvasc/docker-habbo-server:latest";

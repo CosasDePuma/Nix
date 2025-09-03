@@ -139,8 +139,8 @@
     firewall = {
       enable = true;
       allowedTCPPorts = [
-        5678    # n8n
-        64022   # SSH
+        5678 # n8n
+        64022 # SSH
       ];
     };
   };

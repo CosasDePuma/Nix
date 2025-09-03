@@ -53,15 +53,14 @@
         value = {
           device = share;
           fsType = "cifs";
-          options =
-            [
-              "nofail"
-              "x-systemd.automount"
-              "x-systemd.mount-timeout=10m"
-            ]
-            ++ (lib.lists.optional (
-              config ? "age" && config.age.secrets ? "smb.creds"
-            ) "credentials=/run/agenix/smb.creds");
+          options = [
+            "nofail"
+            "x-systemd.automount"
+            "x-systemd.mount-timeout=10m"
+          ]
+          ++ (lib.lists.optional (
+            config ? "age" && config.age.secrets ? "smb.creds"
+          ) "credentials=/run/agenix/smb.creds");
         };
       }
     ) shares
