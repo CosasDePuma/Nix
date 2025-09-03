@@ -270,8 +270,15 @@
         in ''
           #!${pkgs.runtimeShell}
           # Create the OCI containers networks
-          ${pkgs."${backend}"}/bin/${backend} network inspect public >/dev/null || \
+          ${pkgs."${backend}"}/bin/${backend} network inspect public 2>&1 >/dev/null || \
           ${pkgs."${backend}"}/bin/${backend} network create --subnet=10.200.0.0/24 public
+        '';
+      "habbo-repository".text =
+        ''
+          #!${pkgs.runtimeShell}
+          # Create the OCI containers networks
+          ${pkgs.coreutils}/bin/test -d /srv/havana || \
+            ${pkgs.git}/bin/git clone --depth=1 https://github.com/habboservers/docker-habbo-server /srv
         '';
     };
   };
@@ -422,6 +429,45 @@
       #      "database"
       #    ];
       #  };
+      #};
+        "habbo" = {
+          hostname = "habbo";
+          image = "vitorvasc/docker-habbo-server:latest";
+          environment = {
+            HABBO_SERVER_IP_BIND = "0.0.0.0";
+            HABBO_WEBSERVER_IP_BIND = "0.0.0.0";
+            HABBO_DATABASE_HOST = "database";
+            HABBO_DATABASE_PORT = "3306";
+            HABBO_DATABASE_USERNAME = "havana";
+            HABBO_DATABASE_PASSWORD = "havana";
+            HABBO_DATABASE_NAME = "havana";
+            HABBO_WEBSERVER_STATIC_CONTENT_PATH = "https://cdn.habboservers.com/havana";
+            HABBO_WEBSERVER_SITE_PATH = "http://localhost";
+          };
+          ports = [
+            "0.0.0.0:80:80"
+            "0.0.0.0:12321:12321"
+          ];
+          networks = [ "public" ];
+          dependsOn = [
+            "database"
+          ];
+        };
+        "database" = {
+          hostname = "database";
+          image = "mariadb:10.3.9";
+          environment = {
+            MYSQL_ROOT_PASSWORD = "pass";
+            MYSQL_DATABASE = "havana";
+            MYSQL_USER = "havana";
+            MYSQL_PASSWORD = "havana";
+          };
+          networks = [ "public" ];
+          volumes = [
+            "/srv/examples/havana/havana-mariadb-example/database:/docker-entrypoint-initdb.d"
+            "habbo:/var/lib/mysql"
+          ];
+        };
       };
     };
   };

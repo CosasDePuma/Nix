@@ -17,7 +17,7 @@
         >x-clacks-overhead "GNU Pumita"
         >x-joke "What is the best thing about Switzerland? I don't know, but the flag is a big plus."
         >x-nananananananana "Batman!"
-        >x-poweredby "Pumas, unicorns and rainbows </3"
+        >x-powered-by "Pumas, unicorns and rainbows </3"
     }
 }
 (logs) {
@@ -52,6 +52,7 @@
         -via
         -x-aspnet-version
         -x-aspnetmvc-version
+        -x-redirect-by
         -x-xss-protection
     }
 }
