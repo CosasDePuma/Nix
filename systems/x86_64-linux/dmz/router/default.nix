@@ -181,6 +181,10 @@
                 name = "friends-carolina";
                 publicKey = "cdTNp+I3u7jpKWPrjg1QsfzQhLAdPZmJMxd1IXd9pFY=";
               }
+              {
+                name = "frieds-peblo-tv";
+                publicKey = "KPsh7wV9s+jZVAU4gqysErsRkHlQ0XT5gA6Y7E7OUQM=";
+              }
             ];
           in
           lib.lists.imap1 (i: user: {

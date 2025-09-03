@@ -201,11 +201,11 @@
       encryption.mode = "none";
       compression = "auto,zstd";
       paths = [
-        "/var/lib/jellyfi/config"
-        "/var/lib/jellyfi/data"
-        "/var/lib/jellyfi/metadata"
-        "/var/lib/jellyfi/plugins"
-        "/var/lib/jellyfi/root"
+        "/var/lib/jellyfin/config"
+        "/var/lib/jellyfin/data"
+        "/var/lib/jellyfin/metadata"
+        "/var/lib/jellyfin/plugins"
+        "/var/lib/jellyfin/root"
         "/var/lib/komga/database.sqlite"
       ];
       prune.keep = {
