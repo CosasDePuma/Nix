@@ -61,6 +61,11 @@
     auto_https disable_redirects
 }
 
+kike.wtf:443 {
+    import defaults
+    import logs homepage
+    reverse_proxy http://127.0.0.1:8082
+}
 automate.kike.wtf:443 {
     import defaults
     import logs n8n
@@ -110,7 +115,6 @@ streaming.kike.wtf:443 {
         max_size 100MB
     }
 }
-
 :443 {
     abort
 }

@@ -37,6 +37,10 @@ in
     nixos
     vm-homelab.proxy
   ];
+  "systems/x86_64-linux/homelab/proxy/homepage.env.age".publicKeys = [
+    nixos
+    vm-homelab.proxy
+  ];
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                   Router                  ┃
