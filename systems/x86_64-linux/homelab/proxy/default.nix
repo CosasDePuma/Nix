@@ -35,6 +35,7 @@
     identityPaths = builtins.map (key: key.path) config.services.openssh.hostKeys;
     secrets = {
       "acme.env".file = ./acme.env.age;
+      "homepage.env".file = ./homepage.env.age;
     };
   };
 
@@ -188,6 +189,26 @@
       enableReload = true;
       logFormat = "level INFO";
       configFile = ./Caddyfile;
+    };
+
+    # ┌──────────────────────────────────────┐
+    # │               Homepage               │
+    # └──────────────────────────────────────┘
+
+    homepage-dashboard = let homepageConfig = builtins.fromJSON (builtins.readFile ./homepage.json); in {
+      enable = true;
+      listenPort = 8082;
+      allowedHosts = "*";
+      environmentFile = config.age.secrets."homepage.env".path;
+      settings = {
+        color = "slate";
+        title = "Kike's Homelab";
+        description = "A collection of services running on Kike's Homelab";
+        hideVersion = true;
+        useEqualHeights = true;
+        layout = homepageConfig.layout;
+      };
+      services = homepageConfig.services;
     };
 
     # ┌──────────────────────────────────────┐

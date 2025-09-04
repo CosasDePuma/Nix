@@ -1,0 +1,192 @@
+{
+    "layout": {
+        "Media": {
+            "style": "row",
+            "columns": "2"
+        },
+        "MediaRequester": {
+            "style": "row",
+            "columns": "3",
+            "header": false
+        },
+        "Misc.": {
+            "style": "row",
+            "columns": "2"
+        },
+        "Hardware": {
+            "style": "row",
+            "columns": "2"
+        }
+    },
+    "services": [
+        {
+            "Hardware": [
+                {
+                    "Proxmox": {
+                        "icon": "sh-proxmox",
+                        "description": "VM machines management",
+                        "href": "https://192.168.1.4:8006"
+                    }
+                },
+                {
+                    "TrueNAS": {
+                        "icon": "sh-truenas-core",
+                        "description": "Storage server",
+                        "href": "https://truenas.local"
+                    }
+                }
+            ]
+        },
+        {
+            "Media": [
+                {
+                    "Jellyfin": {
+                        "icon": "sh-jellyfin",
+                        "description": "Movies, series, anime and music server",
+                        "href": "https://streaming.kike.wtf",
+                        "siteMonitor": "https://streaming.kike.wtf",
+                        "widget": {
+                            "type": "jellyfin",
+                            "url": "https://streaming.kike.wtf",
+                            "key": "{{HOMEPAGE_VAR_JELLYFIN_API}}",
+                            "fields": [
+                                "movies",
+                                "series",
+                                "episodes"
+                            ],
+                            "enableBlocks": true,
+                            "enableNowPlaying": false
+                        }
+                    }
+                },
+                {
+                    "Komga": {
+                        "icon": "sh-komga",
+                        "description": "Comic and manga server",
+                        "href": "https://books.kike.wtf",
+                        "siteMonitor": "https://books.kike.wtf",
+                        "widget": {
+                            "type": "komga",
+                            "url": "https://books.kike.wtf",
+                            "username": "{{HOMEPAGE_VAR_KOMGA_USER}}",
+                            "key": "{{HOMEPAGE_VAR_KOMGA_API}}",
+                            "fields": [
+                                "libraries",
+                                "series",
+                                "books"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "MediaRequester": [
+                {
+                    "Prowlarr": {
+                        "icon": "sh-prowlarr",
+                        "description": "Indexing torrents manager",
+                        "href": "https://requester.kike.wtf/torrents",
+                        "siteMonitor": "https://requester.kike.wtf/torrents",
+                        "widget": {
+                            "type": "prowlarr",
+                            "url": "https://requester.kike.wtf/torrents",
+                            "key": "{{HOMEPAGE_VAR_PROWLARR_API}}",
+                            "fields": [
+                                "numberOfGrabs",
+                                "numberOfFailGrabs"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Radarr": {
+                        "icon": "sh-radarr",
+                        "description": "Movie collection manager",
+                        "href": "https://requester.kike.wtf/movies",
+                        "siteMonitor": "https://requester.kike.wtf/movies",
+                        "widget": {
+                            "type": "radarr",
+                            "url": "https://requester.kike.wtf/movies",
+                            "key": "{{HOMEPAGE_VAR_RADARR_API}}",
+                            "fields": [
+                                "wanted",
+                                "queued"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Sonarr": {
+                        "icon": "sh-sonarr",
+                        "description": "TV series collection manager",
+                        "href": "https://requester.kike.wtf/series",
+                        "siteMonitor": "https://requester.kike.wtf/series",
+                        "widget": {
+                            "type": "sonarr",
+                            "url": "https://requester.kike.wtf/series",
+                            "key": "{{HOMEPAGE_VAR_SONARR_API}}",
+                            "fields": [
+                                "wanted",
+                                "queued"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Misc.": [
+                {
+                    "qBitTorrent": {
+                        "icon": "sh-qbittorrent",
+                        "description": "Torrent client",
+                        "href": "https://magnet.kike.wtf",
+                        "siteMonitor": "https://magnet.kike.wtf",
+                        "widget": {
+                            "type": "qbittorrent",
+                            "url": "https://magnet.kike.wtf",
+                            "username": "user",
+                            "password": "{{HOMEPAGE_VAR_QBITTORRENT_PASS}}",
+                            "enableLeechProgress": false,
+                            "fields": [
+                                "leech",
+                                "seed",
+                                "download"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "n8n": {
+                        "icon": "sh-n8n",
+                        "description": "Workflow automation tool",
+                        "href": "https://automate.kike.wtf",
+                        "siteMonitor": "https://automate.kike.wtf",
+                        "widget": {
+                            "type": "customapi",
+                            "url": "https://automate.kike.wtf/webhook/stats",
+                            "mappings": [
+                                {
+                                    "field": "workflows",
+                                    "label": "Workflows",
+                                    "format": "number"
+                                },
+                                {
+                                    "field": "executions",
+                                    "label": "Executions",
+                                    "format": "number"
+                                },
+                                {
+                                    "field": "errors",
+                                    "label": "Errors",
+                                    "format": "number"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
