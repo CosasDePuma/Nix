@@ -15,12 +15,19 @@
         },
         "Hardware": {
             "style": "row",
-            "columns": "2"
+            "columns": "3"
         }
     },
     "services": [
         {
             "Hardware": [
+                {
+                    "Router": {
+                        "icon": "sh-openwrt",
+                        "description": "Network management",
+                        "href": "http://192.168.1.1"
+                    }
+                },
                 {
                     "Proxmox": {
                         "icon": "sh-proxmox",
