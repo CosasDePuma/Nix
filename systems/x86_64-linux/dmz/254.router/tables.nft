@@ -8,7 +8,6 @@ table inet filter {
         iifname "lo" accept comment "Allow loopback traffic";
 
         iifname {
-            "vl10.corp",
             "vl20.redteam",
             "vl255.dmz",
             "wireguard"
@@ -23,48 +22,36 @@ table inet filter {
         type filter hook forward priority filter; policy drop;
 
         iifname {
-            "vl10.corp",
             "vl20.redteam",
             "vl255.dmz",
             "wireguard"
         } oifname "eth0" counter accept comment "Allow VLANs and VPN access to the Internet";
 
-        iifname "eth0" oifname "vl255.dmz" tcp dport { 80, 443 } counter accept comment "Allow forwarded ports from the Internet to DMZ";
+        iifname "eth0" oifname "vl255.dmz" tcp dport { 22, 80, 443 } counter accept comment "Allow forwarded ports from the Internet to DMZ";
         iifname "eth0" oifname {
-            "vl10.corp",
             "vl20.redteam",
             "vl255.dmz",
             "wireguard"
         } ct state established,related counter accept comment "Allow Internet traffic back to VLANs and VPN";
 
         iifname "wireguard" oifname {
-            "vl10.corp",
             "vl20.redteam",
             "vl255.dmz"
         } counter accept comment "Allow WireGuard access to all VLANs";
 
         iifname {
-            "vl10.corp",
             "vl20.redteam",
             "vl255.dmz",
             "wireguard"
         } oifname "wireguard" ct state established,related counter accept comment "Allow VLANs and VPN traffic back to WireGuard";
 
-        iifname "vl10.corp" oifname "vl10.corp" counter accept comment "Allow intra-VLAN traffic for Corporative VLAN";
-        iifname "vl10.corp" oifname {
-            "vl20.redteam",
-            "vl255.dmz"
-        } counter drop comment "Block Corporative VLAN from other VLANs";
-
         iifname "vl20.redteam" oifname "vl20.redteam" counter accept comment "Allow intra-VLAN traffic for Red Team VLAN";
         iifname "vl20.redteam" oifname {
-            "vl10.corp",
             "vl255.dmz"
         } counter drop comment "Block Red Team VLAN from other VLANs";
 
         iifname "vl255.dmz" oifname "vl255.dmz" counter accept comment "Allow intra-VLAN traffic for DMZ VLAN";
         iifname "vl255.dmz" oifname {
-            "vl10.corp",
             "vl20.redteam"
         } counter drop comment "Block DMZ VLAN from other VLANs";
 
@@ -76,8 +63,9 @@ table ip nat {
     chain prerouting {
         type nat hook prerouting priority filter; policy accept;
 
+        iifname "eth0" tcp dport 22 dnat to 10.0.255.9:22 comment "Redirect SSH to DMZ innovation host";
         iifname "eth0" tcp dport 80 dnat to 10.0.255.1:80 comment "Redirect HTTP to DMZ exposed host";
-        iifname "eth0" tcp dport 443 dnat to 10.0.255.1:443 comment "Redirect HTTPS to DMZ exposed host"
+        iifname "eth0" tcp dport 443 dnat to 10.0.255.1:443 comment "Redirect HTTPS to DMZ exposed host";
     }
     chain postrouting {
         type nat hook postrouting priority filter; policy accept;

@@ -11,7 +11,6 @@
       ];
       extraArgs = {
         inherit inputs lib;
-        publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN9Dt0O0OJokuV6x1jcejmHvJiGT8ZEubd5/aHGYEyUi audea";
         stateVersion = "25.05";
       };
       forEachSystem =
@@ -61,7 +60,8 @@
       nixosConfigurations = {
         mobile = nixosConfiguration ./systems/x86_64-linux/redteam/03.mobile;
         report = nixosConfiguration ./systems/x86_64-linux/redteam/01.report;
-        router = nixosConfiguration ./systems/x86_64-linux/dmz/router;
+        proxy = nixosConfiguration ./systems/x86_64-linux/dmz/253.proxy;
+        router = nixosConfiguration ./systems/x86_64-linux/dmz/254.router;
         vulnerability = nixosConfiguration ./systems/x86_64-linux/redteam/02.vulnerability;
       };
 
