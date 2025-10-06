@@ -9,8 +9,8 @@ in
   # ┃                   Router                  ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-  "systems/x86_64-linux/dmz/router/wireguard.key.age".publicKeys = [ audea vm-router ];
-  "systems/x86_64-linux/dmz/router/wireguard-profiles.conf.age".publicKeys = [ audea ];
+  "systems/x86_64-linux/dmz/254.router/wireguard.key.age".publicKeys = [ audea vm-router ];
+  "systems/x86_64-linux/dmz/254.router/wireguard-profiles.conf.age".publicKeys = [ audea ];
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃          RedTeam: Vulnerability           ┃

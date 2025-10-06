@@ -13,13 +13,23 @@ table inet filter {
             "wireguard"
         } counter accept comment "Allow VLANs and VPN to access the router";
 
+        # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+        # ┃              Port Forwarding              ┃
+        # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+        iifname "eth0" tcp dport { 22, 80, 443, 3000, 8443 } counter accept comment "Allow DMZ-specific ports";
         iifname "eth0" tcp dport 64022 counter accept comment "Allow SSH connections (custom port)";
         iifname "eth0" udp dport 51820 counter accept comment "Allow WireGuard connections";
+
         iifname "eth0" ct state { established, related } counter accept comment "Allow established Internet traffic back";
         iifname "eth0" drop comment "Drop all other Internet traffic";
     }
     chain forward {
         type filter hook forward priority filter; policy drop;
+
+        # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+        # ┃                  WAN/LAN                  ┃
+        # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
         iifname {
             "vl20.redteam",
@@ -27,36 +37,31 @@ table inet filter {
             "wireguard"
         } oifname "eth0" counter accept comment "Allow VLANs and VPN access to the Internet";
 
-        iifname "eth0" oifname "vl255.dmz" tcp dport { 22, 80, 443 } counter accept comment "Allow forwarded ports from the Internet to DMZ";
-        iifname "eth0" oifname {
-            "vl20.redteam",
-            "vl255.dmz",
-            "wireguard"
-        } ct state established,related counter accept comment "Allow Internet traffic back to VLANs and VPN";
+        # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+        # ┃                 VLAN: DMZ                 ┃
+        # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-        iifname "wireguard" oifname {
-            "vl20.redteam",
-            "vl255.dmz"
-        } counter accept comment "Allow WireGuard access to all VLANs";
-
-        iifname {
-            "vl20.redteam",
-            "vl255.dmz",
-            "wireguard"
-        } oifname "wireguard" ct state established,related counter accept comment "Allow VLANs and VPN traffic back to WireGuard";
-
-        iifname "vl20.redteam" oifname "vl20.redteam" counter accept comment "Allow intra-VLAN traffic for Red Team VLAN";
-        iifname "vl20.redteam" oifname {
-            "vl255.dmz"
-        } counter drop comment "Block Red Team VLAN from other VLANs";
+        iifname "eth0" oifname "vl255.dmz" ct state new,established,related counter accept comment "Allow port forwarding from Internet to DMZ";
 
         iifname "vl255.dmz" oifname "vl255.dmz" counter accept comment "Allow intra-VLAN traffic for DMZ VLAN";
-        iifname "vl255.dmz" oifname {
-            "vl20.redteam"
-        } counter drop comment "Block DMZ VLAN from other VLANs";
+        
+        # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+        # ┃               VLAN: RedTeam               ┃
+        # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+        iifname "vl20.redteam" oifname "vl20.redteam" ip daddr 10.0.20.254 counter accept comment "Allow RedTeam traffic to RedTeam router";
+        iifname "vl20.redteam" oifname "vl20.redteam" counter drop comment "Block intra-RedTeam traffic for RedTeam VLAN";
+
+        # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+        # ┃                 WireGuard                 ┃
+        # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+        iifname "wireguard" oifname { "vl20.redteam", "vl255.dmz" } tcp dport { 22, 64022 } counter accept comment "Allow WireGuard SSH access to VLANs";
+        iifname "wireguard" oifname { "vl20.redteam", "vl255.dmz" } tcp dport { 80, 443 } counter accept comment "Allow WireGuard HTTP(S) access to VLANs";
+        iifname { "vl20.redteam", "vl255.dmz" } oifname "wireguard" ct state established,related counter accept comment "Allow return traffic from VLANs to WireGuard";
 
         iifname "wireguard" oifname "wireguard" ip daddr 10.10.10.254 counter accept comment "Allow WireGuard traffic to WireGuard router";
-        iifname "wireguard" oifname "wireguard" counter drop comment "Block intra-WireGuard traffic for WireGuard";
+        iifname "wireguard" oifname "wireguard" counter drop comment "Block intra-WireGuard traffic for WireGuard VLAN";
     }
 }
 table ip nat {
@@ -64,6 +69,10 @@ table ip nat {
         type nat hook prerouting priority filter; policy accept;
 
         iifname "eth0" tcp dport 22 dnat to 10.0.255.9:22 comment "Redirect SSH to DMZ innovation host";
+        iifname "eth0" tcp dport 3000 dnat to 10.0.255.9:3000 comment "Redirect something to DMZ innovation host";
+        iifname "eth0" tcp dport 8443 dnat to 10.0.255.9:8443 comment "Redirect another thing to DMZ innovation host";
+        iifname "eth0" tcp dport 5432 dnat to 10.0.255.9:5432 comment "Redirect wtf to DMZ innovation host";
+
         iifname "eth0" tcp dport 80 dnat to 10.0.255.1:80 comment "Redirect HTTP to DMZ exposed host";
         iifname "eth0" tcp dport 443 dnat to 10.0.255.1:443 comment "Redirect HTTPS to DMZ exposed host";
     }
