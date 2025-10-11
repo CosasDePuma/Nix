@@ -189,6 +189,10 @@
                 name = "frieds-gabi-pc";
                 publicKey = "/Xcib4hmIUhwjW7UQIgF+7TWz0y54a9/zfh6IUt2Bio=";
               }
+              {
+                name = "friends-gabi-movil";
+                publicKey = "dL05dJsgNuDczO9Mx7v5SueoKvmyFPoMHSX8Id3KYGQ=";
+              }
             ];
           in
           lib.lists.imap1 (i: user: {
