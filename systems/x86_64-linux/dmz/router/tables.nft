@@ -7,6 +7,8 @@ table inet filter {
 
         iifname "lo" accept comment "Allow loopback traffic";
 
+        ct state { established, related } counter accept comment "Allow established connections";
+
         iifname {
             "vl10.homelab",
             "vl20.gaming",
@@ -22,7 +24,6 @@ table inet filter {
         iifname "eth0" tcp dport 61640 counter accept comment "Allow TCP qBitTorrent Seeder";
         iifname "eth0" udp dport 61640 counter accept comment "Allow UDP qBitTorrent Seeder";
 
-        iifname "eth0" ct state { established, related } counter accept comment "Allow established Internet traffic back";
         iifname "eth0" drop comment "Drop all other Internet traffic";
     }
     chain forward {

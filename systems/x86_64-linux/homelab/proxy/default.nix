@@ -292,7 +292,7 @@
     inherit stateVersion;
 
     autoUpgrade = {
-      enable = true;
+      enable = false;
       flake = "github:cosasdepuma/nix";
       dates = "daily";
       operation = "switch";

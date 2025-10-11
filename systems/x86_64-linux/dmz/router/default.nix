@@ -185,6 +185,10 @@
                 name = "frieds-peblo-tv";
                 publicKey = "KPsh7wV9s+jZVAU4gqysErsRkHlQ0XT5gA6Y7E7OUQM=";
               }
+              {
+                name = "frieds-gabi-pc";
+                publicKey = "/Xcib4hmIUhwjW7UQIgF+7TWz0y54a9/zfh6IUt2Bio=";
+              }
             ];
           in
           lib.lists.imap1 (i: user: {
@@ -285,16 +289,6 @@
           }"
           "vl20.gaming,option:dns-server,${
             (builtins.head config.networking.interfaces."vl20.gaming".ipv4.addresses).address
-          }"
-          "wireguard,option:router,${
-            builtins.head (
-              lib.strings.splitString "/" (builtins.head (config.networking.wireguard.interfaces."wireguard".ips))
-            )
-          }"
-          "wireguard,option:dns-server,${
-            builtins.head (
-              lib.strings.splitString "/" (builtins.head (config.networking.wireguard.interfaces."wireguard".ips))
-            )
           }"
         ];
         cache-size = 1000;

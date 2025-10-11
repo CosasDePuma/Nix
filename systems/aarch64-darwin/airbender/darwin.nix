@@ -141,18 +141,12 @@
           }) apps;
       in
       builtins.concatLists [
-        (organize "Artificial Intelligence" [
-          "claude"
-          "ollama-app"
-          "lm-studio"
-        ])
         (organize "Communication" [
           "discord"
           "telegram"
           "whatsapp"
         ])
         (organize "Development" [
-          "outerbase-studio"
           "visual-studio-code"
           "warp"
         ])
@@ -169,14 +163,11 @@
           "bitwarden"
         ])
         (organize "Utilities" [
-          "balenaetcher"
           "brave-browser"
           "flameshot"
           "font-fira-code-nerd-font"
           "font-jetbrains-mono-nerd-font"
           "the-unarchiver"
-          "vlc"
-          "webtorrent"
         ])
         (organize "Virtualization" [
           "orbstack"
