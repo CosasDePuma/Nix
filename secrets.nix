@@ -9,6 +9,7 @@ in
   # ┃                   Router                  ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
+  "systems/x86_64-linux/router/.caddy/acme.env.age".publicKeys = [ audea vm-router ];
   "systems/x86_64-linux/router/.wireguard/key.age".publicKeys = [ audea vm-router ];
   "systems/x86_64-linux/router/.wireguard/profiles.conf.age".publicKeys = [ audea ];
 

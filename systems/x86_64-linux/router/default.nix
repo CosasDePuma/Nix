@@ -49,6 +49,7 @@
   age = {
     identityPaths = builtins.map (key: key.path) config.services.openssh.hostKeys;
     secrets = {
+      "acme.env".file = ./.caddy/acme.env.age;
       "wireguard.key".file = ./.wireguard/key.age;
     };
   };
@@ -207,6 +208,19 @@
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
   security = {
+    acme = {
+      acceptTerms = true;
+      certs."audea.com" = {
+        domain = "audea.com";
+        dnsPropagationCheck = true;
+        dnsProvider = "cloudflare";
+        dnsResolver = "1.1.1.1:53";
+        email = "acme@audea.com";
+        environmentFile = config.age.secrets."acme.env".path;
+        extraDomainNames = [ "*.audea.com" ];
+        group = config.services.caddy.group;
+      };
+    };
     pam = {
       sshAgentAuth.enable = true;
       services."sudo".sshAgentAuth = true;
@@ -222,7 +236,18 @@
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
   services = {
-    
+
+    # ┌──────────────────────────────────────┐
+    # │                Caddy                │
+    # └──────────────────────────────────────┘
+
+    caddy = {
+      enable = true;
+      enableReload = true;
+      logFormat = "level INFO";
+      configFile = ./.caddy/Caddyfile;
+    };
+
     # ┌──────────────────────────────────────┐
     # │                DNSmasq               │
     # └──────────────────────────────────────┘
@@ -231,6 +256,10 @@
       enable = true;
       resolveLocalQueries = false;
       settings = {
+        address = [
+          "/audea.com/10.10.10.254"
+          "/audea.es/10.10.10.254"
+        ];
         bind-dynamic = true;
         interface = [
           "vl20.redteam"

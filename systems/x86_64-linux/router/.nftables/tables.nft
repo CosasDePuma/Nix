@@ -75,9 +75,6 @@ table ip nat {
         iifname "eth0" tcp dport 3000 dnat to 10.0.255.9:3000 comment "Redirect something to DMZ innovation host";
         iifname "eth0" tcp dport 8443 dnat to 10.0.255.9:8443 comment "Redirect another thing to DMZ innovation host";
         iifname "eth0" tcp dport 5432 dnat to 10.0.255.9:5432 comment "Redirect wtf to DMZ innovation host";
-
-        iifname "eth0" tcp dport 80 dnat to 10.0.255.1:80 comment "Redirect HTTP to DMZ exposed host";
-        iifname "eth0" tcp dport 443 dnat to 10.0.255.1:443 comment "Redirect HTTPS to DMZ exposed host";
     }
     chain postrouting {
         type nat hook postrouting priority filter; policy accept;

@@ -10,6 +10,18 @@
 (encoding) {
     encode gzip zstd
 }
+(internal) {
+	import dns-challenge
+
+	@vpn_only {
+		remote_ip 10.10.10.0/24
+	}
+	
+	@not_vpn {
+		not remote_ip 10.10.10.0/24
+	}
+	respond @not_vpn 404
+}
 (joke-headers) {
     header {
         >x-clacks-overhead "GNU Pumita"
@@ -65,46 +77,106 @@
 # │                  DMZ                  │
 # └───────────────────────────────────────┘
 
-audea.com, audea.es, www.audea.com, www.audea.es {
-    import defaults
+audea.es, www.audea.es {
+	bind 172.16.0.2 10.10.10.254
+    reverse_proxy http://10.0.255.1:80
+	
+	import defaults
     import logs www
-    import tls-challenge
+	import tls-challenge
+}
+
+audea.com, www.audea.com {
+	bind 172.16.0.2 10.10.10.254
+    reverse_proxy http://10.0.255.1:80
+    
+	import encoding
+	import joke-headers
+	import unwanted-headers
+    import logs www
+    import dns-challenge
 	header {
         >server "Gameboy Color"
 		>x-joke "Why do programmers prefer dark mode? Because light attracts bugs!"
+		>frame-deny "sameorigin"
+        >permissions-policy "camera=(), geolocation=(), interest-cohort=(), microphone=()"
+        >referrer-policy "strict-origin"
+        >strict-transport-security "max-age=31536000; includeSubDomains; preload"
+        >x-content-type-options "nosniff"
+        >x-frame-options "sameorigin"
 	}
 
     @blockXMLRPC path /xmlrpc.php
     respond @blockXMLRPC 403
-
-    reverse_proxy http://10.0.255.1:80
 }
 
-aur.audea.com, aur.audea.es {
+aur.audea.com {
+	bind 172.16.0.2 10.10.10.254
+    reverse_proxy https://10.0.255.9:443
+
     import logs aur
 	import encoding
 	import joke-headers
 	import unwanted-headers
-    import tls-challenge
+    import dns-challenge
 	header {
         >server "Nokia 3310"
 		>x-joke "A SQL query goes into a bar, walks up to two tables and asks: 'Can I join you?'"
 	}
-
-    reverse_proxy http://10.0.255.9:80
 }
 
 # ┌───────────────────────────────────────┐
 # │                RedTeam                │
 # └───────────────────────────────────────┘
 
-report.audea.com {
+mobsf.audea.com {
+	bind 10.10.10.254
+	reverse_proxy @vpn_only http://10.0.20.3:80
+
 	import defaults
-	import logs report
-	import tls-challenge
-	reverse_proxy http://10.0.20.1:443
+	import internal
+	import logs mobsf
+	header {
+        >server "Motorola Razr"
+		>x-joke "Why do Java developers wear glasses? Because they can't C#!"
+	}
 }
 
+nessus.audea.com {
+	bind 10.10.10.254
+	reverse_proxy @vpn_only https://10.0.20.2:443 {
+		transport http {
+			tls
+			tls_insecure_skip_verify
+		}
+	}
+
+	import defaults
+	import internal
+	import logs nessus
+	header {
+        >server "ThinkPad T420"
+		>x-joke "How many programmers does it take to change a light bulb? None, that's a hardware problem."
+	}
+}
+
+report.audea.com {
+	bind 10.10.10.254
+	reverse_proxy @vpn_only https://10.0.20.1:443 {
+		transport http {
+			tls
+			tls_insecure_skip_verify
+		}
+	}
+
+	import defaults
+	import internal
+	import logs report
+	header {
+        >server "Blackberry Bold 9900"
+		>x-joke "A SQL query goes into a bar, walks up to two tables and asks: 'Can I join you?'"
+	}
+}
 
 # ┌───────────────────────────────────────┐
 # │             Other handlers            │
