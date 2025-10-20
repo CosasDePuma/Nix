@@ -7,6 +7,8 @@ table inet filter {
 
         iifname "lo" accept comment "Allow loopback traffic";
 
+        ct state { established, related } counter accept comment "Allow established connections";
+
         iifname {
             "vl20.redteam",
             "vl255.dmz",
@@ -21,11 +23,12 @@ table inet filter {
         iifname "eth0" tcp dport 64022 counter accept comment "Allow SSH connections (custom port)";
         iifname "eth0" udp dport 51820 counter accept comment "Allow WireGuard connections";
 
-        iifname "eth0" ct state { established, related } counter accept comment "Allow established Internet traffic back";
         iifname "eth0" drop comment "Drop all other Internet traffic";
     }
     chain forward {
         type filter hook forward priority filter; policy drop;
+
+        ct state { established, related } counter accept comment "Allow established connections";
 
         # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
         # ┃                  WAN/LAN                  ┃

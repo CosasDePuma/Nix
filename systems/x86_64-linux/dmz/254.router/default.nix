@@ -49,7 +49,7 @@
   age = {
     identityPaths = builtins.map (key: key.path) config.services.openssh.hostKeys;
     secrets = {
-      "wireguard.key".file = ./wireguard.key.age;
+      "wireguard.key".file = ./.wireguard/key.age;
     };
   };
 
@@ -157,28 +157,7 @@
         listenPort = 51820;
         privateKeyFile = config.age.secrets."wireguard.key".path;
         peers = let
-          users = [
-            {
-              name = "efontan";
-              publicKey = "09SUz/zGOFkZKnV8e8k+MJ4ul97EAvFEm8MN2rjztkQ=";
-            }
-            {
-              name = "jlzayas";
-              publicKey = "6BVvYsdL54NFNMMq/KvY1sTIJSnli4keNbAbPWJ1JTg=";
-            }
-            {
-              name = "arecuerda";
-              publicKey = "53ryeMG/zQwjiRbt91PYfp2FpHu3CWgJGBvCrFXcajQ=";
-            }
-            {
-              name = "gvega";
-              publicKey = "vgk5LopyO0/sRse6NS+0yTCxbseNVEurzj1YVVtGoio=";
-            }
-            {
-              name = "fabiom";
-              publicKey = "txqyCEZYJk37bXBNcvsSZ4sjIfKy2vB4nZKKWApBemc=";
-            }
-          ];
+          users = builtins.fromJSON (builtins.readFile ./.wireguard/peers.json);
         in lib.lists.imap1 (i: user: {
           inherit (user) name publicKey;
           allowedIPs = ["10.10.10.${builtins.toString i}/32"];
@@ -187,8 +166,6 @@
       };
     };
     # --- dns
-    domain = "audea.corp";
-    search = [ "audea.corp" ];
     nameservers = [
       "1.1.1.1"
       "8.8.8.8"
@@ -198,7 +175,7 @@
     firewall.enable = false;
     nftables = {
       enable = true;
-      ruleset = builtins.readFile ./tables.nft;
+      ruleset = builtins.readFile ./.nftables/tables.nft;
     };
   };
 
@@ -277,12 +254,6 @@
           "vl255.dmz,option:dns-server,${
             (builtins.head config.networking.interfaces."vl255.dmz".ipv4.addresses).address
           }"
-          "wireguard,option:router,${
-            builtins.head (lib.strings.splitString "/" (builtins.head (config.networking.wireguard.interfaces."wireguard".ips)))
-          }"
-          "wireguard,option:dns-server,${
-            builtins.head (lib.strings.splitString "/" (builtins.head (config.networking.wireguard.interfaces."wireguard".ips)))
-          }"
         ];
         cache-size = 1000;
         domain-needed = true;
@@ -313,19 +284,7 @@
       ];
       ports = [ ];
       startWhenNeeded = true;
-      banner = ''
-        ==============================================================
-        |                   AUTHORIZED ACCESS ONLY                   |
-        ==============================================================
-        |                                                            |
-        |    WARNING: All connections are monitored and recorded.    |
-        |  Disconnect IMMEDIATELY if you are not an authorized user! |
-        |                                                            |
-        |       *** Unauthorized access will be prosecuted ***       |
-        |                                                            |
-        ==============================================================
-
-      '';
+      banner = builtins.readFile ./.ssh/banner.txt;
       settings = {
         AuthorizedPrincipalsFile = "none";
         ChallengeResponseAuthentication = false;
@@ -377,14 +336,6 @@
 
   system = {
     inherit stateVersion;
-
-    autoUpgrade = {
-      enable = false; # FIXME(git): Enable this when we have a proper upgrade strategy.
-      flake = "github:cosasdepuma/nix/audea";
-      dates = "daily";
-      operation = "switch";
-      persistent = true;
-    };
   };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -417,7 +368,7 @@
         "wheel"
         "sshuser"
       ];
-      openssh.authorizedKeys.keys = lib.strings.splitString "\n" (builtins.readFile ./authorized_keys);
+      openssh.authorizedKeys.keys = lib.strings.splitString "\n" (builtins.readFile ./.ssh/authorized_keys);
     };
   };
 }
