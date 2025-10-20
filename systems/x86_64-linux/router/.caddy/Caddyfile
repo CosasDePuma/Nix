@@ -1,0 +1,115 @@
+(defaults) {
+    import default-headers
+    import encoding
+}
+(default-headers) {
+    import joke-headers
+    import security-headers
+    import unwanted-headers
+}
+(encoding) {
+    encode gzip zstd
+}
+(joke-headers) {
+    header {
+        >x-clacks-overhead "GNU Pumita"
+        >x-nananananananana "Batman!"
+        >x-powered-by "Pumas, unicorns and rainbows </3"
+    }
+}
+(logs) {
+    log {
+        output file /var/log/caddy/{args[0]}.audea.log
+        format console
+    }
+}
+(security-headers) {
+    header {
+        >cross-origin-embedder-policy "require-corp"
+        >cross-origin-opener-policy "same-origin"
+        >cross-origin-resource-policy "same-origin"
+        >frame-deny "sameorigin"
+        >permissions-policy "camera=(), geolocation=(), interest-cohort=(), microphone=()"
+        >referrer-policy "strict-origin"
+        >strict-transport-security "max-age=31536000; includeSubDomains; preload"
+        >x-content-type-options "nosniff"
+        >x-frame-options "sameorigin"
+    }
+}
+(dns-challenge) {
+	tls /var/lib/acme/audea.com/cert.pem /var/lib/acme/audea.com/key.pem {
+		protocols tls1.2 tls1.3
+		curves x25519mlkem768 secp256r1 secp384r1
+		ciphers TLS_AES_256_GCM_SHA384 TLS_AES_128_GCM_SHA256 TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384 TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+	}
+}
+(tls-challenge) {
+    tls acme@audea.es {
+        protocols tls1.2 tls1.3
+        curves x25519mlkem768 secp256r1 secp384r1
+        ciphers TLS_AES_256_GCM_SHA384 TLS_AES_128_GCM_SHA256 TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384 TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384 
+    }
+}
+(unwanted-headers) {
+    header {
+        -expect-ct
+        -via
+        -x-aspnet-version
+        -x-aspnetmvc-version
+        -x-redirect-by
+        -x-xss-protection
+    }
+}
+
+# ┌───────────────────────────────────────┐
+# │                  DMZ                  │
+# └───────────────────────────────────────┘
+
+audea.com, audea.es, www.audea.com, www.audea.es {
+    import defaults
+    import logs www
+    import tls-challenge
+	header {
+        >server "Gameboy Color"
+		>x-joke "Why do programmers prefer dark mode? Because light attracts bugs!"
+	}
+
+    @blockXMLRPC path /xmlrpc.php
+    respond @blockXMLRPC 403
+
+    reverse_proxy http://10.0.255.1:80
+}
+
+aur.audea.com, aur.audea.es {
+    import logs aur
+	import encoding
+	import joke-headers
+	import unwanted-headers
+    import tls-challenge
+	header {
+        >server "Nokia 3310"
+		>x-joke "A SQL query goes into a bar, walks up to two tables and asks: 'Can I join you?'"
+	}
+
+    reverse_proxy http://10.0.255.9:80
+}
+
+# ┌───────────────────────────────────────┐
+# │                RedTeam                │
+# └───────────────────────────────────────┘
+
+report.audea.com {
+	import defaults
+	import logs report
+	import tls-challenge
+	reverse_proxy http://10.0.20.1:443
+}
+
+
+# ┌───────────────────────────────────────┐
+# │             Other handlers            │
+# └───────────────────────────────────────┘
+
+:80, :443 {
+    abort
+}
