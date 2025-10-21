@@ -10,16 +10,12 @@
   # ┃                   Boot                    ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-  boot.loader.grub.enable = true;
-
-  # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  # ┃                Environment                ┃
-  # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-  environment.systemPackages = with pkgs; [
-    curl
-    openssl
-  ];
+  boot = {
+    # --- loader
+    loader.grub.enable = true;
+    # --- nix store
+    readOnlyNixStore = true;
+  };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                 Hardware                  ┃
@@ -76,7 +72,7 @@
 
   networking = {
     # --- host
-    hostName = "proxy";
+    hostName = "mobile";
     hostId = builtins.substring 0 8 (builtins.hashString "md5" config.networking.hostName);
     # --- interfaces
     usePredictableInterfaceNames = false;
@@ -86,27 +82,38 @@
         useDHCP = false;
         ipv4.addresses = [
           {
-            address = "10.0.10.253";
+            address = "10.0.20.3";
             prefixLength = 24;
           }
         ];
       };
     };
+
     # --- gateway
     defaultGateway = {
       interface = "eth0";
-      address = "10.0.10.254";
+      address = "10.0.20.254";
     };
     # --- dns
-    nameservers = [ "10.0.10.254" ];
-    # --- firewall
+    nameservers = [
+      "10.0.20.254"
+    ];
     firewall = {
       enable = true;
-      allowedTCPPorts = [
-        80
-        443
-        64022
-      ];
+      allowPing = false;
+      allowedTCPPorts = lib.lists.flatten (
+        lib.attrsets.mapAttrsToList (_: container:
+          if container ? ports then
+        map (portMapping:
+          let
+            parts = lib.strings.splitString ":" portMapping;
+            portIndex = if (builtins.length parts) == 3 then 1 else 0;
+          in
+            builtins.fromJSON (builtins.elemAt parts portIndex)
+        ) container.ports
+          else []
+        ) config.virtualisation.oci-containers.containers
+      ) ++ (map (addr: addr.port) config.services.openssh.listenAddresses);
     };
   };
 
@@ -131,7 +138,7 @@
   # ┃                  Nixpkgs                  ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-  nixpkgs.config.allowUnfree = false;
+  nixpkgs.config.allowUnfree = true;
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                  Security                 ┃
@@ -155,17 +162,6 @@
   services = {
 
     # ┌──────────────────────────────────────┐
-    # │                 Caddy                │
-    # └──────────────────────────────────────┘
-
-    caddy = {
-      enable = true;
-      enableReload = true;
-      logFormat = "level INFO";
-      configFile = ./Caddyfile;
-    };
-
-    # ┌──────────────────────────────────────┐
     # │                OpenSSH               │
     # └──────────────────────────────────────┘
 
@@ -181,18 +177,7 @@
       ];
       ports = [ ];
       startWhenNeeded = true;
-      banner = ''
-        ==============================================================
-        |                   AUTHORIZED ACCESS ONLY                   |
-        ==============================================================
-        |                                                            |
-        |    WARNING: All connections are monitored and recorded.    |
-        |  Disconnect IMMEDIATELY if you are not an authorized user! |
-        |                                                            |
-        |       *** Unauthorized access will be prosecuted ***       |
-        |                                                            |
-        ==============================================================
-      '';
+      banner = builtins.readFile ./.ssh/banner.txt;
       settings = {
         AuthorizedPrincipalsFile = "none";
         ChallengeResponseAuthentication = false;
@@ -244,14 +229,6 @@
 
   system = {
     inherit stateVersion;
-
-    autoUpgrade = {
-      enable = false;
-      flake = "github:cosasdepuma/nix/audea";
-      dates = "daily";
-      operation = "switch";
-      persistent = true;
-    };
   };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -272,11 +249,11 @@
       "users" = { };
     };
     # --- users
-    users."proxy" = {
+    users."mobile" = {
       isNormalUser = true;
-      description = "Proxy management user";
+      description = "Mobile management user";
       initialPassword = null;
-      home = "/home/users/proxy";
+      home = "/home/users/mobile";
       uid = 1000;
       group = "users";
       useDefaultShell = true;
@@ -284,7 +261,43 @@
         "wheel"
         "sshuser"
       ];
-      openssh.authorizedKeys.keys = lib.strings.splitString "\n" (builtins.readFile ./authorized_keys);
+      openssh.authorizedKeys.keys = lib.strings.splitString "\n" (builtins.readFile ./.ssh/authorized_keys);
+    };
+  };
+
+  # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  # ┃               Virtualisation              ┃
+  # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  virtualisation = {
+    docker = {
+      enable = true;
+      enableOnBoot = true;
+      storageDriver = "overlay2";
+      autoPrune = {
+        enable = true;
+        flags = ["--all" "--force"];
+        persistent = true;
+        dates = "daily";
+      };
+    };
+
+    oci-containers = {
+      backend = "docker";
+      containers = {
+
+        # ┌──────────────────────────────────┐
+        # │               MobSF              │
+        # └──────────────────────────────────┘
+
+        "mobsf" = {
+          image = "opensecurity/mobile-security-framework-mobsf:latest";
+          ports = [ "0.0.0.0:80:8000" ];
+          volumes = [
+            "mobsf:/home/mobsf/.MobSF"
+          ];
+        };
+      };
     };
   };
 }

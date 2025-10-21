@@ -24,17 +24,6 @@
   hardware.enableAllHardware = true;
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  # ┃                Inputs: Age                ┃
-  # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-  age = {
-    identityPaths = builtins.map (key: key.path) config.services.openssh.hostKeys;
-    secrets = {
-      "nessus.env".file = ./nessus.env.age;
-    };
-  };
-
-  # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃               Inputs: Disko               ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
@@ -83,7 +72,7 @@
 
   networking = {
     # --- host
-    hostName = "vulnerability";
+    hostName = "pwndoc";
     hostId = builtins.substring 0 8 (builtins.hashString "md5" config.networking.hostName);
     # --- interfaces
     usePredictableInterfaceNames = false;
@@ -93,7 +82,7 @@
         useDHCP = false;
         ipv4.addresses = [
           {
-            address = "10.0.20.2";
+            address = "10.0.20.1";
             prefixLength = 24;
           }
         ];
@@ -109,7 +98,23 @@
     nameservers = [
       "10.0.20.254"
     ];
-    firewall.enable = false;
+    firewall = {
+      enable = true;
+      allowPing = false;
+      allowedTCPPorts = lib.lists.flatten (
+        lib.attrsets.mapAttrsToList (_: container:
+          if container ? ports then
+        map (portMapping:
+          let
+            parts = lib.strings.splitString ":" portMapping;
+            portIndex = if (builtins.length parts) == 3 then 1 else 0;
+          in
+            builtins.fromJSON (builtins.elemAt parts portIndex)
+        ) container.ports
+          else []
+        ) config.virtualisation.oci-containers.containers
+      ) ++ (map (addr: addr.port) config.services.openssh.listenAddresses);
+    };
   };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -172,19 +177,7 @@
       ];
       ports = [ ];
       startWhenNeeded = true;
-      banner = ''
-        ==============================================================
-        |                   AUTHORIZED ACCESS ONLY                   |
-        ==============================================================
-        |                                                            |
-        |    WARNING: All connections are monitored and recorded.    |
-        |  Disconnect IMMEDIATELY if you are not an authorized user! |
-        |                                                            |
-        |       *** Unauthorized access will be prosecuted ***       |
-        |                                                            |
-        ==============================================================
-
-      '';
+      banner = builtins.readFile ./.ssh/banner.txt;
       settings = {
         AuthorizedPrincipalsFile = "none";
         ChallengeResponseAuthentication = false;
@@ -237,13 +230,20 @@
   system = {
     inherit stateVersion;
 
-    autoUpgrade = {
-      enable = false;
-      flake = "github:cosasdepuma/nix/audea";
-      dates = "daily";
-      operation = "switch";
-      persistent = true;
-    };
+    # ┌──────────────────────────────────┐
+    # │        Container networks        │
+    # └──────────────────────────────────┘
+
+    activationScripts."oci-containers-networks".text =
+      let
+        inherit (config.virtualisation.oci-containers) backend;
+      in
+      ''
+        #!/bin/sh
+        # Create the OCI containers networks
+        ${pkgs."${backend}"}/bin/${backend} network inspect pwndoc >/dev/null || \
+          ${pkgs."${backend}"}/bin/${backend} network create --subnet=172.16.100.0/24 pwndoc
+      '';
   };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -264,11 +264,11 @@
       "users" = { };
     };
     # --- users
-    users."av" = {
+    users."pwndoc" = {
       isNormalUser = true;
-      description = "Vulnerability management user";
+      description = "Report management user";
       initialPassword = null;
-      home = "/home/users/av";
+      home = "/home/users/pwndoc";
       uid = 1000;
       group = "users";
       useDefaultShell = true;
@@ -276,7 +276,7 @@
         "wheel"
         "sshuser"
       ];
-      openssh.authorizedKeys.keys = lib.strings.splitString "\n" (builtins.readFile ./authorized_keys);
+      openssh.authorizedKeys.keys = lib.strings.splitString "\n" (builtins.readFile ./.ssh/authorized_keys);
     };
   };
 
@@ -302,16 +302,33 @@
       containers = {
 
         # ┌──────────────────────────────────┐
-        # │              Nessus              │
+        # │              Pwndoc              │
         # └──────────────────────────────────┘
 
-        "nessus" = {
-          image = "tenable/nessus:latest-ubuntu";
-          ports = [ "0.0.0.0:443:8834" ];
-          environmentFiles = [ config.age.secrets."nessus.env".path ];
-          volumes = [
-            "nessus:/opt/nessus"
-          ];
+        "pwndoc-frontend" = {
+          hostname = "pwndoc-frontend";
+          image = "ghcr.io/pwndoc/pwndoc-frontend:latest";
+          ports = [ "0.0.0.0:443:8443" ];
+          networks = [ "pwndoc" ];
+        };
+        "pwndoc-backend" = {
+          hostname = "pwndoc-backend";
+          image = "ghcr.io/pwndoc/pwndoc-backend:latest";
+          environment = {
+            DB_SERVER = "mongodb";
+            DB_NAME = "pwndoc";
+          };
+          networks = [ "pwndoc" ];
+          volumes = [ "pwndoc:/app" ];
+        };
+        "mongodb" = {
+          hostname = "mongodb";
+          image = "mongo:4.2.15";
+          environment = {
+            MONGO_DB = "pwndoc";
+          };
+          networks = [ "pwndoc" ];
+          volumes = [ "mongodb:/data/db" ];
         };
       };
     };

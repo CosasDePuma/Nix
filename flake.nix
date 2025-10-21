@@ -58,11 +58,11 @@
       # +--------------- nixos systems ----------------+
 
       nixosConfigurations = {
-        mobile = nixosConfiguration ./systems/x86_64-linux/redteam/03.mobile;
-        proxy = nixosConfiguration ./systems/x86_64-linux/dmz/253.proxy;
-        report = nixosConfiguration ./systems/x86_64-linux/redteam/01.report;
         router = nixosConfiguration ./systems/x86_64-linux/router;
-        vulnerability = nixosConfiguration ./systems/x86_64-linux/redteam/02.vulnerability;
+        # -- redteam
+        pwndoc = nixosConfiguration ./systems/x86_64-linux/redteam/01.pwndoc;
+        nessus = nixosConfiguration ./systems/x86_64-linux/redteam/02.nessus;
+        mobsf = nixosConfiguration ./systems/x86_64-linux/redteam/03.mobsf;
       };
 
       # +----------------- templates ------------------+
