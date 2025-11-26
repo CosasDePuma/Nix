@@ -5,6 +5,9 @@
   stateVersion ? "25.05",
   ...
 }:
+let
+  domain = "kike.wtf";
+in
 {
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                   Boot                    ┃
@@ -48,7 +51,8 @@
   age = {
     identityPaths = builtins.map (key: key.path) config.services.openssh.hostKeys;
     secrets = {
-      "wireguard.key".file = ./wireguard.key.age;
+      "cloudflare.key".file = ./.ddclient/cloudflare.key.age;
+      "wireguard.key".file = ./.wireguard/wireguard.key.age;
     };
   };
 
@@ -193,6 +197,18 @@
                 name = "friends-gabi-movil";
                 publicKey = "dL05dJsgNuDczO9Mx7v5SueoKvmyFPoMHSX8Id3KYGQ=";
               }
+              {
+                name = "friends-gabi-tv";
+                publicKey = "tim3QC6RAXa4CqOLp8WO616LPSAz5X6EVSL/vo2OO0I=";
+              }
+              {
+                name = "friends-pabloorg-pc";
+                publicKey = "uV16lL5MEJWpULQUmSfxELNUC9nWp0aqZDSXQTJFFV8=";
+              }
+              {
+                name = "friends-pol-pc";
+                publicKey = "MfuxUAJhZlcX7gxvfeJNfb/Vie4SCgOwfcv0DBEZNg8=";
+              }
             ];
           in
           lib.lists.imap1 (i: user: {
@@ -214,7 +230,7 @@
     firewall.enable = false;
     nftables = {
       enable = true;
-      ruleset = builtins.readFile ./tables.nft;
+      ruleset = builtins.readFile ./.nftables/tables.nft;
     };
   };
 
@@ -263,6 +279,20 @@
   services = {
 
     # ┌──────────────────────────────────────┐
+    # │               DDClient               │
+    # └──────────────────────────────────────┘
+
+    ddclient = {
+      enable = true;
+      domains = [ domain ];
+      interval = "1h";
+      protocol = "cloudflare";
+      passwordFile = config.age.secrets."cloudflare.key".path;
+      verbose = true;
+      zone = domain;
+    };
+
+    # ┌──────────────────────────────────────┐
     # │                DNSmasq               │
     # └──────────────────────────────────────┘
 
@@ -270,7 +300,7 @@
       enable = true;
       resolveLocalQueries = false;
       settings = {
-        address = [ "/kike.wtf/10.0.10.1" ];
+        address = [ "/${domain}/10.0.10.1" ];
         bind-dynamic = true;
         interface = [
           "vl10.homelab"
@@ -324,18 +354,7 @@
       ];
       ports = [ ];
       startWhenNeeded = true;
-      banner = ''
-        ==============================================================
-        |                   AUTHORIZED ACCESS ONLY                   |
-        ==============================================================
-        |                                                            |
-        |    WARNING: All connections are monitored and recorded.    |
-        |  Disconnect IMMEDIATELY if you are not an authorized user! |
-        |                                                            |
-        |       *** Unauthorized access will be prosecuted ***       |
-        |                                                            |
-        ==============================================================
-      '';
+      banner = builtins.readFile ./.ssh/banner.txt;
       settings = {
         AuthorizedPrincipalsFile = "none";
         ChallengeResponseAuthentication = false;
@@ -427,7 +446,9 @@
         "wheel"
         "sshuser"
       ];
-      openssh.authorizedKeys.keys = lib.strings.splitString "\n" (builtins.readFile ./authorized_keys);
+      openssh.authorizedKeys.keys = lib.strings.splitString "\n" (
+        builtins.readFile ./.ssh/authorized_keys
+      );
     };
   };
 }

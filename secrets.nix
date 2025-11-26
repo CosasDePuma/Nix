@@ -46,8 +46,12 @@ in
   # ┃                   Router                  ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-  "systems/x86_64-linux/dmz/router/wireguard-profiles.conf.age".publicKeys = [ nixos ];
-  "systems/x86_64-linux/dmz/router/wireguard.key.age".publicKeys = [
+  "systems/x86_64-linux/dmz/router/.ddclient/cloudflare.key.age".publicKeys = [
+    nixos
+    vm-dmz.router
+  ];
+  "systems/x86_64-linux/dmz/router/.wireguard/wireguard-profiles.conf.age".publicKeys = [ nixos ];
+  "systems/x86_64-linux/dmz/router/.wireguard/wireguard.key.age".publicKeys = [
     nixos
     vm-dmz.router
   ];
