@@ -195,21 +195,25 @@
     # │               Homepage               │
     # └──────────────────────────────────────┘
 
-    homepage-dashboard = let homepageConfig = builtins.fromJSON (builtins.readFile ./homepage.json); in {
-      enable = true;
-      listenPort = 8082;
-      allowedHosts = "*";
-      environmentFile = config.age.secrets."homepage.env".path;
-      settings = {
-        color = "slate";
-        title = "Kike's Homelab";
-        description = "A collection of services running on Kike's Homelab";
-        hideVersion = true;
-        useEqualHeights = true;
-        layout = homepageConfig.layout;
+    homepage-dashboard =
+      let
+        homepageConfig = builtins.fromJSON (builtins.readFile ./homepage.json);
+      in
+      {
+        enable = true;
+        listenPort = 8082;
+        allowedHosts = "*";
+        environmentFile = config.age.secrets."homepage.env".path;
+        settings = {
+          color = "slate";
+          title = "Kike's Homelab";
+          description = "A collection of services running on Kike's Homelab";
+          hideVersion = true;
+          useEqualHeights = true;
+          layout = homepageConfig.layout;
+        };
+        services = homepageConfig.services;
       };
-      services = homepageConfig.services;
-    };
 
     # ┌──────────────────────────────────────┐
     # │                OpenSSH               │
