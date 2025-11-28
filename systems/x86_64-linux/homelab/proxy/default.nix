@@ -5,6 +5,9 @@
   stateVersion ? "25.05",
   ...
 }:
+let
+  domain = "kike.wtf";
+in
 {
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                   Boot                    ┃
@@ -34,8 +37,8 @@
   age = {
     identityPaths = builtins.map (key: key.path) config.services.openssh.hostKeys;
     secrets = {
-      "acme.env".file = ./acme.env.age;
-      "homepage.env".file = ./homepage.env.age;
+      "acme.env".file = ./.acme/acme.env.age;
+      "homepage.env".file = ./.homepage/homepage.env.age;
     };
   };
 
@@ -153,15 +156,15 @@
   security = {
     acme = {
       acceptTerms = true;
-      certs."kike.wtf" = {
-        domain = "kike.wtf";
+      certs."${domain}" = {
+        inherit domain;
+        inherit (config.services.caddy) group;
         dnsPropagationCheck = true;
         dnsProvider = "cloudflare";
         dnsResolver = "1.1.1.1:53";
-        email = "acme@kike.wtf";
+        email = "acme@${domain}";
         environmentFile = config.age.secrets."acme.env".path;
-        extraDomainNames = [ "*.kike.wtf" ];
-        group = config.services.caddy.group;
+        extraDomainNames = [ "*.${domain}" ];
       };
     };
     pam = {
@@ -188,7 +191,7 @@
       enable = true;
       enableReload = true;
       logFormat = "level INFO";
-      configFile = ./Caddyfile;
+      configFile = ./.caddy/Caddyfile;
     };
 
     # ┌──────────────────────────────────────┐
@@ -197,22 +200,22 @@
 
     homepage-dashboard =
       let
-        homepageConfig = builtins.fromJSON (builtins.readFile ./homepage.json);
+        homepageConfig = builtins.fromJSON (builtins.readFile ./.homepage/homepage.json);
       in
       {
+        inherit (homepageConfig) services;
         enable = true;
         listenPort = 8082;
         allowedHosts = "*";
         environmentFile = config.age.secrets."homepage.env".path;
         settings = {
+          inherit (homepageConfig) layout;
           color = "slate";
           title = "Kike's Homelab";
           description = "A collection of services running on Kike's Homelab";
           hideVersion = true;
           useEqualHeights = true;
-          layout = homepageConfig.layout;
         };
-        services = homepageConfig.services;
       };
 
     # ┌──────────────────────────────────────┐
@@ -231,18 +234,7 @@
       ];
       ports = [ ];
       startWhenNeeded = true;
-      banner = ''
-        ==============================================================
-        |                   AUTHORIZED ACCESS ONLY                   |
-        ==============================================================
-        |                                                            |
-        |    WARNING: All connections are monitored and recorded.    |
-        |  Disconnect IMMEDIATELY if you are not an authorized user! |
-        |                                                            |
-        |       *** Unauthorized access will be prosecuted ***       |
-        |                                                            |
-        ==============================================================
-      '';
+      banner = builtins.readFile ./.ssh/banner.txt;
       settings = {
         AuthorizedPrincipalsFile = "none";
         ChallengeResponseAuthentication = false;
@@ -334,7 +326,9 @@
         "wheel"
         "sshuser"
       ];
-      openssh.authorizedKeys.keys = lib.strings.splitString "\n" (builtins.readFile ./authorized_keys);
+      openssh.authorizedKeys.keys = lib.strings.splitString "\n" (
+        builtins.readFile ./.ssh/authorized_keys
+      );
     };
   };
 }
