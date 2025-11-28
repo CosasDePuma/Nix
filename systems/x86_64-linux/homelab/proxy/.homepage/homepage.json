@@ -1,21 +1,21 @@
 {
     "layout": {
+        "Hardware": {
+            "style": "row",
+            "columns": "3"
+        },
         "Media": {
             "style": "row",
             "columns": "2"
         },
         "MediaRequester": {
             "style": "row",
-            "columns": "3",
+            "columns": "2",
             "header": false
         },
         "Misc.": {
             "style": "row",
             "columns": "2"
-        },
-        "Hardware": {
-            "style": "row",
-            "columns": "3"
         }
     },
     "services": [
@@ -89,23 +89,6 @@
         },
         {
             "MediaRequester": [
-                {
-                    "Prowlarr": {
-                        "icon": "sh-prowlarr",
-                        "description": "Indexing torrents manager",
-                        "href": "https://requester.kike.wtf/torrents",
-                        "siteMonitor": "https://requester.kike.wtf/torrents",
-                        "widget": {
-                            "type": "prowlarr",
-                            "url": "https://requester.kike.wtf/torrents",
-                            "key": "{{HOMEPAGE_VAR_PROWLARR_API}}",
-                            "fields": [
-                                "numberOfGrabs",
-                                "numberOfFailGrabs"
-                            ]
-                        }
-                    }
-                },
                 {
                     "Radarr": {
                         "icon": "sh-radarr",

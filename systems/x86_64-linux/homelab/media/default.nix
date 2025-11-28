@@ -36,7 +36,7 @@
           device = "//192.168.1.3/${share}";
           fsType = "cifs";
           options = [
-            "credentials=${config.age.secrets."samba.creds".path}"
+            "credentials=${config.age.secrets."smb.creds".path}"
             "noauto"
             "x-systemd.automount"
             "x-systemd.device-timeout=5s"
@@ -64,7 +64,7 @@
   age = {
     identityPaths = builtins.map (key: key.path) config.services.openssh.hostKeys;
     secrets = {
-      "samba.creds".file = ./samba.creds.age;
+      "smb.creds".file = ./.smb/smb.creds.age;
     };
   };
 
@@ -259,18 +259,7 @@
       ];
       ports = [ ];
       startWhenNeeded = true;
-      banner = ''
-        ==============================================================
-        |                   AUTHORIZED ACCESS ONLY                   |
-        ==============================================================
-        |                                                            |
-        |    WARNING: All connections are monitored and recorded.    |
-        |  Disconnect IMMEDIATELY if you are not an authorized user! |
-        |                                                            |
-        |       *** Unauthorized access will be prosecuted ***       |
-        |                                                            |
-        ==============================================================
-      '';
+      banner = builtins.readFile ./.ssh/banner.txt;
       settings = {
         AuthorizedPrincipalsFile = "none";
         ChallengeResponseAuthentication = false;
@@ -312,18 +301,6 @@
         AllowUsers = lib.attrsets.mapAttrsToList (name: _: name) (
           lib.attrsets.filterAttrs (_: v: builtins.elem "sshuser" v.extraGroups) config.users.users
         );
-      };
-    };
-
-    # ┌──────────────────────────────────────┐
-    # │               Prowlarr               │
-    # └──────────────────────────────────────┘
-
-    prowlarr = {
-      enable = true;
-      settings.server = {
-        urlbase = "/torrents";
-        port = 9696;
       };
     };
 
@@ -421,7 +398,9 @@
         "wheel"
         "sshuser"
       ];
-      openssh.authorizedKeys.keys = lib.strings.splitString "\n" (builtins.readFile ./authorized_keys);
+      openssh.authorizedKeys.keys = lib.strings.splitString "\n" (
+        builtins.readFile ./.ssh/authorized_keys
+      );
     };
   };
 }

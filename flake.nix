@@ -70,6 +70,7 @@
         automation = nixosConfiguration ./systems/x86_64-linux/homelab/automation;
         media = nixosConfiguration ./systems/x86_64-linux/homelab/media;
         proxy = nixosConfiguration ./systems/x86_64-linux/homelab/proxy;
+        siem = nixosConfiguration ./systems/x86_64-linux/homelab/siem;
       };
 
       # +----------------- templates ------------------+

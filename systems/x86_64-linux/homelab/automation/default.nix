@@ -1,7 +1,6 @@
 {
   config ? throw "not imported as module",
   lib ? throw "not imported as module",
-  pkgs ? throw "not imported as module",
   stateVersion ? "25.05",
   ...
 }:
@@ -13,61 +12,10 @@
   boot.loader.grub.enable = true;
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  # ┃                Environment                ┃
-  # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-  environment.systemPackages = with pkgs; [
-    cifs-utils
-    rsync
-  ];
-
-  # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  # ┃                FileSystems                ┃
-  # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-  fileSystems = {
-    "/mnt/backups" = {
-      device = "//192.168.1.3/backups";
-      fsType = "cifs";
-      options = [
-        "credentials=${config.age.secrets."samba.creds".path}"
-        "noauto"
-        "x-systemd.automount"
-        "x-systemd.device-timeout=5s"
-        "x-systemd.idle-timeout=60"
-        "x-systemd.mount-timeout=5s"
-      ];
-    };
-    "/mnt/media" = {
-      device = "//192.168.1.3/media";
-      fsType = "cifs";
-      options = [
-        "credentials=${config.age.secrets."samba.creds".path}"
-        "noauto"
-        "x-systemd.automount"
-        "x-systemd.device-timeout=5s"
-        "x-systemd.idle-timeout=60"
-        "x-systemd.mount-timeout=5s"
-      ];
-    };
-  };
-
-  # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                 Hardware                  ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
   hardware.enableAllHardware = true;
-
-  # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  # ┃                Inputs: Age                ┃
-  # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-  age = {
-    identityPaths = builtins.map (key: key.path) config.services.openssh.hostKeys;
-    secrets = {
-      "samba.creds".file = ./samba.creds.age;
-    };
-  };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃               Inputs: Disko               ┃
@@ -214,18 +162,7 @@
       ];
       ports = [ ];
       startWhenNeeded = true;
-      banner = ''
-        ==============================================================
-        |                   AUTHORIZED ACCESS ONLY                   |
-        ==============================================================
-        |                                                            |
-        |    WARNING: All connections are monitored and recorded.    |
-        |  Disconnect IMMEDIATELY if you are not an authorized user! |
-        |                                                            |
-        |       *** Unauthorized access will be prosecuted ***       |
-        |                                                            |
-        ==============================================================
-      '';
+      banner = builtins.readFile ./.ssh/banner.txt;
       settings = {
         AuthorizedPrincipalsFile = "none";
         ChallengeResponseAuthentication = false;
@@ -317,7 +254,9 @@
         "wheel"
         "sshuser"
       ];
-      openssh.authorizedKeys.keys = lib.strings.splitString "\n" (builtins.readFile ./authorized_keys);
+      openssh.authorizedKeys.keys = lib.strings.splitString "\n" (
+        builtins.readFile ./.ssh/authorized_keys
+      );
     };
   };
 }
