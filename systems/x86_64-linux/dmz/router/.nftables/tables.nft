@@ -11,7 +11,7 @@ table inet filter {
 
         iifname {
             "vl10.homelab",
-            "vl20.gaming",
+            "vl20.hacking",
             "wireguard"
         } counter accept comment "Allow VLANs and VPN to access the router";
 
@@ -36,7 +36,7 @@ table inet filter {
 
         iifname {
             "vl10.homelab",
-            "vl20.gaming",
+            "vl20.hacking",
             "wireguard"
         } oifname "eth0" counter accept comment "Allow VLANs and VPN access to the Internet";
 
@@ -47,20 +47,17 @@ table inet filter {
         iifname "eth0" oifname "vl10.homelab" ct state new,established,related counter accept comment "Allow port forwarding from Internet to Homelab";
         
         iifname "vl10.homelab" oifname "vl10.homelab" ip daddr 10.0.10.254 counter accept comment "Allow Homelab traffic to Homelab router";
-        iifname "vl10.homelab" oifname "vl10.homelab" counter drop comment "Block Homelab traffic to other Homelab servers";
+        iifname "vl10.homelab" oifname "vl10.homelab" counter drop comment "Block Homelab traffic to other Homelab machines";
 
         iifname "vl10.homelab" oifname "eth0" ip daddr 192.168.1.3 tcp dport { 139, 445 } counter accept comment "Allow Homelab VLAN to SMB server TCP";
         iifname "vl10.homelab" oifname "eth0" ip daddr 192.168.1.3 udp dport { 137, 138 } counter accept comment "Allow Homelab VLAN to SMB server UDP";
 
         # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-        # ┃               VLAN: Gaming                ┃
+        # ┃               VLAN: Hacking               ┃
         # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-        iifname "vl20.gaming" oifname "vl20.gaming" ip daddr 10.0.20.254 counter accept comment "Allow Gaming traffic to Gaming router";
-        iifname "vl20.gaming" oifname "vl20.gaming" counter drop comment "Block Gaming traffic to other Gaming servers";
-
-        iifname "vl20.gaming" oifname "eth0" ip daddr 192.168.1.3 tcp dport { 139, 445 } counter accept comment "Allow Gaming VLAN to SMB server TCP";
-        iifname "vl20.gaming" oifname "eth0" ip daddr 192.168.1.3 udp dport { 137, 138 } counter accept comment "Allow Gaming VLAN to SMB server UDP";
+        iifname "vl20.hacking" oifname "vl20.hacking" counter accept comment "Allow Hacking traffic to other Hacking machines";
+        iifname "vl20.hacking" oifname "wireguard" counter accept comment "Allow Hacking VLAN to access WireGuard clients";
 
         # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
         # ┃                 WireGuard                 ┃
@@ -69,8 +66,9 @@ table inet filter {
         iifname "wireguard" oifname "wireguard" ip daddr 10.10.10.254 counter accept comment "Allow WireGuard traffic to WireGuard router";
         iifname "wireguard" oifname "wireguard" counter drop comment "Block WireGuard traffic to other WireGuard clients";
 
-        iifname "wireguard" oifname { "vl10.homelab", "vl20.gaming" } tcp dport { 22, 64022 } counter accept comment "Allow WireGuard SSH access to VLANs";
+        iifname "wireguard" oifname "vl10.homelab" tcp dport { 22, 64022 } counter accept comment "Allow WireGuard SSH access to Homelab servers";
         iifname "wireguard" oifname "vl10.homelab" ip daddr 10.0.10.1 tcp dport 443 counter accept comment "Allow WireGuard HTTPS access to Homelab reverse proxy";
+        iifname "wireguard" oifname "vl20.hacking" counter accept comment "Allow WireGuard access to Hacking VLAN";
     }
 }
 table ip nat {

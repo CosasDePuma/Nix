@@ -128,7 +128,7 @@ in
           prefixLength = 24;
         }
       ];
-      "vl20.gaming".ipv4.addresses = [
+      "vl20.hacking".ipv4.addresses = [
         {
           address = "10.0.20.254";
           prefixLength = 24;
@@ -146,7 +146,7 @@ in
         id = 10;
         interface = "eth1";
       };
-      "vl20.gaming" = {
+      "vl20.hacking" = {
         id = 20;
         interface = "eth1";
       };
@@ -284,7 +284,7 @@ in
 
     ddclient = {
       enable = true;
-      domains = [ domain ];
+      domains = [ "vpn.${domain}" ];
       interval = "1h";
       protocol = "cloudflare";
       passwordFile = config.age.secrets."cloudflare.key".path;
@@ -304,12 +304,12 @@ in
         bind-dynamic = true;
         interface = [
           "vl10.homelab"
-          "vl20.gaming"
+          "vl20.hacking"
           "wireguard"
         ];
         dhcp-range = [
           "vl10.homelab,10.0.10.100,10.0.10.200,255.255.255.0,24h"
-          "vl20.gaming,10.0.20.100,10.0.20.200,255.255.255.0,24h"
+          "vl20.hacking,10.0.20.100,10.0.20.200,255.255.255.0,24h"
         ];
         dhcp-option = [
           "vl10.homelab,option:router,${
@@ -318,11 +318,11 @@ in
           "vl10.homelab,option:dns-server,${
             (builtins.head config.networking.interfaces."vl10.homelab".ipv4.addresses).address
           }"
-          "vl20.gaming,option:router,${
-            (builtins.head config.networking.interfaces."vl20.gaming".ipv4.addresses).address
+          "vl20.hacking,option:router,${
+            (builtins.head config.networking.interfaces."vl20.hacking".ipv4.addresses).address
           }"
-          "vl20.gaming,option:dns-server,${
-            (builtins.head config.networking.interfaces."vl20.gaming".ipv4.addresses).address
+          "vl20.hacking,option:dns-server,${
+            (builtins.head config.networking.interfaces."vl20.hacking".ipv4.addresses).address
           }"
         ];
         cache-size = 1000;
