@@ -181,34 +181,34 @@ in
                 name = "family-david";
                 publicKey = "ojqm9Pk4bWfAkoIwvEXRKf+bmxrra1C81HHxltsUhEU=";
               }
-              {
-                name = "friends-carolina";
-                publicKey = "cdTNp+I3u7jpKWPrjg1QsfzQhLAdPZmJMxd1IXd9pFY=";
-              }
-              {
-                name = "frieds-peblo-tv";
-                publicKey = "KPsh7wV9s+jZVAU4gqysErsRkHlQ0XT5gA6Y7E7OUQM=";
-              }
-              {
-                name = "frieds-gabi-pc";
-                publicKey = "/Xcib4hmIUhwjW7UQIgF+7TWz0y54a9/zfh6IUt2Bio=";
-              }
-              {
-                name = "friends-gabi-movil";
-                publicKey = "dL05dJsgNuDczO9Mx7v5SueoKvmyFPoMHSX8Id3KYGQ=";
-              }
-              {
-                name = "friends-gabi-tv";
-                publicKey = "tim3QC6RAXa4CqOLp8WO616LPSAz5X6EVSL/vo2OO0I=";
-              }
-              {
-                name = "friends-pabloorg-pc";
-                publicKey = "uV16lL5MEJWpULQUmSfxELNUC9nWp0aqZDSXQTJFFV8=";
-              }
-              {
-                name = "friends-pol-pc";
-                publicKey = "MfuxUAJhZlcX7gxvfeJNfb/Vie4SCgOwfcv0DBEZNg8=";
-              }
+              #{
+              #  name = "friends-carolina";
+              #  publicKey = "cdTNp+I3u7jpKWPrjg1QsfzQhLAdPZmJMxd1IXd9pFY=";
+              #}
+              #{
+              #  name = "frieds-peblo-tv";
+              #  publicKey = "KPsh7wV9s+jZVAU4gqysErsRkHlQ0XT5gA6Y7E7OUQM=";
+              #}
+              #{
+              #  name = "frieds-gabi-pc";
+              #  publicKey = "/Xcib4hmIUhwjW7UQIgF+7TWz0y54a9/zfh6IUt2Bio=";
+              #}
+              #{
+              #  name = "friends-gabi-movil";
+              #  publicKey = "dL05dJsgNuDczO9Mx7v5SueoKvmyFPoMHSX8Id3KYGQ=";
+              #}
+              #{
+              #  name = "friends-gabi-tv";
+              #  publicKey = "tim3QC6RAXa4CqOLp8WO616LPSAz5X6EVSL/vo2OO0I=";
+              #}
+              #{
+              #  name = "friends-pabloorg-pc";
+              #  publicKey = "uV16lL5MEJWpULQUmSfxELNUC9nWp0aqZDSXQTJFFV8=";
+              #}
+              #{
+              #  name = "friends-pol-pc";
+              #  publicKey = "MfuxUAJhZlcX7gxvfeJNfb/Vie4SCgOwfcv0DBEZNg8=";
+              #}
             ];
           in
           lib.lists.imap1 (i: user: {
