@@ -112,7 +112,8 @@ audea.com, www.audea.com {
 
 aur.audea.com {
 	bind 172.16.0.2 10.10.10.254
-    reverse_proxy https://10.0.255.9:443
+    # reverse_proxy https://10.0.255.9:443
+	reverse_proxy https://185.37.226.49:443
 
     import logs aur
 	import encoding
