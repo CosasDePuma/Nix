@@ -118,13 +118,15 @@
     # --- cli applications
     brews = [
       "bat"
+      "bitwarden-cli"
+      "chezmoi"
       "direnv"
-      "fish"
       "git"
       "lsd"
       "starship"
       "stow"
       "zoxide"
+      "zsh"
     ];
 
     # --- graphical applications
@@ -147,8 +149,8 @@
           "whatsapp"
         ])
         (organize "Development" [
+          "ghostty"
           "visual-studio-code"
-          "warp"
         ])
         (organize "Entertainment" [
           "spotify"
@@ -158,9 +160,6 @@
           "burp-suite-professional"
           "firefox"
           "obsidian"
-        ])
-        (organize "HomeLab" [
-          "bitwarden"
         ])
         (organize "Utilities" [
           "brave-browser"

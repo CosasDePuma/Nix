@@ -165,6 +165,7 @@ in
         email = "acme@${domain}";
         environmentFile = config.age.secrets."acme.env".path;
         extraDomainNames = [ "*.${domain}" ];
+        renewInterval = "90d";
       };
     };
     pam = {

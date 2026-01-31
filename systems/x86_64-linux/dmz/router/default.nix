@@ -284,7 +284,7 @@ in
 
     ddclient = {
       enable = true;
-      domains = [ "vpn.${domain}" ];
+      domains = [ "vpn.${domain}" "minecraft.${domain}" ];
       interval = "1h";
       protocol = "cloudflare";
       passwordFile = config.age.secrets."cloudflare.key".path;
