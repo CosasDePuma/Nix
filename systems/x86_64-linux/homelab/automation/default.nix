@@ -1,6 +1,7 @@
 {
   config ? throw "not imported as module",
   lib ? throw "not imported as module",
+  pkgs ? throw "not imported as module",
   stateVersion ? "25.05",
   ...
 }:
@@ -12,10 +13,57 @@
   boot.loader.grub.enable = true;
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  # ┃                Environment                ┃
+  # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  environment.systemPackages = with pkgs; [
+    cifs-utils
+    handbrake
+  ];
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  # ┃                FileSystems                ┃
+  # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  fileSystems = builtins.listToAttrs (
+    builtins.map
+      (share: {
+        name = "/mnt/${share}";
+        value = {
+          device = "//192.168.1.3/${share}";
+          fsType = "cifs";
+          options = [
+            "credentials=${config.age.secrets."smb.creds".path}"
+            "noauto"
+            "x-systemd.automount"
+            "x-systemd.device-timeout=5s"
+            "x-systemd.idle-timeout=60"
+            "x-systemd.mount-timeout=5s"
+          ];
+        };
+      })
+      [
+        "backups"
+        "media"
+      ]
+  );
+
+  # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                 Hardware                  ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
   hardware.enableAllHardware = true;
+
+  # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  # ┃                Inputs: Age                ┃
+  # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  age = {
+    identityPaths = builtins.map (key: key.path) config.services.openssh.hostKeys;
+    secrets = {
+      "smb.creds".file = ./.smb/smb.creds.age;
+    };
+  };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃               Inputs: Disko               ┃
@@ -143,7 +191,7 @@
 
     n8n = {
       enable = true;
-      webhookUrl = "https://automate.kike.wtf";
+      environment.WEBHOOK_URL = "https://automate.kike.wtf";
     };
 
     # ┌──────────────────────────────────────┐
