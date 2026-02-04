@@ -17,6 +17,6 @@ mkShell {
     statix # nixos configuration linter
 
     inputs.agenix.packages.${system}.default # secret management
-    inputs.nix-darwin.packages.${system}.default # darwin configuration rebuild
+    (lib.optional (system == "aarch64-darwin") inputs.nix-darwin.packages.${system}.default) # darwin configuration rebuild
   ];
 }
