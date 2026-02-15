@@ -71,6 +71,8 @@
         media = nixosConfiguration ./systems/x86_64-linux/homelab/media;
         proxy = nixosConfiguration ./systems/x86_64-linux/homelab/proxy;
         siem = nixosConfiguration ./systems/x86_64-linux/homelab/siem;
+        # --- | Vulnerable
+        "5g" = nixosConfiguration ./systems/x86_64-linux/vulnerable/5g;
       };
 
       # +----------------- templates ------------------+
