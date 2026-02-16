@@ -123,8 +123,8 @@
       "direnv"
       "git"
       "lsd"
+      "opencode"
       "starship"
-      "stow"
       "zoxide"
       "zsh"
     ];
@@ -157,7 +157,6 @@
           "steam"
         ])
         (organize "Hacking" [
-          "burp-suite-professional"
           "firefox"
           "obsidian"
         ])
