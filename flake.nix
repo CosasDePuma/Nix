@@ -66,13 +66,12 @@
 
       nixosConfigurations = {
         router = nixosConfiguration ./systems/x86_64-linux/dmz/router;
+        # --- | Desktop
+        wonderland = nixosConfiguration ./systems/x86_64-linux/desktop/wonderland;
         # --- | Homelab
         automation = nixosConfiguration ./systems/x86_64-linux/homelab/automation;
         media = nixosConfiguration ./systems/x86_64-linux/homelab/media;
         proxy = nixosConfiguration ./systems/x86_64-linux/homelab/proxy;
-        siem = nixosConfiguration ./systems/x86_64-linux/homelab/siem;
-        # --- | Vulnerable
-        "5g" = nixosConfiguration ./systems/x86_64-linux/vulnerable/5g;
       };
 
       # +----------------- templates ------------------+
