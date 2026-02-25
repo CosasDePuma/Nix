@@ -65,7 +65,7 @@
       # +--------------- nixos systems ----------------+
 
       nixosConfigurations = {
-        router = nixosConfiguration ./systems/x86_64-linux/dmz/router;
+        router = nixosConfiguration ./systems/x86_64-linux/homelab/router;
         # --- | Desktop
         wonderland = nixosConfiguration ./systems/x86_64-linux/desktop/wonderland;
         # --- | Homelab
