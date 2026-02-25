@@ -27,14 +27,63 @@
   # ┃                Environment                ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-  environment.systemPackages = with pkgs; [
-    git
-    nano
-    direnv
-    opencode
-    vscodium
-    zsh
-  ];
+  environment = {
+    # --- environment variables
+    sessionVariables = {
+      NIXOS_OZONE_WL = "1";
+    };
+    # --- applications
+    systemPackages = with pkgs; [
+
+      # desktop
+      ghostty
+      mako
+      niri
+      rofi
+      swww
+      tuigreet
+      uwsm
+      waybar
+
+      # terminal
+      bat
+      direnv
+      git
+      lsd
+      nano
+      starship
+      zoxide
+
+      # development
+      opencode
+      vscode
+
+      # miscellaneous
+      spotify
+    ];
+  };
+
+  # --- desktop
+  xdg = {
+    portal = {
+      enable = true;
+      wlr.enable = true;
+      extraPortals = [
+        pkgs.xdg-desktop-portal-gtk
+      ];
+      config.common.default = "*";
+    };
+  };
+
+  # --- fonts
+  fonts = {
+    enableDefaultPackages = true;
+    packages = with pkgs; [
+      fira-code
+      fira-code-symbols
+      font-awesome
+    ];
+  };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                 Hardware                  ┃
@@ -46,7 +95,7 @@
   };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  # ┃            Internationalisation           ┃
+  # ┃           Internationalisation            ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
   i18n = {
@@ -69,38 +118,89 @@
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
   networking = {
+    # --- host
     hostName = "wonderland";
     hostId = builtins.substring 0 8 (builtins.hashString "md5" config.networking.hostName);
+    # --- interfaces
     networkmanager.enable = true;
+    usePredictableInterfaceNames = false;
+    # --- dns
+    domain = "home";
+    search = [ "home" ];
+    nameservers = [ "1.1.1.1" "8.8.8.8" ];
+    # --- firewall
+    firewall = {
+      enable = true;
+      allowedTCPPorts = [ 22 ];
+      allowedUDPPorts = [ ];
+    };
+  };
+
+  # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  # ┃                    Nix                    ┃
+  # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  nix = {
+    extraOptions = ''
+      experimental-features = nix-command flakes
+    '';
+    gc = {
+      automatic = true;
+      dates = "weekly";
+      options = "--delete-older-than 7d";
+      persistent = true;
+    };
+    settings.allowed-users = [ "@wheel" ];
   };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                 NixPkgs                   ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-  nixpkgs = {
-    config.allowUnfree = true;
-    hostPlatform = lib.mkDefault "x86_64-linux";
+  nixpkgs.config.allowUnfree = true;
+
+  # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  # ┃                  Security                 ┃
+  # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  security = {
+    pam = {
+      sshAgentAuth.enable = true;
+      services."sudo".sshAgentAuth = true;
+    };
+    sudo-rs = {
+      enable = true;
+      execWheelOnly = true;
+    };
   };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                 Programs                  ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-  programs.firefox.enable = true;
+  programs = {
+    firefox.enable = true;
+    zsh.enable = true;
+    dconf.enable = true;
+  };
 
-  # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  # ┃                 Security                  ┃
-  # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-  security.rtkit.enable = true;
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                 Services                  ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
   services = {
-    # --- audio
+
+    # ┌──────────────────────────────────────┐
+    # │                 Dbus                 │
+    # └──────────────────────────────────────┘
+
+    dbus.enable = true;
+
+    # ┌──────────────────────────────────────┐
+    # │                Audio                 │
+    # └──────────────────────────────────────┘
+
     pipewire = {
       enable = true;
       alsa = {
@@ -111,17 +211,29 @@
     };
     pulseaudio.enable = false;
 
-    # --- printing
-    printing.enable = true;
+    # ┌──────────────────────────────────────┐
+    # │           Display Manager            │
+    # └──────────────────────────────────────┘
 
-    # --- display server
+    greetd = {
+      enable = true;
+      settings = {
+        default_session = {
+          command = "${pkgs.tuigreet}/bin/tuigreet --time --cmd niri-session";
+          user = "greeter";
+        };
+      };
+    };
+
+    # ┌──────────────────────────────────────┐
+    # │               Desktop                │
+    # └──────────────────────────────────────┘
+
     xserver = {
       enable = true;
-      desktopManager.cinnamon.enable = true;
-      displayManager.lightdm.enable = true;
       xkb = {
-        layout = "us";
-        variant = "";
+        layout = "us,es";
+        options = "grp:lalt_lshift_toggle";
       };
     };
   };
@@ -145,10 +257,18 @@
   users.users.rabbit = {
     isNormalUser = true;
     description = "White Rabbit";
+    shell = pkgs.zsh;
     extraGroups = [
       "networkmanager"
       "wheel"
     ];
-    packages = with pkgs; [ ];
   };
+
+  users.users.greeter = {
+    isSystemUser = true;
+    group = "greeter";
+    description = "greetd greeter user";
+  };
+
+  users.groups.greeter = { };
 }
