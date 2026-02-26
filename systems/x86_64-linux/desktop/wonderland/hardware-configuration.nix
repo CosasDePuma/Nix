@@ -18,7 +18,7 @@
         "usbhid"
         "sd_mod"
       ];
-      kernelModules = [ ];
+      kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
     };
     kernelModules = [ "kvm-amd" ];
     extraModulePackages = [ ];
