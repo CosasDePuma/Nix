@@ -21,6 +21,7 @@
       systemd-boot.enable = true;
       efi.canTouchEfiVariables = true;
     };
+    kernelParams = [ "nvidia-drm.modeset=1" ];
   };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -30,6 +31,11 @@
   environment = {
     # --- environment variables
     sessionVariables = {
+      # nvidia
+      __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+      GBM_BACKEND = "nvidia-drm";
+      LIBVA_DRIVER_NAME = "nvidia";
+      # wayland
       NIXOS_OZONE_WL = "1";
     };
     # --- applications
@@ -59,6 +65,7 @@
       vscode
 
       # miscellaneous
+      discord
       spotify
     ];
   };
@@ -92,6 +99,22 @@
   hardware = {
     enableAllHardware = true;
     cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+    
+    # --- nvidia
+    nvidia = {
+      modesetting.enable = true;
+      package = config.boot.kernelPackages.nvidiaPackages.latest;
+      powerManagement.enable = false;
+      powerManagement.finegrained = false;
+      open = false;
+      nvidiaSettings = true;
+    };
+    
+    # --- graphics
+    graphics = {
+      enable = true;
+      enable32Bit = true;
+    };
   };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -127,7 +150,10 @@
     # --- dns
     domain = "home";
     search = [ "home" ];
-    nameservers = [ "1.1.1.1" "8.8.8.8" ];
+    nameservers = [
+      "1.1.1.1"
+      "8.8.8.8"
+    ];
     # --- firewall
     firewall = {
       enable = true;
@@ -184,7 +210,6 @@
     dconf.enable = true;
   };
 
-
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                 Services                  ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
@@ -231,6 +256,7 @@
 
     xserver = {
       enable = true;
+      videoDrivers = [ "nvidia" ];
       xkb = {
         layout = "us,es";
         options = "grp:lalt_lshift_toggle";
