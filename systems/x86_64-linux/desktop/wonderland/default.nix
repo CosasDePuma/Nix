@@ -37,6 +37,7 @@
       LIBVA_DRIVER_NAME = "nvidia";
       # wayland
       NIXOS_OZONE_WL = "1";
+      XDG_SESSION_TYPE = "wayland";
     };
     # --- applications
     systemPackages = with pkgs; [
@@ -50,6 +51,7 @@
       tuigreet
       uwsm
       waybar
+      xwayland-satellite
 
       # terminal
       bat
@@ -74,11 +76,19 @@
   xdg = {
     portal = {
       enable = true;
-      wlr.enable = true;
-      extraPortals = [
-        pkgs.xdg-desktop-portal-gtk
+      config = {
+        common = {
+          default = [ "gtk" ];
+          "org.freedesktop.impl.portal.ScreenCast" = [ "gnome" ];
+          "org.freedesktop.impl.portal.RemoteDesktop" = [ "gnome" ];
+        };
+      };
+      extraPortals = with pkgs; [
+        xdg-desktop-portal-gtk
+        xdg-desktop-portal-gnome
       ];
-      config.common.default = "*";
+      wlr.enable = true;
+      xdgOpenUsePortal = true;
     };
   };
 
@@ -99,17 +109,17 @@
   hardware = {
     enableAllHardware = true;
     cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-    
+
     # --- nvidia
     nvidia = {
       modesetting.enable = true;
       package = config.boot.kernelPackages.nvidiaPackages.latest;
       powerManagement.enable = false;
       powerManagement.finegrained = false;
-      open = false;
+      open = true;
       nvidiaSettings = true;
     };
-    
+
     # --- graphics
     graphics = {
       enable = true;
@@ -205,9 +215,10 @@
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
   programs = {
-    firefox.enable = true;
-    zsh.enable = true;
     dconf.enable = true;
+    firefox.enable = true;
+    xwayland.enable = true;
+    zsh.enable = true;
   };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -265,6 +276,42 @@
   };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  # ┃              Specialisations              ┃
+  # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  specialisation = {
+    # --- gaming
+    gaming = {
+      inheritParentConfig = true;
+      configuration = {
+        environment = {
+          sessionVariables = {
+            GAMEMODERUNEXEC = "1";
+            MANGOHUD = "1";
+            PROTON_ENABLE_WAYLAND = "1";
+            PROTON_USE_WINED3D = "0";
+            SDL_VIDEODRIVER = "wayland";
+            STEAM_USE_WAYLAND = "1";
+          };
+          systemPackages = with pkgs; [
+            mangohud
+            gamemode
+            wayland
+          ];
+        };
+        programs = {
+          steam = {
+            dedicatedServer.openFirewall = true;
+            enable = true;
+            extraCompatPackages = with pkgs; [ proton-ge-bin ];
+            remotePlay.openFirewall = true;
+          };
+        };
+      };
+    };
+  };
+
+  # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                  System                   ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
@@ -297,4 +344,5 @@
   };
 
   users.groups.greeter = { };
+
 }
