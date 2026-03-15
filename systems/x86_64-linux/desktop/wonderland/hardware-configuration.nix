@@ -1,7 +1,4 @@
 {
-  config ? throw "not imported as module",
-  lib ? throw "not imported as module",
-  pkgs ? throw "not imported as module",
   modulesPath ? throw "not imported as module",
   ...
 }:

@@ -1,4 +1,6 @@
-/**/.direnv/
+# Files
 /**/.DS_Store
 /**/result*
-/**/.reference/
+
+# Folders
+/**/.direnv/

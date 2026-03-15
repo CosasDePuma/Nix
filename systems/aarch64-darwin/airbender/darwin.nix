@@ -123,10 +123,13 @@
       "direnv"
       "git"
       "lsd"
-      "opencode"
       "starship"
       "zoxide"
       "zsh"
+      # --- ai tools
+      "gemini-cli"
+      "ollama"
+      "opencode"
     ];
 
     # --- graphical applications
@@ -149,23 +152,24 @@
           "whatsapp"
         ])
         (organize "Development" [
+          "claude-code"
           "ghostty"
+          "kiro"
           "visual-studio-code"
         ])
         (organize "Entertainment" [
           "spotify"
           "steam"
         ])
-        (organize "Hacking" [
-          "firefox"
-          "obsidian"
-        ])
-        (organize "Utilities" [
-          "brave-browser"
+        (organize "System" [
           "flameshot"
           "font-fira-code-nerd-font"
           "font-jetbrains-mono-nerd-font"
           "the-unarchiver"
+        ])
+        (organize "Utilities" [
+          "brave-browser"
+          "obsidian"
         ])
         (organize "Virtualization" [
           "orbstack"
