@@ -77,13 +77,9 @@
       # +----------------- templates ------------------+
 
       templates = {
-        flake = {
-          path = ./templates/flake;
-          description = "Flake template";
-        };
-        shell = {
-          path = ./templates/shell;
-          description = "Shell template for development environments";
+        workspace = {
+          path = ./templates/workspace;
+          description = "Workspace template";
         };
       };
     };

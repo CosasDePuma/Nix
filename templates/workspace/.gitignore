@@ -1,0 +1,7 @@
+# Folders
+/**/.direnv/
+/**/.idea/
+
+# Files
+/**/.env
+/**/.DS_Store
