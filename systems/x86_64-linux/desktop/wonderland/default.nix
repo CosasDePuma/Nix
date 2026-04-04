@@ -1,8 +1,8 @@
 {
   config ? throw "not imported as module",
-  inputs ? throw "not imported as module",
   lib ? throw "not imported as module",
   pkgs ? throw "not imported as module",
+  firefox-addons,
   homeModules ? [ ],
   stateVersion ? "25.05",
   ...
@@ -196,7 +196,7 @@ in
     useGlobalPkgs = true;
     useUserPackages = true;
     extraSpecialArgs = {
-      inherit stateVersion username;
+      inherit firefox-addons stateVersion username;
     };
     users."${username}" = {
       imports = homeModules ++ [ ./home.nix ];
@@ -296,7 +296,6 @@ in
 
   programs = {
     dconf.enable = true;
-    firefox.enable = true;
     xwayland.enable = true;
     zsh.enable = true;
   };
