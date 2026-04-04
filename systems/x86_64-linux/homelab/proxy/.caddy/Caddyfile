@@ -1,0 +1,120 @@
+(defaults) {
+    import default-headers
+    import encoding
+    import tls
+}
+(default-headers) {
+    import joke-headers
+    import security-headers
+    import unwanted-headers
+}
+(encoding) {
+    encode gzip zstd
+}
+(joke-headers) {
+    header {
+        >server "'; DROP TABLE users; -- --"
+        >x-clacks-overhead "GNU Pumita"
+        >x-joke "What is the best thing about Switzerland? I don't know, but the flag is a big plus."
+        >x-nananananananana "Batman!"
+        >x-powered-by "Pumas, unicorns and rainbows </3"
+    }
+}
+(logs) {
+    log {
+        output file /var/log/caddy/{args[0]}.log
+        format console
+    }
+}
+(security-headers) {
+    header {
+        >cross-origin-embedder-policy "require-corp"
+        >cross-origin-opener-policy "same-origin"
+        >cross-origin-resource-policy "same-origin"
+        >frame-deny "sameorigin"
+        >permissions-policy "camera=(), geolocation=(), interest-cohort=(), microphone=()"
+        >referrer-policy "strict-origin"
+        >strict-transport-security "max-age=31536000; includeSubDomains; preload"
+        >x-content-type-options "nosniff"
+        >x-frame-options "deny"
+    }
+}
+(tls) {
+    tls /var/lib/acme/kike.wtf/cert.pem /var/lib/acme/kike.wtf/key.pem {
+        protocols tls1.2 tls1.3
+        curves x25519mlkem768 secp256r1 secp384r1
+        ciphers TLS_AES_256_GCM_SHA384 TLS_AES_128_GCM_SHA256 TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384 TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384 
+    }
+}
+(unwanted-headers) {
+    header {
+        -expect-ct
+        -via
+        -x-aspnet-version
+        -x-aspnetmvc-version
+        -x-redirect-by
+        -x-xss-protection
+    }
+}
+
+{
+    auto_https disable_redirects
+}
+
+kike.wtf:443 {
+    import defaults
+    import logs homepage
+    reverse_proxy http://127.0.0.1:8082
+}
+automate.kike.wtf:443 {
+    import defaults
+    import logs n8n
+    reverse_proxy http://10.0.10.4:5678
+}
+books.kike.wtf:443 {
+    import defaults
+    import logs komga
+    reverse_proxy http://10.0.10.3:25600
+    request_body {
+        max_size 100MB
+    }
+}
+magnet.kike.wtf:443 {
+    import defaults
+    import logs deluge
+    reverse_proxy http://10.0.10.3:8080
+}
+requester.kike.wtf:443 {
+    import defaults
+    import logs arr
+
+    @movies path_regexp /movies(/.*)?$
+    handle @movies {
+        reverse_proxy http://10.0.10.3:7878
+    }
+
+    @series path_regexp /series(/.*)?$
+    handle @series {
+        reverse_proxy http://10.0.10.3:8989
+    }
+
+    @torrents path_regexp ^/torrents(/.*)?$
+    handle @torrents {
+        reverse_proxy http://10.0.10.3:9696
+    }
+
+    handle {
+        abort
+    }
+}
+streaming.kike.wtf:443 {
+    import defaults
+    import logs jellyfin
+    reverse_proxy http://10.0.10.3:8096
+    request_body {
+        max_size 100MB
+    }
+}
+:443 {
+    abort
+}
