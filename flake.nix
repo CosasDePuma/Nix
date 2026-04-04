@@ -10,7 +10,8 @@
         "x86_64-linux"
       ];
       extraArgs = {
-        inherit inputs lib;
+        inherit lib;
+        firefox-addons = inputs.firefox-addons.packages;
         homeModules = [
           inputs.catppuccin.homeModules.default
         ];
@@ -107,6 +108,12 @@
     # disk partitioning to be used with `nixos-anywhere`
     disko = {
       url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # firefox addons to be used with `home-manager`
+    firefox-addons = {
+      url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
