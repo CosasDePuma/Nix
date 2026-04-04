@@ -21,7 +21,7 @@ rec {
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
   programs = {
-    # --- bat
+    #region bat
     bat = {
       enable = true;
       config = {
@@ -30,14 +30,19 @@ rec {
         style = "plain";
       };
     };
+    #endregion
 
-    # --- claude
+    #region claude
     claude-code = {
       enable = true;
       enableMcpIntegration = true;
+      outputStyles = {
+        "Caveman" = ./.claude/output-styles/Caveman.md;
+      };
     };
+    #endregion
 
-    # --- direnv
+    #region direnv
     direnv = {
       enable = true;
       enableBashIntegration = true;
@@ -45,8 +50,9 @@ rec {
       nix-direnv.enable = true;
       silent = true;
     };
+    #endregion
 
-    # --- firefox
+    #region firefox
     firefox =
       let
         extension = name: "https://addons.mozilla.org/firefox/downloads/latest/${name}/latest.xpi";
@@ -97,6 +103,12 @@ rec {
             "{446900e4-71c2-419f-a6a7-df9c091e268b}" = {
               default_area = "navbar";
               install_url = extension "bitwarden-password-manager";
+              installation_mode = "normal_installed";
+              private_browsing = true;
+            };
+            "support@lastpass.com" = {
+              default_area = "menupanel";
+              install_url = extension "lastpass-password-manager";
               installation_mode = "normal_installed";
               private_browsing = true;
             };
@@ -244,8 +256,9 @@ rec {
           };
         };
       };
+    #endregion
 
-    # --- ghostty
+    #region ghostty
     ghostty = {
       enable = true;
       enableBashIntegration = true;
@@ -260,8 +273,9 @@ rec {
         window-padding-y = 10;
       };
     };
+    #endregion
 
-    # --- git
+    #region git
     git = {
       enable = true;
       ignores = [
@@ -293,7 +307,6 @@ rec {
         push.autoSetupRemote = true;
         url = {
           "git@github.com:".insteadOf = "github:";
-          "https://github.com/".insteadOf = "github/";
         };
         user = {
           email = "26680023+CosasDePuma@users.noreply.github.com";
@@ -301,16 +314,18 @@ rec {
         };
       };
     };
+    #endregion
 
-    # --- lsd
+    #region lsd
     lsd = {
       enable = true;
       enableBashIntegration = true;
       enableZshIntegration = true;
       settings.color.when = "always";
     };
+    #endregion
 
-    # --- mcps
+    #region mcps
     mcp = {
       enable = true;
       servers = {
@@ -324,8 +339,16 @@ rec {
         };
       };
     };
+    #endregion
 
-    # --- starship
+    #region quickshell
+    quickshell = {
+      enable = true;
+      systemd.enable = true;
+    };
+    #endregion
+
+    #region starship
     starship = {
       enable = true;
       enableBashIntegration = true;
@@ -351,8 +374,9 @@ rec {
         sudo.disabled = true;
       };
     };
+    #endregion
 
-    # --- vscode
+    #region vscode
     vscode = {
       enable = true;
       profiles =
@@ -394,16 +418,18 @@ rec {
           };
         };
     };
+    #endregion
 
-    # --- zoxide
+    #region zoxide
     zoxide = {
       enable = true;
       enableBashIntegration = true;
       enableZshIntegration = true;
       options = [ "--cmd cd" ];
     };
+    #endregion
 
-    # --- zsh
+    #region zsh
     zsh = {
       enable = true;
       enableCompletion = true;
@@ -425,24 +451,27 @@ rec {
       };
     };
   };
+  #endregion
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                 Services                  ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
   services = {
-    # --- ssh-agent
+    #region ssh-agent
     ssh-agent = {
       enable = true;
       enableBashIntegration = true;
       enableZshIntegration = true;
     };
+    #endregion
   };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                   Theme                   ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
+  #region theme
   catppuccin = {
     enable = true;
     flavor = "macchiato";
@@ -451,4 +480,5 @@ rec {
       "python" = { };
     };
   };
+  #endregion
 }

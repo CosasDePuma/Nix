@@ -141,7 +141,7 @@ in
       config = {
         common = {
           default = [ "*" ];
-          "org.freedesktop.impl.portal.ScreenCast" = [ "gnome" ];
+          "org.freedesktop.impl.portal.ScreenCast" = [ "wlr" ];
           "org.freedesktop.impl.portal.RemoteDesktop" = [ "gnome" ];
         };
       };
@@ -149,8 +149,8 @@ in
         xdg-desktop-portal-gtk
         xdg-desktop-portal-gnome
       ];
-      wlr.enable = true;
       xdgOpenUsePortal = true;
+      wlr.enable = true;
     };
   };
 
