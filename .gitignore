@@ -1,6 +1,15 @@
-# Files
-/**/.DS_Store
-/**/result*
-
-# Folders
-/**/.direnv/
+**/*~
+**/*.bck
+**/*.env
+**/*.local.*
+**/*.pyc
+**/*.swp
+**/.desktop.ini
+**/.direnv/
+**/.DS_Store
+**/.idea/
+**/__pycache__/
+**/build/
+**/dist/
+**/node_modules/
+**/result/
