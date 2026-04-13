@@ -2,6 +2,7 @@
 **/*.bck
 **/*.env
 **/*.local.*
+**/*.log
 **/*.pyc
 **/*.swp
 **/.desktop.ini
