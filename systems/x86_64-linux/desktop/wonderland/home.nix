@@ -59,6 +59,7 @@ rec {
       in
       {
         enable = true;
+        configPath = ".mozilla/firefox";
         package = pkgs.firefox-esr;
         policies = {
           AutofillAddressEnabled = false;
@@ -450,8 +451,8 @@ rec {
         "--help" = "--help 2>&1 | ${pkgs.bat}/bin/bat --language=help";
       };
     };
+    #endregion
   };
-  #endregion
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                 Services                  ┃
@@ -459,11 +460,7 @@ rec {
 
   services = {
     #region ssh-agent
-    ssh-agent = {
-      enable = true;
-      enableBashIntegration = true;
-      enableZshIntegration = true;
-    };
+    ssh-agent.enable = true;
     #endregion
   };
 

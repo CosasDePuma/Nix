@@ -14,7 +14,7 @@ in
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                   Boot                    ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
+  #region boot
   boot = {
     loader = {
       systemd-boot.enable = true;
@@ -40,11 +40,12 @@ in
     kernelModules = [ "kvm-amd" ];
     extraModulePackages = [ ];
   };
+  #endregion
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                   Disko                   ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
+  #region disko
   disko.devices = {
     disk."main" = {
       device = "/dev/nvme0n1";
@@ -88,11 +89,12 @@ in
       ];
     };
   };
+  #endregion
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                Environment                ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
+  #region environment
   environment = {
     pathsToLink = [ "/share/zsh" ]; # https://nix-community.github.io/home-manager/options.xhtml#opt-programs.zsh.enableCompletion
     # --- environment variables
@@ -111,7 +113,6 @@ in
       bibata-cursors
       brightnessctl
       kdePackages.dolphin
-      mako
       niri
       pavucontrol
       rofi
@@ -120,6 +121,7 @@ in
       uwsm
       waybar
       xwayland-satellite
+      libnotify
 
       # terminal
       nano
@@ -131,6 +133,8 @@ in
       # miscellaneous
       discord
       spotify
+      burpsuite
+      ftb-app
     ];
   };
 
@@ -162,11 +166,12 @@ in
       font-awesome
     ];
   };
+  #endregion
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                 Hardware                  ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
+  #region hardware
   hardware = {
     enableAllHardware = true;
     cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
@@ -187,11 +192,12 @@ in
       enable32Bit = true;
     };
   };
+  #endregion
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃               Home Manager                ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
+  #region home-manager
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
@@ -202,11 +208,12 @@ in
       imports = homeModules ++ [ ./home.nix ];
     };
   };
+  #endregion
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃           Internationalisation            ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
+  #region internationalisation
   i18n = {
     defaultLocale = "en_US.UTF-8";
     extraLocaleSettings = {
@@ -221,11 +228,12 @@ in
       LC_TIME = "es_ES.UTF-8";
     };
   };
+  #endregion
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                Networking                 ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
+  #region networking
   networking = {
     # --- host
     hostName = "wonderland";
@@ -250,11 +258,12 @@ in
       allowedUDPPorts = [ ];
     };
   };
+  #endregion
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                    Nix                    ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
+  #region nix
   nix = {
     extraOptions = ''
       experimental-features = nix-command flakes
@@ -267,17 +276,19 @@ in
     };
     settings.allowed-users = [ "@wheel" ];
   };
+  #endregion
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                 NixPkgs                   ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
+  #region nixpkgs
   nixpkgs.config.allowUnfree = true;
+  #endregion
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                  Security                 ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
+  #region security
   security = {
     pam = {
       sshAgentAuth.enable = true;
@@ -289,21 +300,23 @@ in
       execWheelOnly = true;
     };
   };
+  #endregion
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                 Programs                  ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
+  #region programs
   programs = {
     dconf.enable = true;
     xwayland.enable = true;
     zsh.enable = true;
   };
+  #endregion
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                 Services                  ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
+  #region services
   services = {
 
     # ┌──────────────────────────────────────┐
@@ -351,6 +364,12 @@ in
     };
 
     # ┌──────────────────────────────────────┐
+    # │                  AI                  │
+    # └──────────────────────────────────────┘
+
+    ollama.enable = true;
+
+    # ┌──────────────────────────────────────┐
     # │               Desktop                │
     # └──────────────────────────────────────┘
 
@@ -363,11 +382,12 @@ in
       };
     };
   };
+  #endregion
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃              Specialisations              ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
+  #region specialisations
   specialisation = {
     # --- gaming
     gaming = {
@@ -399,47 +419,56 @@ in
       };
     };
   };
+  #endregion
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                  System                   ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
+  #region system
   system = { inherit stateVersion; };
+  #endregion
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                 Systemd                   ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
+  #region systemd
   systemd.tmpfiles.rules = [ "d /var/lib/alsa 0755 root root -" ];
+  #endregion
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                   Time                    ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
+  #region time
   time.timeZone = "Europe/Madrid";
+  #endregion
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                   Users                   ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-  users.users."${username}" = {
-    isNormalUser = true;
-    description = "White Rabbit";
-    shell = pkgs.zsh;
-    extraGroups = [
-      "networkmanager"
-      "wheel"
-    ];
+  #region users
+  users = {
+    # --- users
+    users = {
+      "${username}" = {
+        isNormalUser = true;
+        description = "White Rabbit";
+        shell = pkgs.zsh;
+        extraGroups = [
+          "networkmanager"
+          "wheel"
+        ];
+      };
+      "greeter" = {
+        isSystemUser = true;
+        group = "greeter";
+        description = "greetd greeter user";
+      };
+    };
+    # --- groups
+    groups = {
+      audio = { };
+      greeter = { };
+    };
   };
-
-  users.users."greeter" = {
-    isSystemUser = true;
-    group = "greeter";
-    description = "greetd greeter user";
-  };
-
-  users.groups = {
-    audio = { };
-    greeter = { };
-  };
+  #endregion
 }
