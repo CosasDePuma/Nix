@@ -304,7 +304,6 @@ in
       enable = true;
       allowSFTP = true;
       authorizedKeysInHomedir = false;
-      banner = builtins.readFile ./.ssh/banner.txt;
       listenAddresses = [
         {
           addr = "0.0.0.0";
@@ -314,6 +313,7 @@ in
       ports = [ ];
       startWhenNeeded = true;
       settings = {
+        Banner = toString ./.ssh/banner.txt;
         AllowUsers = lib.attrsets.mapAttrsToList (name: _: name) (
           lib.attrsets.filterAttrs (_: v: builtins.elem "sshuser" v.extraGroups) config.users.users
         );

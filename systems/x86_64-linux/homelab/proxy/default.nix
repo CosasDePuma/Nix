@@ -190,7 +190,7 @@ in
         enable = true;
         listenPort = 8082;
         allowedHosts = "*";
-        environmentFile = config.age.secrets."homepage.env".path;
+        environmentFiles = [ config.age.secrets."homepage.env".path ];
         settings = {
           inherit (homepageConfig) layout;
           color = "slate";
@@ -209,7 +209,6 @@ in
       enable = true;
       allowSFTP = true;
       authorizedKeysInHomedir = false;
-      banner = builtins.readFile ./.ssh/banner.txt;
       listenAddresses = [
         {
           addr = "0.0.0.0";
@@ -219,6 +218,7 @@ in
       ports = [ ];
       startWhenNeeded = true;
       settings = {
+        Banner = toString ./.ssh/banner.txt;
         AllowUsers = lib.attrsets.mapAttrsToList (name: _: name) (
           lib.attrsets.filterAttrs (_: v: builtins.elem "sshuser" v.extraGroups) config.users.users
         );

@@ -10,7 +10,7 @@
         "x86_64-linux"
       ];
       extraArgs = {
-        inherit lib;
+        inherit lib inputs;
         firefox-addons = inputs.firefox-addons.packages;
         homeModules = [
           inputs.catppuccin.homeModules.default
