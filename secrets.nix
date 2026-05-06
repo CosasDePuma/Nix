@@ -12,7 +12,7 @@ in
   # ┃                Automation                 ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-  "systems/x86_64-linux/homelab/automation/.smb/smb.creds.age".publicKeys = [
+  "modules/hosts/automation/.smb/smb.creds.age".publicKeys = [
     nixos
     vm-homelab.automation
   ];
@@ -21,7 +21,7 @@ in
   # ┃                   Media                   ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-  "systems/x86_64-linux/homelab/media/.smb/smb.creds.age".publicKeys = [
+  "modules/hosts/media/.smb/smb.creds.age".publicKeys = [
     nixos
     vm-homelab.media
   ];
@@ -30,11 +30,11 @@ in
   # ┃                   Proxy                   ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-  "systems/x86_64-linux/homelab/proxy/.acme/acme.env.age".publicKeys = [
+  "modules/hosts/proxy/.acme/acme.env.age".publicKeys = [
     nixos
     vm-homelab.proxy
   ];
-  "systems/x86_64-linux/homelab/proxy/.homepage/homepage.env.age".publicKeys = [
+  "modules/hosts/proxy/.homepage/homepage.env.age".publicKeys = [
     nixos
     vm-homelab.proxy
   ];
@@ -43,12 +43,12 @@ in
   # ┃                   Router                  ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-  "systems/x86_64-linux/homelab/router/.ddclient/cloudflare.key.age".publicKeys = [
+  "modules/hosts/router/.ddclient/cloudflare.key.age".publicKeys = [
     nixos
     vm-homelab.router
   ];
-  "systems/x86_64-linux/homelab/router/.wireguard/wireguard-profiles.conf.age".publicKeys = [ nixos ];
-  "systems/x86_64-linux/homelab/router/.wireguard/wireguard.key.age".publicKeys = [
+  "modules/hosts/router/.wireguard/wireguard-profiles.conf.age".publicKeys = [ nixos ];
+  "modules/hosts/router/.wireguard/wireguard.key.age".publicKeys = [
     nixos
     vm-homelab.router
   ];
