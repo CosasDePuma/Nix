@@ -1,7 +1,29 @@
-# Folders
-/**/.direnv/
-/**/.idea/
-
-# Files
-/**/.env
-/**/.DS_Store
+**/*~
+**/*.bck
+**/*.db
+**/*.env
+**/.env.local
+**/.env.*.local
+**/*.local.*
+**/*.log
+**/*.pyc
+**/*.swo
+**/*.swp
+**/*.tsbuildinfo
+**/.cache/
+**/.claude/
+**/.dastia/
+**/.desktop.ini
+**/.direnv/
+**/.DS_Store
+**/.idea/
+**/__pycache__/
+**/build/
+**/bun.lockb
+**/coverage/
+**/dist/*
+**/node_modules/
+**/result/
+**/temp/
+**/Thumbs.db
+**/tmp/
