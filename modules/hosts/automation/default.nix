@@ -4,7 +4,7 @@
     { config, pkgs, ... }:
     {
       imports = with inputs.self.modules.nixos; [
-        system-server
+        server-defaults
         (inputs.self.factory.homelab-user {
           name = "automation";
           description = "Automation management user";

@@ -1,23 +1,15 @@
 { inputs, ... }:
-let
-  user = "pumita";
-in
 {
   flake.modules.darwin.airbender = {
     imports = with inputs.self.modules.darwin; [
-      system-default
+      system-defaults
+      # --- software
+      claude-software
+      gemini-software
+      homebrew-software
     ];
 
     homebrew = {
-      enable = true;
-      global = {
-        autoUpdate = true;
-        brewfile = true;
-      };
-      onActivation = {
-        autoUpdate = true;
-        cleanup = "zap";
-      };
       brews = [
         "bat"
         "bitwarden-cli"
@@ -28,7 +20,6 @@ in
         "starship"
         "zoxide"
         "zsh"
-        "gemini-cli"
         "ollama"
         "opencode"
         "pi-coding-agent"
@@ -50,7 +41,6 @@ in
             "whatsapp"
           ])
           (organize "Development" [
-            "claude-code"
             "ghostty"
             "kiro"
             "visual-studio-code"
@@ -83,27 +73,7 @@ in
       };
     };
 
-    system = {
-      defaults = {
-        dock.autohide = true;
-        finder = {
-          CreateDesktop = false;
-          ShowExternalHardDrivesOnDesktop = true;
-          ShowHardDrivesOnDesktop = true;
-          ShowMountedServersOnDesktop = true;
-          ShowRemovableMediaOnDesktop = true;
-          _FXSortFoldersFirst = true;
-          AppleShowAllExtensions = true;
-          AppleShowAllFiles = true;
-          FXPreferredViewStyle = "clmv";
-          NewWindowTarget = "Home";
-          QuitMenuItem = true;
-          ShowPathbar = true;
-          ShowStatusBar = true;
-        };
-      };
-      primaryUser = user;
-    };
+    system.primaryUser = "pumita";
   };
 
   flake.darwinConfigurations = inputs.self.lib.mkDarwin "aarch64-darwin" "airbender";

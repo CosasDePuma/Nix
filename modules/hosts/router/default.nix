@@ -1,13 +1,18 @@
 { inputs, ... }:
 {
   flake.modules.nixos.router =
-    { config, pkgs, lib, ... }:
+    {
+      config,
+      pkgs,
+      lib,
+      ...
+    }:
     let
       domain = "kike.wtf";
     in
     {
       imports = with inputs.self.modules.nixos; [
-        system-server
+        server-defaults
         (inputs.self.factory.homelab-user {
           name = "router";
           description = "Router management user";
@@ -197,8 +202,6 @@
             ];
           };
         };
-
-        openssh.banner = builtins.readFile ./.ssh/banner.txt;
       };
 
       system.autoUpgrade = {

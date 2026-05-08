@@ -1,11 +1,11 @@
 { inputs, ... }:
 {
-  flake.modules.nixos.system-server =
+  flake.modules.nixos.server-defaults =
     { config, ... }:
     {
       imports = with inputs.self.modules.nixos; [
-        system-default
-        hardened-ssh
+        ssh-service
+        system-defaults
       ];
 
       age.identityPaths = builtins.map (key: key.path) config.services.openssh.hostKeys;

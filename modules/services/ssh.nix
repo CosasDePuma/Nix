@@ -1,25 +1,26 @@
+{ lib, ... }:
 {
-  flake.modules.nixos.hardened-ssh =
-    { config, lib, ... }:
+  flake.modules.nixos.ssh-service =
+    { config, ... }:
     {
-      networking.firewall.allowedTCPPorts = [ 64022 ];
+      networking.firewall.allowedTCPPorts = lib.mkDefault [ 64022 ];
 
       services.openssh = {
-        enable = true;
-        allowSFTP = true;
-        authorizedKeysInHomedir = false;
-        listenAddresses = [
+        enable = lib.mkDefault true;
+        allowSFTP = lib.mkDefault true;
+        authorizedKeysInHomedir = lib.mkDefault false;
+        listenAddresses = lib.mkDefault [
           {
             addr = "0.0.0.0";
             port = 64022;
           }
         ];
-        ports = [ ];
-        startWhenNeeded = true;
+        ports = lib.mkDefault [ ];
+        startWhenNeeded = lib.mkDefault true;
         settings = {
-          AuthorizedPrincipalsFile = "none";
-          ChallengeResponseAuthentication = false;
-          Ciphers = [
+          AuthorizedPrincipalsFile = lib.mkDefault "none";
+          ChallengeResponseAuthentication = lib.mkDefault false;
+          Ciphers = lib.mkDefault [
             "chacha20-poly1305@openssh.com"
             "aes256-gcm@openssh.com"
             "aes128-gcm@openssh.com"
@@ -27,37 +28,53 @@
             "aes192-ctr"
             "aes128-ctr"
           ];
-          ClientAliveInterval = 300;
-          GatewayPorts = "no";
-          IgnoreRhosts = true;
-          KbdInteractiveAuthentication = false;
-          KexAlgorithms = [
+          ClientAliveInterval = lib.mkDefault 300;
+          GatewayPorts = lib.mkDefault "no";
+          IgnoreRhosts = lib.mkDefault true;
+          KbdInteractiveAuthentication = lib.mkDefault false;
+          KexAlgorithms = lib.mkDefault [
             "curve25519-sha256@libssh.org"
             "diffie-hellman-group16-sha512"
             "diffie-hellman-group18-sha512"
           ];
-          LogLevel = "VERBOSE";
-          LoginGraceTime = "30";
-          Macs = [
+          LogLevel = lib.mkDefault "VERBOSE";
+          LoginGraceTime = lib.mkDefault "30";
+          Macs = lib.mkDefault [
             "hmac-sha2-512-etm@openssh.com"
             "hmac-sha2-256-etm@openssh.com"
             "umac-128-etm@openssh.com"
           ];
-          MaxAuthTries = 3;
-          MaxSessions = 5;
-          MaxStartups = "10:30:100";
-          PasswordAuthentication = false;
-          PermitEmptyPasswords = false;
-          PermitRootLogin = "no";
-          PrintMotd = false;
-          StrictModes = true;
-          UseDns = false;
-          UsePAM = true;
-          X11Forwarding = false;
-          AllowUsers = lib.attrsets.mapAttrsToList (name: _: name) (
-            lib.attrsets.filterAttrs (_: v: builtins.elem "sshuser" v.extraGroups) config.users.users
+          MaxAuthTries = lib.mkDefault 3;
+          MaxSessions = lib.mkDefault 5;
+          MaxStartups = lib.mkDefault "10:30:100";
+          PasswordAuthentication = lib.mkDefault false;
+          PermitEmptyPasswords = lib.mkDefault false;
+          PermitRootLogin = lib.mkDefault "no";
+          PrintMotd = lib.mkDefault false;
+          StrictModes = lib.mkDefault true;
+          UseDns = lib.mkDefault false;
+          UsePAM = lib.mkDefault true;
+          X11Forwarding = lib.mkDefault false;
+          AllowUsers = lib.mkDefault (
+            lib.attrsets.mapAttrsToList (name: _: name) (
+              lib.attrsets.filterAttrs (_: v: builtins.elem "sshusers" v.extraGroups) config.users.users
+            )
           );
         };
+        banner = ''
+          ==============================================================
+          |                   AUTHORIZED ACCESS ONLY                   |
+          ==============================================================
+          |                                                            |
+          |    WARNING: All connections are monitored and recorded.    |
+          |  Disconnect IMMEDIATELY if you are not an authorized user! |
+          |                                                            |
+          |       *** Unauthorized access will be prosecuted ***       |
+          |                                                            |
+          ==============================================================
+        '';
       };
+
+      users.groups."sshusers" = { };
     };
 }

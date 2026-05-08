@@ -4,7 +4,7 @@
     { config, pkgs, ... }:
     {
       imports = with inputs.self.modules.nixos; [
-        system-server
+        server-defaults
         (inputs.self.factory.homelab-user {
           name = "media";
           description = "Media management user";
@@ -117,8 +117,6 @@
             delete-empty-read-lists = true;
           };
         };
-
-        openssh.banner = builtins.readFile ./.ssh/banner.txt;
 
         qbittorrent = {
           enable = true;
