@@ -4,7 +4,7 @@
     { config, pkgs, ... }:
     {
       imports = with inputs.self.modules.nixos; [
-        system-server
+        server-defaults
         (inputs.self.factory.homelab-user {
           name = "gamer";
           description = "Gaming management user";
@@ -21,23 +21,21 @@
       ];
 
       fileSystems = builtins.listToAttrs (
-        builtins.map
-          (share: {
-            name = "/mnt/${share}";
-            value = {
-              device = "//192.168.1.3/${share}";
-              fsType = "cifs";
-              options = [
-                "credentials=${config.age.secrets."smb.creds".path}"
-                "noauto"
-                "x-systemd.automount"
-                "x-systemd.device-timeout=5s"
-                "x-systemd.idle-timeout=60"
-                "x-systemd.mount-timeout=5s"
-              ];
-            };
-          })
-          [ "backups" ]
+        builtins.map (share: {
+          name = "/mnt/${share}";
+          value = {
+            device = "//192.168.1.3/${share}";
+            fsType = "cifs";
+            options = [
+              "credentials=${config.age.secrets."smb.creds".path}"
+              "noauto"
+              "x-systemd.automount"
+              "x-systemd.device-timeout=5s"
+              "x-systemd.idle-timeout=60"
+              "x-systemd.mount-timeout=5s"
+            ];
+          };
+        }) [ "backups" ]
       );
 
       networking = {
@@ -65,8 +63,6 @@
           allowedTCPPorts = [ 25565 ];
         };
       };
-
-      services.openssh.banner = builtins.readFile ./.ssh/banner.txt;
 
       system.autoUpgrade = {
         enable = true;

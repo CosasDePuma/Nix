@@ -20,6 +20,8 @@
   config = {
     systems = [
       "aarch64-darwin"
+      "aarch64-linux"
+      "x86_64-darwin"
       "x86_64-linux"
     ];
 
@@ -57,8 +59,6 @@
 
         devShells = {
           default = import ../../shells/nixos.nix { inherit pkgs system inputs; };
-          hacking = import ../../shells/hacking.nix { inherit pkgs; };
-          hacking-infra = import ../../shells/hacking-infra.nix { inherit pkgs; };
           nixos = import ../../shells/nixos.nix { inherit pkgs system inputs; };
         };
       };

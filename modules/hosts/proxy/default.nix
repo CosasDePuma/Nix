@@ -7,7 +7,7 @@
     in
     {
       imports = with inputs.self.modules.nixos; [
-        system-server
+        server-defaults
         (inputs.self.factory.homelab-user {
           name = "proxy";
           description = "Proxy management user";
@@ -101,8 +101,6 @@
               useEqualHeights = true;
             };
           };
-
-        openssh.banner = builtins.readFile ./.ssh/banner.txt;
       };
 
       system.autoUpgrade = {

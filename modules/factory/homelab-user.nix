@@ -25,9 +25,7 @@
           "wheel"
           "sshuser"
         ];
-        openssh.authorizedKeys.keys = lib.strings.splitString "\n" (
-          builtins.readFile authorizedKeysFile
-        );
+        openssh.authorizedKeys.keys = lib.strings.splitString "\n" (builtins.readFile authorizedKeysFile);
       };
     };
 }
