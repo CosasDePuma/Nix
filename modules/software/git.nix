@@ -14,23 +14,24 @@
     };
   };
   gitignore = [
-    "**/*~"
+    # keep-sorted start
     "**/*.bck"
     "**/*.db"
     "**/*.env"
-    "**/.env.local"
-    "**/.env.*.local"
     "**/*.local.*"
     "**/*.log"
     "**/*.pyc"
     "**/*.swo"
     "**/*.swp"
     "**/*.tsbuildinfo"
+    "**/*~"
+    "**/.DS_Store"
     "**/.cache/"
     "**/.claude/"
     "**/.desktop.ini"
     "**/.direnv/"
-    "**/.DS_Store"
+    "**/.env.*.local"
+    "**/.env.local"
     "**/.idea/"
     "**/__pycache__/"
     "**/build/"
@@ -41,6 +42,7 @@
     "**/result/"
     "**/temp/"
     "**/tmp/"
+    # keep-sorted end
   ];
 in {
   flake.modules = {
