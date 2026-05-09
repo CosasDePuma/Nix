@@ -6,8 +6,7 @@ let
     proxy = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOxYJhovcbELqZzBf+NR95qNRBa003w7kZtqpWEwr7bP @homelab.proxy";
     router = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMH4o2Q4cwq9GvJ2+MgErC5Odtf+WPbvz3H7KbOyOhoA @homelab.router";
   };
-in
-{
+in {
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                Automation                 ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
@@ -47,7 +46,7 @@ in
     nixos
     vm-homelab.router
   ];
-  "modules/hosts/router/.wireguard/wireguard-profiles.conf.age".publicKeys = [ nixos ];
+  "modules/hosts/router/.wireguard/wireguard-profiles.conf.age".publicKeys = [nixos];
   "modules/hosts/router/.wireguard/wireguard.key.age".publicKeys = [
     nixos
     vm-homelab.router

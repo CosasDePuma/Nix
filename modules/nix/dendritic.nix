@@ -1,19 +1,23 @@
-{ inputs, lib, ... }:
 {
+  inputs,
+  lib,
+  ...
+}: {
   imports = [
     inputs.flake-parts.flakeModules.modules
     inputs.flake-parts.flakeModules.nixosConfigurations
+    inputs.treefmt-nix.flakeModule
   ];
 
   options = {
     flake.lib = lib.mkOption {
       type = lib.types.attrsOf lib.types.unspecified;
-      default = { };
+      default = {};
     };
 
     flake.darwinConfigurations = lib.mkOption {
       type = lib.types.lazyAttrsOf lib.types.raw;
-      default = { };
+      default = {};
     };
   };
 
@@ -32,7 +36,7 @@
             inputs.disko.nixosModules.default
             inputs.agenix.nixosModules.default
             inputs.self.modules.nixos.${name}
-            { nixpkgs.hostPlatform = lib.mkDefault system; }
+            {nixpkgs.hostPlatform = lib.mkDefault system;}
           ];
         };
       };
@@ -41,7 +45,7 @@
         ${name} = inputs.nix-darwin.lib.darwinSystem {
           modules = [
             inputs.self.modules.darwin.${name}
-            { nixpkgs.hostPlatform = lib.mkDefault system; }
+            {nixpkgs.hostPlatform = lib.mkDefault system;}
           ];
         };
       };
@@ -52,15 +56,28 @@
       };
     };
 
-    perSystem =
-      { pkgs, system, ... }:
-      {
-        formatter = pkgs.nixfmt-tree;
-
-        devShells = {
-          default = import ../../shells/nixos.nix { inherit pkgs system inputs; };
-          nixos = import ../../shells/nixos.nix { inherit pkgs system inputs; };
+    perSystem = {
+      config,
+      pkgs,
+      system,
+      ...
+    }: {
+      treefmt = {
+        projectRootFile = "flake.nix";
+        programs = {
+          alejandra.enable = true;
+          deadnix.enable = true;
+          keep-sorted.enable = true;
+          statix.enable = true;
         };
       };
+
+      formatter = config.treefmt.build.wrapper;
+
+      devShells = {
+        default = import ../../shells/nixos.nix {inherit pkgs system inputs;};
+        nixos = import ../../shells/nixos.nix {inherit pkgs system inputs;};
+      };
+    };
   };
 }

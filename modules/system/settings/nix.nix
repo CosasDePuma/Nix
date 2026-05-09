@@ -1,5 +1,4 @@
-{ lib, ... }:
-{
+{lib, ...}: {
   flake.modules = {
     darwin.nix-settings = {
       nix = {
@@ -24,7 +23,7 @@
           persistent = lib.mkDefault true;
         };
         settings = {
-          allowed-users = lib.mkDefault [ "@wheel" ];
+          allowed-users = lib.mkDefault ["@wheel"];
           auto-optimise-store = lib.mkDefault true;
         };
       };

@@ -1,5 +1,4 @@
-{ lib, ... }:
-{
+{lib, ...}: {
   flake.modules.darwin.homebrew-software = {
     homebrew = {
       enable = lib.mkDefault true;

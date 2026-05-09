@@ -1,12 +1,10 @@
-{ lib, ... }:
-let
+{lib, ...}: let
   nixpkgs-settings = {
     nixpkgs.config.allowUnfree = lib.mkDefault true;
   };
-in
-{
+in {
   flake.modules = {
-    darwin = { inherit nixpkgs-settings; };
-    nixos = { inherit nixpkgs-settings; };
+    darwin = {inherit nixpkgs-settings;};
+    nixos = {inherit nixpkgs-settings;};
   };
 }

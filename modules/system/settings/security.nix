@@ -1,5 +1,4 @@
-{ lib, ... }:
-{
+{lib, ...}: {
   flake.modules = {
     darwin.security-settings = {
       security.pam.services.sudo_local = {

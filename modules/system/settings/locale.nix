@@ -1,5 +1,4 @@
-{ lib, ... }:
-let
+{lib, ...}: let
   timezone = {
     time.timeZone = lib.mkDefault "Europe/Madrid";
   };
@@ -19,8 +18,7 @@ let
       };
     };
   };
-in
-{
+in {
   flake.modules = {
     darwin.locale-settings = timezone;
     nixos.locale-settings = spanish_us // timezone;
