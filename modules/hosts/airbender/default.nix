@@ -1,5 +1,4 @@
-{ inputs, ... }:
-{
+{inputs, ...}: {
   flake.modules.darwin.airbender = {
     imports = with inputs.self.modules.darwin; [
       system-defaults
@@ -24,16 +23,15 @@
         "opencode"
         "pi-coding-agent"
       ];
-      casks =
-        let
-          appsDir = "/Applications/Homebrew";
-          organize =
-            folder: apps:
-            builtins.map (name: {
-              inherit name;
-              args.appdir = "${appsDir}/${folder}";
-            }) apps;
-        in
+      casks = let
+        appsDir = "/Applications/Homebrew";
+        organize = folder: apps:
+          builtins.map (name: {
+            inherit name;
+            args.appdir = "${appsDir}/${folder}";
+          })
+          apps;
+      in
         builtins.concatLists [
           (organize "Communication" [
             "discord"

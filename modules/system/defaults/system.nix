@@ -1,5 +1,8 @@
-{ inputs, lib, ... }:
 {
+  inputs,
+  lib,
+  ...
+}: {
   flake.modules.nixos.system-defaults = {
     imports = with inputs.self.modules.nixos; [
       locale-settings

@@ -1,7 +1,6 @@
-{ lib, ... }:
-{
+{lib, ...}: {
   flake.modules.darwin.macos-settings = {
-   system.defaults = {
+    system.defaults = {
       dock.autohide = lib.mkDefault true;
       finder = {
         CreateDesktop = lib.mkDefault false;

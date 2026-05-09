@@ -1,9 +1,5 @@
-{
-  modulesPath ? throw "not imported as module",
-  ...
-}:
-{
-  imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
+{modulesPath ? throw "not imported as module", ...}: {
+  imports = [(modulesPath + "/installer/scan/not-detected.nix")];
 
   boot = {
     initrd = {
@@ -22,8 +18,8 @@
         "nvidia_drm"
       ];
     };
-    kernelModules = [ "kvm-amd" ];
-    extraModulePackages = [ ];
+    kernelModules = ["kvm-amd"];
+    extraModulePackages = [];
   };
 
   fileSystems = {
@@ -42,5 +38,5 @@
     };
   };
 
-  swapDevices = [ ];
+  swapDevices = [];
 }
