@@ -7,6 +7,8 @@
   }: {
     imports = with inputs.self.modules.nixos; [
       system-defaults
+      # --- drivers
+      nvidia-drivers
     ];
 
     boot = {
@@ -14,14 +16,10 @@
         systemd-boot.enable = true;
         efi.canTouchEfiVariables = true;
       };
-      kernelParams = ["nvidia-drm.modeset=1"];
     };
 
     environment = {
       sessionVariables = {
-        __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-        GBM_BACKEND = "nvidia-drm";
-        LIBVA_DRIVER_NAME = "nvidia";
         NIXOS_OZONE_WL = "1";
         XDG_SESSION_TYPE = "wayland";
       };
@@ -56,18 +54,6 @@
     hardware = {
       enableAllHardware = true;
       cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-      nvidia = {
-        modesetting.enable = true;
-        package = config.boot.kernelPackages.nvidiaPackages.latest;
-        powerManagement.enable = false;
-        powerManagement.finegrained = false;
-        open = true;
-        nvidiaSettings = true;
-      };
-      graphics = {
-        enable = true;
-        enable32Bit = true;
-      };
     };
 
     home-manager = {
@@ -142,7 +128,6 @@
       pulseaudio.enable = false;
       xserver = {
         enable = true;
-        videoDrivers = ["nvidia"];
         xkb = {
           layout = "us,es";
           options = "grp:lalt_lshift_toggle";
