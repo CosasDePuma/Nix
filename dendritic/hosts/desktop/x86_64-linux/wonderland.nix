@@ -21,6 +21,8 @@
       software-qemu
       software-sudo
       software-zsh
+
+      services-ssh
     ];
     disko.devices.disk."main".device = "/dev/nvme0n1";
     networking.hostName = "wonderland";
@@ -144,6 +146,7 @@
     users = {
       users.rabbit = {
         isNormalUser = true;
+        initialPassword = "nixos";
         description = "White Rabbit";
         shell = pkgs.zsh;
         extraGroups = [
