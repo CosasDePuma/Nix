@@ -1,10 +1,10 @@
 {inputs, ...}: {
-  flake.modules.nixos.media = {
+  flake.nixosModules.media = {
     config,
     pkgs,
     ...
   }: {
-    imports = with inputs.self.modules.nixos; [
+    imports = with inputs.self.nixosModules; [
       server-defaults
       (inputs.self.factory.homelab-user {
         name = "media";

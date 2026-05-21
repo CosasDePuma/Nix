@@ -1,10 +1,10 @@
 {lib, ...}: {
-  flake.modules = {
-    darwin.software-vscode = {
+  flake = {
+    darwinModules.software-vscode = {
       homebrew.casks = ["visual-studio-code"];
     };
 
-    homeManager.software-vscode = {
+    homeManagerModules.software-vscode = {
       config,
       pkgs,
       ...
@@ -59,10 +59,8 @@
       };
     };
 
-    nixos.software-vscode = {pkgs, ...}: {
-      environment.systemPackages = with pkgs; [
-        vscode
-      ];
+    nixosModules.software-vscode = {pkgs, ...}: {
+      environment.systemPackages = with pkgs; [vscode];
     };
   };
 }

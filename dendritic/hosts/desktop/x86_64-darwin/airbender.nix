@@ -1,28 +1,32 @@
 {inputs, ...}: {
-  flake.modules.darwin.airbender = {
-    imports = with inputs.self.modules.darwin; [
-      desktop-defaults
-      # --- software
-      bat-software
-      claude-software
-      direnv-software
-      discord-software
-      gemini-software
-      ghostty-software
-      homebrew-software
-      lsd-software
-      opencode-software
-      spotify-software
-      starship-software
-      zsh-software
+  flake.darwinModules.airbender = {
+    imports = with inputs.self.darwinModules; [
+      settings-locale
+      settings-macos
+      settings-nix
+      settings-nixpkgs
+      software-bat
+      software-claude
+      software-direnv
+      software-discord
+      software-gemini
+      software-git
+      software-ghostty
+      software-homebrew
+      software-lsd
+      software-opencode
+      software-spotify
+      software-starship
+      software-sudo
+      software-vscode
+      software-zoxide
+      software-zsh
     ];
 
     homebrew = {
       brews = [
         "bitwarden-cli"
         "chezmoi"
-        "git"
-        "zoxide"
         "ollama"
         "pi-coding-agent"
       ];
@@ -42,7 +46,6 @@
           ])
           (organize "Development" [
             "kiro"
-            "visual-studio-code"
           ])
           (organize "Entertainment" [
             "steam"

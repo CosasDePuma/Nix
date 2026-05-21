@@ -5,18 +5,17 @@
     style = lib.mkDefault "plain";
   };
 in {
-  flake.modules = {
-    darwin.software-bat = {
+  flake = {
+    darwinModules.software-bat = {
       homebrew.brews = ["bat"];
     };
 
-    homeManager.software-bat = {pkgs, ...}: {
+    homeManagerModules.software-bat = {pkgs, ...}: {
       programs = {
         bat = {
           enable = lib.mkDefault true;
           config = lib.mkDefault batconfig;
         };
-
         zsh = {
           shellAliases."cat" = lib.mkDefault "${pkgs.bat}/bin/bat";
           shellGlobalAliases = {
@@ -27,13 +26,12 @@ in {
       };
     };
 
-    nixos.software-bat = {pkgs, ...}: {
+    nixosModules.software-bat = {pkgs, ...}: {
       programs = {
         bat = {
           enable = lib.mkDefault true;
           settings = lib.mkDefault batconfig;
         };
-
         zsh.shellAliases."cat" = lib.mkDefault "${pkgs.bat}/bin/bat";
       };
     };

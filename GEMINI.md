@@ -18,10 +18,10 @@ When creating or modifying a module, you should aim to cover the following whene
 #### Module Structure Example (`bat.nix`):
 ```nix
 { lib, ... }: {
-  flake.modules = {
-    darwin.bat-software = { /* ... */ };
-    homeManager.bat-software = { /* ... */ };
-    nixos.bat-software = { /* ... */ };
+  flake = {
+    darwinModules.bat-software = { /* ... */ };
+    homeManagerModules.bat-software = { /* ... */ };
+    nixosModules.bat-software = { /* ... */ };
   };
 }
 ```

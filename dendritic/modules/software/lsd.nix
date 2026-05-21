@@ -1,10 +1,10 @@
 {lib, ...}: {
-  flake.modules = {
-    darwin.software-lsd = {
+  flake = {
+    darwinModules.software-lsd = {
       homebrew.brews = ["lsd"];
     };
 
-    homeManager.software-lsd = {osConfig, ...}: {
+    homeManagerModules.software-lsd = {osConfig, ...}: {
       programs.lsd = {
         enable = lib.mkDefault true;
         enableBashIntegration = lib.mkDefault osConfig.programs.bash.enable;
@@ -14,10 +14,8 @@
       };
     };
 
-    nixos.software-lsd = {pkgs, ...}: {
-      environment.systemPackages = with pkgs; [
-        lsd
-      ];
+    nixosModules.software-lsd = {pkgs, ...}: {
+      environment.systemPackages = with pkgs; [lsd];
     };
   };
 }

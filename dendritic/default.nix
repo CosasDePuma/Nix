@@ -4,12 +4,21 @@
   ...
 }: {
   imports = [
-    inputs.flake-parts.flakeModules.modules
     inputs.flake-parts.flakeModules.nixosConfigurations
     inputs.treefmt-nix.flakeModule
   ];
 
   options = {
+    flake.darwinModules = lib.mkOption {
+      type = lib.types.lazyAttrsOf lib.types.unspecified;
+      default = {};
+    };
+
+    flake.homeManagerModules = lib.mkOption {
+      type = lib.types.lazyAttrsOf lib.types.unspecified;
+      default = {};
+    };
+
     flake.lib = lib.mkOption {
       type = lib.types.attrsOf lib.types.unspecified;
       default = {};
@@ -35,7 +44,7 @@
           modules = [
             inputs.disko.nixosModules.default
             inputs.agenix.nixosModules.default
-            inputs.self.modules.nixos.${name}
+            inputs.self.nixosModules.${name}
             {nixpkgs.hostPlatform = lib.mkDefault system;}
           ];
         };
@@ -44,7 +53,7 @@
       lib.mkDarwin = system: name: {
         ${name} = inputs.nix-darwin.lib.darwinSystem {
           modules = [
-            inputs.self.modules.darwin.${name}
+            inputs.self.darwinModules.${name}
             {nixpkgs.hostPlatform = lib.mkDefault system;}
           ];
         };

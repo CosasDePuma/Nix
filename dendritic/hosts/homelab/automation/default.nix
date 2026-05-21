@@ -1,10 +1,10 @@
 {inputs, ...}: {
-  flake.modules.nixos.automation = {
+  flake.nixosModules.automation = {
     config,
     pkgs,
     ...
   }: {
-    imports = with inputs.self.modules.nixos; [
+    imports = with inputs.self.nixosModules; [
       server-defaults
       (inputs.self.factory.homelab-user {
         name = "automation";

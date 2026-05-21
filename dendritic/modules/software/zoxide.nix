@@ -1,10 +1,10 @@
 {lib, ...}: {
-  flake.modules = {
-    darwin.software-zoxide = {
+  flake = {
+    darwinModules.software-zoxide = {
       homebrew.brews = ["zoxide"];
     };
 
-    homeManager.software-zoxide = {osConfig, ...}: {
+    homeManagerModules.software-zoxide = {osConfig, ...}: {
       programs.zoxide = {
         enable = lib.mkDefault true;
         enableBashIntegration = lib.mkDefault osConfig.programs.bash.enable;
@@ -14,7 +14,7 @@
       };
     };
 
-    nixos.software-zoxide = {config, ...}: {
+    nixosModules.software-zoxide = {config, ...}: {
       programs.zoxide = {
         enable = lib.mkDefault true;
         enableBashIntegration = lib.mkDefault config.programs.bash.enable;

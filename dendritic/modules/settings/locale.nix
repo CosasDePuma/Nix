@@ -4,23 +4,23 @@
   };
   spanish_us = {
     i18n = {
-      defaultLocale = "en_US.UTF-8";
+      defaultLocale = lib.mkDefault "en_US.UTF-8";
       extraLocaleSettings = {
-        LC_ADDRESS = "es_ES.UTF-8";
-        LC_IDENTIFICATION = "es_ES.UTF-8";
-        LC_MEASUREMENT = "es_ES.UTF-8";
-        LC_MONETARY = "es_ES.UTF-8";
-        LC_NAME = "es_ES.UTF-8";
-        LC_NUMERIC = "es_ES.UTF-8";
-        LC_PAPER = "es_ES.UTF-8";
-        LC_TELEPHONE = "es_ES.UTF-8";
-        LC_TIME = "es_ES.UTF-8";
+        LC_ADDRESS = lib.mkDefault "es_ES.UTF-8";
+        LC_IDENTIFICATION = lib.mkDefault "es_ES.UTF-8";
+        LC_MEASUREMENT = lib.mkDefault "es_ES.UTF-8";
+        LC_MONETARY = lib.mkDefault "es_ES.UTF-8";
+        LC_NAME = lib.mkDefault "es_ES.UTF-8";
+        LC_NUMERIC = lib.mkDefault "es_ES.UTF-8";
+        LC_PAPER = lib.mkDefault "es_ES.UTF-8";
+        LC_TELEPHONE = lib.mkDefault "es_ES.UTF-8";
+        LC_TIME = lib.mkDefault "es_ES.UTF-8";
       };
     };
   };
 in {
-  flake.modules = {
-    darwin.settings-locale = timezone;
-    nixos.settings-locale = spanish_us // timezone;
+  flake = {
+    darwinModules.settings-locale = timezone;
+    nixosModules.settings-locale = spanish_us // timezone;
   };
 }
