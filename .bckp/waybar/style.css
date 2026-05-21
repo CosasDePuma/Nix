@@ -1,0 +1,70 @@
+@import "colorscheme.css";
+
+* {
+    border: none;
+    border-radius: 0;
+    font-family: 'Fira Code', monospace;
+    padding: 0;
+    margin: 0;
+    min-width: 10px;
+    background: transparent;
+}
+
+window.#waybar {
+    min-width: 50px;
+    color: @fg;
+}
+window.#waybar #center {
+    background: @bg1;
+    border-radius: 0 16px 16px 0;
+    padding-right: 5px;
+}
+
+tooltip,
+#tray menu {
+    background: alpha(#262626, 0.999);
+    border-radius: 8px;
+    padding: 1px 2px;
+}
+
+/*
+ * ╔══════════════════════════════════════════════╗
+ * ║                  Workspaces                  ║
+ * ╚══════════════════════════════════════════════╝
+ */
+
+#workspaces {
+    padding: 30px 14px;
+}
+#workspaces button {
+    font-size: 7px;
+    color: transparent;
+    background: @grey0;
+    transition: all 0.2s ease-in-out;
+    min-width: 0;
+    min-height: 0;
+    border-radius: 9999px;
+    margin: 3px 0;
+}
+#workspaces button.active {
+    background: @grey2;
+    min-height: 40px;
+}
+
+#clock,
+#cpu,
+#language,
+#memory,
+#network,
+#tray {
+    padding: 5px 5px;
+    border-radius: 16px;
+}
+#clock,
+#tray {
+    padding-top: 15px;
+}
+#language,
+#network {
+    padding-bottom: 15px;
+}
