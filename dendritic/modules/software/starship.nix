@@ -19,12 +19,12 @@
     sudo.disabled = lib.mkDefault true;
   };
 in {
-  flake.modules = {
-    darwin.software-starship = {
+  flake = {
+    darwinModules.software-starship = {
       homebrew.brews = ["starship"];
     };
 
-    homeManager.software-starship = {osConfig, ...}: {
+    homeManagerModules.software-starship = {osConfig, ...}: {
       programs.starship = {
         enable = lib.mkDefault true;
         enableBashIntegration = lib.mkDefault osConfig.programs.bash.enable;
@@ -35,7 +35,7 @@ in {
       };
     };
 
-    nixos.software-starship = _: {
+    nixosModules.software-starship = _: {
       programs.starship = {
         enable = lib.mkDefault true;
         presets = lib.mkDefault ["nerd-font-symbols"];

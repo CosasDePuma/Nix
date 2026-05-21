@@ -1,6 +1,6 @@
 {lib, ...}: {
-  flake.modules = {
-    darwin.settings-nix = {
+  flake = {
+    darwinModules.settings-nix = {
       nix = {
         enable = lib.mkDefault false;
         extraOptions = lib.mkDefault ''
@@ -9,9 +9,10 @@
         '';
         settings.auto-optimise-store = lib.mkDefault false;
       };
+      stateVersion = lib.mkDefault 6;
     };
 
-    nixos.settings-nix = {
+    nixosModules.settings-nix = {
       nix = {
         extraOptions = lib.mkDefault ''
           experimental-features = nix-command flakes
@@ -27,6 +28,7 @@
           auto-optimise-store = lib.mkDefault true;
         };
       };
+      system.stateVersion = lib.mkDefault "25.05";
     };
   };
 }

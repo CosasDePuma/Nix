@@ -1,5 +1,5 @@
 {inputs, ...}: {
-  flake.modules.nixos.router = {
+  flake.nixosModules.router = {
     config,
     pkgs,
     lib,
@@ -7,7 +7,7 @@
   }: let
     domain = "kike.wtf";
   in {
-    imports = with inputs.self.modules.nixos; [
+    imports = with inputs.self.nixosModules; [
       server-defaults
       (inputs.self.factory.homelab-user {
         name = "router";

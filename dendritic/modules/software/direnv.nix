@@ -8,16 +8,16 @@
     silent = lib.mkDefault true;
   };
 in {
-  flake.modules = {
-    darwin.software-direnv = {
+  flake = {
+    darwinModules.software-direnv = {
       homebrew.brews = ["direnv"];
     };
 
-    homeManager.software-direnv = {osConfig, ...}: {
+    homeManagerModules.software-direnv = {osConfig, ...}: {
       programs.direnv = direnv osConfig;
     };
 
-    nixos.software-direnv = {config, ...}: {
+    nixosModules.software-direnv = {config, ...}: {
       programs.direnv = direnv config;
     };
   };

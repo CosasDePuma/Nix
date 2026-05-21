@@ -3,26 +3,24 @@
   lib,
   ...
 }: {
-  flake.modules = {
-    darwin.software-gemini = {
+  flake = {
+    darwinModules.software-gemini = {
       homebrew = {
         brews = ["gemini-cli"];
         casks = ["google-gemini"];
       };
     };
 
-    homeManager.software-gemini = {
+    homeManagerModules.software-gemini = {
       config,
       pkgs,
       ...
     }: {
-      imports = with inputs.self.modules.homeManager; [
-        software-mcp
-      ];
+      imports = with inputs.self.homeManagerModules; [software-mcp];
       config = lib.mkMerge [
         {
           programs.gemini-cli = {
-            context.fileName = ''
+            context.fileName = lib.mkDefault ''
               AGENTS.md
               CLAUDE.md
               CONTEXT.md
@@ -46,7 +44,7 @@
       ];
     };
 
-    nixos.software-gemini = {pkgs, ...}: {
+    nixosModules.software-gemini = {pkgs, ...}: {
       environment.systemPackages = with pkgs; [gemini-cli];
     };
   };

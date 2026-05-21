@@ -1,19 +1,15 @@
 _: {
-  flake.modules = {
-    darwin.software-spotify = {
+  flake = {
+    darwinModules.software-spotify = {
       homebrew.casks = ["spotify"];
     };
 
-    homeManager.software-spotify = {pkgs, ...}: {
-      home.packages = with pkgs; [
-        spotify
-      ];
+    homeManagerModules.software-spotify = {pkgs, ...}: {
+      home.packages = with pkgs; [spotify];
     };
 
-    nixos.software-spotify = {pkgs, ...}: {
-      environment.systemPackages = with pkgs; [
-        spotify
-      ];
+    nixosModules.software-spotify = {pkgs, ...}: {
+      environment.systemPackages = with pkgs; [spotify];
     };
   };
 }

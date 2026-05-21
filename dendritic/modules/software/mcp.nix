@@ -1,5 +1,5 @@
 {lib, ...}: {
-  flake.modules.homeManager.software-mcp = {pkgs, ...}: {
+  flake.homeManagerModules.software-mcp = {pkgs, ...}: {
     programs.mcp = {
       enable = lib.mkDefault true;
       servers = lib.mkDefault {

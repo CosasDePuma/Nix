@@ -8,10 +8,6 @@
     pull.ff = lib.mkDefault "only";
     push.autoSetupRemote = lib.mkDefault true;
     url."git@github.com:".insteadOf = lib.mkDefault "github:";
-    user = {
-      email = lib.mkDefault "26680023+CosasDePuma@users.noreply.github.com";
-      name = lib.mkDefault "Kike Fontán";
-    };
   };
   gitignore = [
     # keep-sorted start
@@ -45,12 +41,12 @@
     # keep-sorted end
   ];
 in {
-  flake.modules = {
-    darwin.software-git = {
+  flake = {
+    darwinModules.software-git = {
       homebrew.brews = ["git"];
     };
 
-    homeManager.software-git = {
+    homeManagerModules.software-git = {
       programs.git = {
         enable = lib.mkDefault true;
         ignores = lib.mkDefault gitignore;
@@ -58,7 +54,7 @@ in {
       };
     };
 
-    nixos.software-git = {
+    nixosModules.software-git = {
       programs.git = {
         enable = lib.mkDefault true;
         config = lib.mkDefault gitconfig;

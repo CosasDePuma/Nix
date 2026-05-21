@@ -1,13 +1,29 @@
 {inputs, ...}: {
-  flake.modules.nixos.wonderland = {pkgs, ...}: {
-    imports = with inputs.self.modules.nixos; [
-      desktop-defaults
+  flake.nixosModules.wonderland = {pkgs, ...}: {
+    imports = with inputs.self.nixosModules; [
       boot-efi
       boot-loader-grub
       cpu-amd
+      disko-efi
       hardware-defaults
+      hardware-nvme
+      hardware-sd
+      hardware-usb
       gpu-nvidia
+      network-dns
+      network-interfaces
+      network-firewall
+      settings-locale
+      settings-nix
+      settings-nixpkgs
+      software-homemanager
+      software-networkmanager
+      software-qemu
+      software-sudo
+      software-zsh
     ];
+    disko.devices.disk."main".device = "/dev/nvme0n1";
+    networking.hostName = "wonderland";
 
     environment = {
       sessionVariables = {
@@ -39,15 +55,12 @@
     };
 
     home-manager = {
-      useGlobalPkgs = true;
-      useUserPackages = true;
-      backupFileExtension = "bak";
       users.rabbit = {
         home.username = "rabbit";
         home.homeDirectory = "/home/rabbit";
         home.stateVersion = "25.05";
       };
-      sharedModules = with inputs.self.modules.homeManager; [
+      sharedModules = with inputs.self.homeManagerModules; [
         # --- settings
         cosasdepuma-settings
         # --- software
@@ -68,29 +81,10 @@
       ];
     };
 
-    networking = {
-      hostName = "wonderland";
-      hostId = builtins.substring 0 8 (builtins.hashString "md5" "wonderland");
-      networkmanager.enable = true;
-      usePredictableInterfaceNames = false;
-      domain = "home";
-      search = ["home"];
-      nameservers = [
-        "1.1.1.1"
-        "8.8.8.8"
-      ];
-      firewall = {
-        enable = true;
-        allowedTCPPorts = [22];
-        allowedUDPPorts = [];
-      };
-    };
-
     programs = {
       dconf.enable = true;
       firefox.enable = true;
       xwayland.enable = true;
-      zsh.enable = true;
     };
 
     services = {
@@ -186,10 +180,7 @@
   flake.nixosConfigurations.wonderland = inputs.nixpkgs.lib.nixosSystem {
     modules = [
       inputs.agenix.nixosModules.default
-      inputs.disko.nixosModules.default
-      inputs.home-manager.nixosModules.default
-      inputs.self.modules.nixos.wonderland
-      ./_hardware-configuration.nix
+      inputs.self.nixosModules.wonderland
       {nixpkgs.hostPlatform = "x86_64-linux";}
     ];
   };

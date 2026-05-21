@@ -1,15 +1,15 @@
-_: let
+{lib, ...}: let
   git = {
-    email = "26680023+CosasDePuma@users.noreply.github.com";
-    name = "Kike Fontán";
+    email = lib.mkDefault "26680023+CosasDePuma@users.noreply.github.com";
+    name = lib.mkDefault "Kike Fontán";
   };
 in {
-  flake.modules = {
-    homeManager.cosasdepuma-settings = {
+  flake = {
+    homeManagerModules.cosasdepuma-settings = {
       programs.git.settings.user = git;
     };
 
-    nixos.cosasdepuma-settings = {
+    nixosModules.cosasdepuma-settings = {
       programs.git.config.user = git;
     };
   };

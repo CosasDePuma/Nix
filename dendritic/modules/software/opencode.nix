@@ -3,26 +3,18 @@
   lib,
   ...
 }: {
-  flake.modules = {
-    darwin.software-opencode = {
+  flake = {
+    darwinModules.software-opencode = {
       homebrew = {
-        brews = [
-          "opencode"
-        ];
-        casks = [
-          "opencode-desktop"
-        ];
+        brews = ["opencode"];
+        casks = ["opencode-desktop"];
       };
     };
 
-    homeManager.software-opencode = {pkgs, ...}: {
-      imports = with inputs.self.modules.homeManager; [
-        software-mcp
-      ];
+    homeManagerModules.software-opencode = {pkgs, ...}: {
+      imports = with inputs.self.homeManagerModules; [software-mcp];
       config = {
-        home.packages = with pkgs; [
-          opencode-desktop
-        ];
+        home.packages = with pkgs; [opencode-desktop];
         programs.opencode = {
           enable = lib.mkDefault true;
           enableMcpIntegration = lib.mkDefault true;
@@ -34,7 +26,7 @@
       };
     };
 
-    nixos.software-opencode = {pkgs, ...}: {
+    nixosModules.software-opencode = {pkgs, ...}: {
       environment.systemPackages = with pkgs; [
         opencode
         opencode-desktop

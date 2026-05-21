@@ -1,10 +1,10 @@
 {lib, ...}: {
-  flake.modules = {
-    darwin.software-zsh = {
+  flake = {
+    darwinModules.software-zsh = {
       homebrew.brews = ["zsh"];
     };
 
-    homeManager.software-zsh = _: {
+    homeManagerModules.software-zsh = {
       programs.zsh = {
         enable = lib.mkDefault true;
         enableCompletion = lib.mkDefault true;
@@ -15,11 +15,11 @@
       };
     };
 
-    nixos.software-zsh = _: {
+    nixosModules.software-zsh = {
       programs.zsh = {
         enable = lib.mkDefault true;
         enableCompletion = lib.mkDefault true;
-        autosuggestion = {
+        autosuggestions = {
           enable = lib.mkDefault true;
           strategy = lib.mkDefault ["history"];
         };

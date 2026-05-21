@@ -1,10 +1,10 @@
 {inputs, ...}: {
-  flake.modules.nixos.gaming = {
+  flake.nixosModules.gaming = {
     config,
     pkgs,
     ...
   }: {
-    imports = with inputs.self.modules.nixos; [
+    imports = with inputs.self.nixosModules; [
       server-defaults
       (inputs.self.factory.homelab-user {
         name = "gamer";

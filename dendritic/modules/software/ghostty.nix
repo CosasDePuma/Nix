@@ -1,10 +1,10 @@
 {lib, ...}: {
-  flake.modules = {
-    darwin.software-ghostty = {
+  flake = {
+    darwinModules.software-ghostty = {
       homebrew.casks = ["ghostty"];
     };
 
-    homeManager.software-ghostty = {osConfig, ...}: {
+    homeManagerModules.software-ghostty = {osConfig, ...}: {
       programs.ghostty = {
         enable = lib.mkDefault true;
         enableBashIntegration = lib.mkDefault osConfig.programs.bash.enable;
@@ -22,10 +22,8 @@
       };
     };
 
-    nixos.software-ghostty = {pkgs, ...}: {
-      environment.systemPackages = with pkgs; [
-        ghostty
-      ];
+    nixosModules.software-ghostty = {pkgs, ...}: {
+      environment.systemPackages = with pkgs; [ghostty];
     };
   };
 }

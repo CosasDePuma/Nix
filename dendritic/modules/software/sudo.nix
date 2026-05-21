@@ -1,17 +1,15 @@
 {lib, ...}: {
   flake = {
-    darwinModules.settings-security = {
+    darwinModules.software-sudo = {
       security.pam.services.sudo_local = {
         touchIdAuth = lib.mkDefault true;
         reattach = lib.mkDefault true;
       };
     };
 
-    nixosModules.settings-security = {
+    nixosModules.software-sudo = {config, ...}: {
       security = {
-        pam = {
-          services."sudo".sshAgentAuth = lib.mkDefault true;
-        };
+        pam.services."sudo".sshAgentAuth = lib.mkDefault config.security.pam.sshAgentAuth.enable;
         sudo-rs = {
           enable = lib.mkDefault true;
           execWheelOnly = lib.mkDefault true;

@@ -1,6 +1,14 @@
 {lib, ...}: {
-  flake.modules.nixos.gpu-nvidia = {pkgs, ...}: {
-    boot.kernelParams = ["nvidia-drm.modeset=1"];
+  flake.nixosModules.gpu-nvidia = {config, ...}: {
+    boot = {
+      initrd.kernelModules = [
+        "nvidia"
+        "nvidia_modeset"
+        "nvidia_uvm"
+        "nvidia_drm"
+      ];
+      kernelParams = ["nvidia-drm.modeset=1"];
+    };
     environment.sessionVariables = {
       __GLX_VENDOR_LIBRARY_NAME = lib.mkDefault "nvidia";
       GBM_BACKEND = lib.mkDefault "nvidia-drm";
@@ -9,7 +17,7 @@
     hardware = {
       nvidia = {
         modesetting.enable = lib.mkDefault true;
-        package = lib.mkDefault pkgs.linuxPackages.nvidiaPackages.latest;
+        package = lib.mkDefault config.boot.kernelPackages.nvidiaPackages.latest;
         powerManagement = {
           enable = lib.mkDefault false;
           finegrained = lib.mkDefault false;

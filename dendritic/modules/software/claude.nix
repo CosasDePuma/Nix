@@ -3,22 +3,20 @@
   lib,
   ...
 }: {
-  flake.modules = {
-    darwin.software-claude = {
+  flake = {
+    darwinModules.software-claude = {
       homebrew.casks = [
         "claude"
         "claude-code"
       ];
     };
 
-    homeManager.software-claude = {
+    homeManagerModules.software-claude = {
       config,
       pkgs,
       ...
     }: {
-      imports = with inputs.self.modules.homeManager; [
-        software-mcp
-      ];
+      imports = with inputs.self.homeManagerModules; [software-mcp];
       config = lib.mkMerge [
         {
           programs.claude-code = {
@@ -70,10 +68,8 @@
       ];
     };
 
-    nixos.software-claude = {pkgs, ...}: {
-      environment.systemPackages = with pkgs; [
-        claude-code
-      ];
+    nixosModules.software-claude = {pkgs, ...}: {
+      environment.systemPackages = with pkgs; [claude-code];
     };
   };
 }
