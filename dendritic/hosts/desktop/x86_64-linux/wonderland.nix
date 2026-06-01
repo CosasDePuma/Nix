@@ -1,6 +1,7 @@
 {inputs, ...}: {
   flake.nixosModules.wonderland = {pkgs, ...}: {
     imports = with inputs.self.nixosModules; [
+      # keep-sorted start
       boot-efi
       boot-loader-grub
       cpu-amd
@@ -21,10 +22,11 @@
       software-qemu
       software-sudo
       software-zsh
-
-      services-ssh
+      # keep-sorted end
+      service-ssh
     ];
-    disko.devices.disk."main".device = "/dev/nvme0n1";
+    #disko.devices.disk."main".device = "/dev/nvme0n1";
+    disko.devices.disk."main".device = "/dev/sda";
     networking.hostName = "wonderland";
 
     environment = {
@@ -63,9 +65,7 @@
         home.stateVersion = "25.05";
       };
       sharedModules = with inputs.self.homeManagerModules; [
-        # --- settings
-        cosasdepuma-settings
-        # --- software
+        # keep-sorted start
         software-bat
         software-claude
         software-direnv
@@ -80,6 +80,7 @@
         software-starship
         software-vscode
         software-zoxide
+        # keep-sorted end
       ];
     };
 
@@ -151,6 +152,7 @@
         shell = pkgs.zsh;
         extraGroups = [
           "networkmanager"
+          "sshusers"
           "wheel"
         ];
       };

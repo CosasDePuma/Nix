@@ -9,7 +9,7 @@
         '';
         settings.auto-optimise-store = lib.mkDefault false;
       };
-      stateVersion = lib.mkDefault 6;
+      system.stateVersion = lib.mkDefault 6;
     };
 
     nixosModules.settings-nix = {
