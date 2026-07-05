@@ -7,12 +7,9 @@
         inputs.self.homeManagerModules.software-mako
         inputs.self.homeManagerModules.software-jq
         inputs.self.homeManagerModules.software-socat
-      ];
-
-      home.packages = with pkgs; [
-        nemo
-        nwg-look
-        swaybg
+        inputs.self.homeManagerModules.software-nemo
+        inputs.self.homeManagerModules.software-swaybg
+        inputs.self.homeManagerModules.software-nwg-look
       ];
 
       home.pointerCursor = {
@@ -191,6 +188,9 @@
         inputs.self.nixosModules.software-mako
         inputs.self.nixosModules.software-jq
         inputs.self.nixosModules.software-socat
+        inputs.self.nixosModules.software-nemo
+        inputs.self.nixosModules.software-swaybg
+        inputs.self.nixosModules.software-nwg-look
       ];
     };
   };
