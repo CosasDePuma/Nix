@@ -1,7 +1,4 @@
-{
-  inputs,
-  ...
-}: {
+{inputs, ...}: {
   flake.nixosModules.system-impermanence = {
     imports = [
       inputs.impermanence.nixosModules.impermanence
@@ -12,7 +9,7 @@
       directories = [
         "/var/log"
         "/var/lib/nixos"
-        "/var/lib/systemd/coredump"
+        "/var/lib/systemd"
         "/etc/NetworkManager/system-connections"
         "/etc/ssh"
       ];

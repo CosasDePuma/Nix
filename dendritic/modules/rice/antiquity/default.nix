@@ -1,7 +1,4 @@
-{
-  inputs,
-  ...
-}: {
+{inputs, ...}: {
   flake = {
     homeManagerModules.rice-antiquity = {pkgs, ...}: {
       imports = [
