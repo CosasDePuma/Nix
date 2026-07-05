@@ -2,6 +2,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import QtCore
 
 Singleton {
     id: root
@@ -247,7 +248,7 @@ Singleton {
     }
     property alias favoriteApps: favoriteAppsAdapter.apps
     FileView {
-        path: Qt.resolvedUrl("./favoriteapps.json")
+        path: StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/quickshell-favoriteapps.json"
         // when changes are made on disk, reload the file's content
         watchChanges: true
         onFileChanged: reload()
@@ -310,7 +311,7 @@ Singleton {
     }
     property alias widgets: widgetsAdapter.monitors
     FileView {
-        path: Qt.resolvedUrl("./widgets.json")
+        path: StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/quickshell-widgets.json"
         // when changes are made on disk, reload the file's content
         watchChanges: true
         onFileChanged: reload()
@@ -333,7 +334,7 @@ Singleton {
     property bool openSettingsWindow: false
     property alias settings: settingsJsonAdapter.settings
     FileView {
-        path: Qt.resolvedUrl("./settings.json")
+        path: StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/quickshell-settings.json"
         // when changes are made on disk, reload the file's content
         watchChanges: true
         onFileChanged: reload()
