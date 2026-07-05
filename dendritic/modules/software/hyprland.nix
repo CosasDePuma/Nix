@@ -1,6 +1,6 @@
 {lib, ...}: {
   flake = {
-    homeManagerModules.software-hyprland = {
+    homeManagerModules.software-hyprland = _: {
       wayland.windowManager.hyprland.enable = lib.mkDefault true;
     };
 
