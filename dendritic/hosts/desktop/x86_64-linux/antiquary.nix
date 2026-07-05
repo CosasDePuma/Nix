@@ -11,7 +11,7 @@
       network-dns
       network-firewall
       network-interfaces
-      rice-antiquity
+      rice-antiquary
       service-ssh
       settings-locale
       settings-nix
@@ -50,7 +50,7 @@
       };
       sharedModules = with inputs.self.homeManagerModules; [
         # keep-sorted start
-        rice-antiquity
+        rice-antiquary
         software-bat
         software-git
         software-lsd
