@@ -19,7 +19,7 @@
       initialPassword = null;
       extraGroups = [
         "wheel"
-        "sshuser"
+        "sshusers"
       ];
       openssh.authorizedKeys.keys = lib.strings.splitString "\n" (builtins.readFile authorizedKeysFile);
     };
