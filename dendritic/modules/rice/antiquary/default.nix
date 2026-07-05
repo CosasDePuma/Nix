@@ -12,6 +12,7 @@
       home.packages = with pkgs; [
         nemo
         nwg-look
+        swaybg
       ];
 
       wayland.windowManager.hyprland = {
@@ -23,7 +24,7 @@
 
           exec-once = [
             "nm-applet"
-            "hyprpaper"
+            "swaybg -i ${./.wallpapers/georges_riom_collage.png} -m fill"
             "qs"
             "systemctl --user start hyprpolkitagent"
             "hyprctl setcursor Hackneyed-24px 24"
@@ -157,19 +158,6 @@
           layerrule = blur 1, match:namespace diinki_celestialantiquity:no_blur
           layerrule = ignore_alpha 0.19, match:namespace diinki_celestialantiquity:no_blur
         '';
-      };
-
-      services.hyprpaper = {
-        enable = true;
-        settings = {
-          splash = false;
-          preload = [
-            "${./.wallpapers/georges_riom_collage.png}"
-          ];
-          wallpaper = [
-            ",${./.wallpapers/georges_riom_collage.png}"
-          ];
-        };
       };
 
       programs.kitty = {
