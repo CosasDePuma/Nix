@@ -23,5 +23,10 @@
         vhostUserPackages = lib.mkDefault (with pkgs; [virtiofsd]);
       };
     };
+    environment.persistence."/nix/persist" = {
+      directories = [
+        "/var/lib/libvirt"
+      ];
+    };
   };
 }
