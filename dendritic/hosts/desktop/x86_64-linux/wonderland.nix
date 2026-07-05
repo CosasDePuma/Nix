@@ -6,14 +6,14 @@
       boot-loader-grub
       cpu-amd
       disko-efi
+      gpu-nvidia
       hardware-defaults
       hardware-nvme
       hardware-sd
       hardware-usb
-      gpu-nvidia
       network-dns
-      network-interfaces
       network-firewall
+      network-interfaces
       settings-locale
       settings-nix
       settings-nixpkgs
