@@ -44,11 +44,6 @@
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    linux-antiquity = {
-      url = "github:diinki/linux-antiquity";
-      flake = false;
-    };
   };
 
   outputs = inputs: inputs.flake-parts.lib.mkFlake {inherit inputs;} (inputs.import-tree ./dendritic);
