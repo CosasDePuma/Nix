@@ -17,6 +17,7 @@
       settings-locale
       settings-nix
       settings-nixpkgs
+      settings-wayland
       software-homemanager
       software-networkmanager
       software-qemu
@@ -30,10 +31,6 @@
     networking.hostName = "wonderland";
 
     environment = {
-      sessionVariables = {
-        NIXOS_OZONE_WL = "1";
-        XDG_SESSION_TYPE = "wayland";
-      };
       systemPackages = with pkgs; [
         # wayland / desktop
         mako
