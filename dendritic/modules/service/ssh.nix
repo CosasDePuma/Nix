@@ -4,10 +4,7 @@
     pkgs,
     ...
   }: {
-    networking.firewall.allowedTCPPorts = lib.mkDefault (
-      (config.services.openssh.ports or [])
-      ++ (lib.attrsets.mapAttrsToList (_: value: value.port) config.services.openssh.listenAddresses)
-    );
+    services.openssh.openFirewall = lib.mkDefault true;
     security.pam.sshAgentAuth.enable = lib.mkDefault true;
     services.openssh = {
       enable = lib.mkDefault true;
