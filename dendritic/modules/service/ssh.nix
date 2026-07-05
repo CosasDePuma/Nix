@@ -10,13 +10,7 @@
       enable = lib.mkDefault true;
       allowSFTP = lib.mkDefault true;
       authorizedKeysInHomedir = lib.mkDefault false;
-      listenAddresses = lib.mkDefault [
-        {
-          addr = "0.0.0.0";
-          port = 64022;
-        }
-      ];
-      ports = lib.mkDefault [];
+      ports = lib.mkDefault [64022];
       startWhenNeeded = lib.mkDefault true;
       settings = {
         AuthorizedPrincipalsFile = lib.mkDefault "none";
