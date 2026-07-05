@@ -15,6 +15,14 @@
         swaybg
       ];
 
+      home.pointerCursor = {
+        package = pkgs.hackneyed;
+        name = "Hackneyed";
+        size = 24;
+        gtk.enable = true;
+        x11.enable = true;
+      };
+
       wayland.windowManager.hyprland = {
         configType = "hyprlang";
         settings = {
@@ -27,7 +35,7 @@
             "swaybg -i ${./.wallpapers/georges_riom_collage.png} -m fill"
             "qs"
             "systemctl --user start hyprpolkitagent"
-            "hyprctl setcursor Hackneyed-24px 24"
+            "hyprctl setcursor Hackneyed 24"
           ];
 
           env = [
