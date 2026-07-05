@@ -151,14 +151,14 @@
             "SUPER, mouse:272, movewindow"
             "SUPER, mouse:273, resizewindow"
           ];
-
-          layerrule = [
-            "blur, diinki_celestialantiquity:bars"
-            "ignorealpha 0.19, diinki_celestialantiquity:bars"
-            "blur, diinki_celestialantiquity:no_blur"
-            "ignorealpha 0.19, diinki_celestialantiquity:no_blur"
-          ];
         };
+
+        extraConfig = ''
+          layerrule = blur, diinki_celestialantiquity:bars
+          layerrule = ignorealpha 0.19, diinki_celestialantiquity:bars
+          layerrule = blur, diinki_celestialantiquity:no_blur
+          layerrule = ignorealpha 0.19, diinki_celestialantiquity:no_blur
+        '';
       };
 
       services.hyprpaper = {
