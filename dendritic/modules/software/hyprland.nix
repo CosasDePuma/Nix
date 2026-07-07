@@ -45,6 +45,10 @@
             disable_hyprland_logo = lib.mkDefault true;
           };
 
+          ecosystem = {
+            no_update_news = lib.mkDefault true;
+          };
+
           bind = lib.mkDefault [
             "SUPER, Return, exec, kitty"
             "SUPER, Q, killactive,"
@@ -79,9 +83,9 @@
           ];
 
           windowrulev2 = lib.mkDefault [
-            "float, class:^(kitty)$"
-            "center, class:^(kitty)$"
-            "size 800 500, class:^(kitty)$"
+            "float, initialClass:^(kitty)$"
+            "center, initialClass:^(kitty)$"
+            "size 800 500, initialClass:^(kitty)$"
           ];
 
           binde = lib.mkDefault [
