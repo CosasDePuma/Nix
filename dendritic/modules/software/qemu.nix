@@ -1,12 +1,16 @@
-{lib, ...}: {
+{
+  inputs,
+  lib,
+  ...
+}: {
   flake.nixosModules.software-qemu = {pkgs, ...}: {
+    imports = [inputs.self.nixosModules.software-dnsmasq];
     boot.initrd.kernelModules = [
       "virtio_blk"
       "virtio_pci"
       "virtio_scsi"
     ];
     environment.systemPackages = with pkgs; [
-      dnsmasq # TODO: Import as module
       spice
       spice-gtk
       spice-protocol
@@ -22,11 +26,6 @@
         swtpm.enable = lib.mkDefault true;
         vhostUserPackages = lib.mkDefault (with pkgs; [virtiofsd]);
       };
-    };
-    environment.persistence."/nix/persist" = {
-      directories = [
-        "/var/lib/libvirt"
-      ];
     };
   };
 }
