@@ -30,7 +30,7 @@
         settings = {
           exec-once = lib.mkDefault [
             "${pkgs.networkmanagerapplet}/bin/nm-applet"
-            "${pkgs.swaybg}/bin/swaybg -i ${./.wallpapers/georges_riom_collage.png} -m fill"
+            "${pkgs.swaybg}/bin/swaybg -i ${./.wallpapers/georges_riom.png} -m fill"
             "${pkgs.quickshell}/bin/quickshell ipc call appLauncher_$(${pkgs.hyprland}/bin/hyprctl monitors -j | ${pkgs.jq}/bin/jq -r '.[] | select(.focused == true) | .name') toggleAppLauncher"
             "${pkgs.systemd}/bin/systemctl --user start hyprpolkitagent"
             "${pkgs.hyprland}/bin/hyprctl setcursor Hackneyed 24"
