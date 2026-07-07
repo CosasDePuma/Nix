@@ -12,6 +12,7 @@
       network-dns
       network-firewall
       network-interfaces
+      rice-antiquary
       service-ssh
       settings-audio
       settings-fonts
@@ -65,11 +66,15 @@
       };
       sharedModules = with inputs.self.homeManagerModules; [
         # keep-sorted start
+        rice-antiquary
         software-bat
+        software-claude
+        software-gemini
         software-git
         software-hyprland
         software-lsd
         software-nyxt
+        software-opencode
         software-spotify
         software-vscode
         software-zoxide
@@ -105,19 +110,6 @@
     };
 
     # ── Specialisations ──────────────────────────────────────────────────────
-
-    specialisation.ai = {
-      inheritParentConfig = true;
-      configuration = {
-        imports = with inputs.self.nixosModules; [rice-antiquary];
-        home-manager.sharedModules = with inputs.self.homeManagerModules; [
-          rice-antiquary
-          software-claude
-          software-gemini
-          software-opencode
-        ];
-      };
-    };
 
     specialisation.gaming = {
       inheritParentConfig = true;
