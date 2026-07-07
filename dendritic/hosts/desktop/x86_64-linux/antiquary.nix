@@ -24,7 +24,7 @@
       system-impermanence
       # keep-sorted end
     ];
-    disko.devices.disk."main".device = "/dev/sda";
+    disko.devices.disk."main".device = "/dev/nvme0n1";
     networking.hostName = "antiquary";
 
     environment.persistence."/nix/persist" = {
@@ -46,7 +46,7 @@
       users.nixos = {
         home.username = "nixos";
         home.homeDirectory = "/home/nixos";
-        home.stateVersion = "25.05";
+        home.stateVersion = "26.05";
       };
       sharedModules = with inputs.self.homeManagerModules; [
         # keep-sorted start

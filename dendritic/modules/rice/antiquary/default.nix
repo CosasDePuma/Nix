@@ -14,6 +14,7 @@
         inputs.self.homeManagerModules.software-nemo
         inputs.self.homeManagerModules.software-swaybg
         inputs.self.homeManagerModules.software-nwg-look
+        inputs.self.homeManagerModules.software-hyprshot
       ];
 
       home.pointerCursor = {
@@ -28,11 +29,11 @@
         configType = "hyprlang";
         settings = {
           exec-once = lib.mkDefault [
-            "nm-applet"
-            "swaybg -i ${./.wallpapers/georges_riom_collage.png} -m fill"
-            "qs"
-            "systemctl --user start hyprpolkitagent"
-            "hyprctl setcursor Hackneyed 24"
+            "${pkgs.networkmanagerapplet}/bin/nm-applet"
+            "${pkgs.swaybg}/bin/swaybg -i ${./.wallpapers/georges_riom_collage.png} -m fill"
+            "${pkgs.quickshell}/bin/quickshell ipc call appLauncher_$(${pkgs.hyprland}/bin/hyprctl monitors -j | ${pkgs.jq}/bin/jq -r '.[] | select(.focused == true) | .name') toggleAppLauncher"
+            "${pkgs.systemd}/bin/systemctl --user start hyprpolkitagent"
+            "${pkgs.hyprland}/bin/hyprctl setcursor Hackneyed 24"
           ];
 
           env = lib.mkDefault [
@@ -86,9 +87,9 @@
           };
 
           bind = lib.mkDefault [
-            "SUPER SHIFT, S, exec, hyprshot --mode region --output-folder /tmp"
-            "SUPER, E, exec, nemo"
-            "SUPER, D, exec, quickshell ipc call appLauncher_$(hyprctl monitors -j | jq -r '.[] | select(.focused == true) | .name') toggleAppLauncher"
+            "SUPER SHIFT, S, exec, ${pkgs.hyprshot}/bin/hyprshot --mode region --output-folder /tmp"
+            "SUPER, E, exec, ${pkgs.nemo}/bin/nemo"
+            "SUPER, Space, exec, ${pkgs.quickshell}/bin/quickshell ipc call appLauncher_$(${pkgs.hyprland}/bin/hyprctl monitors -j | ${pkgs.jq}/bin/jq -r '.[] | select(.focused == true) | .name') toggleAppLauncher"
           ];
         };
 
@@ -126,6 +127,7 @@
         inputs.self.nixosModules.software-nemo
         inputs.self.nixosModules.software-swaybg
         inputs.self.nixosModules.software-nwg-look
+        inputs.self.nixosModules.software-hyprshot
       ];
     };
   };

@@ -48,8 +48,14 @@
           bind = lib.mkDefault [
             "SUPER, Return, exec, kitty"
             "SUPER, Q, killactive,"
-            "SUPER SHIFT, SPACE, togglefloating,"
+            "SUPER, S, togglefloating,"
             "SUPER, F, fullscreen,"
+            "SUPER, Left, movefocus, l"
+            "SUPER, Right, movefocus, r"
+            "SUPER, Up, movefocus, u"
+            "SUPER, Down, movefocus, d"
+            "SUPER SHIFT, Left, workspace, e-1"
+            "SUPER SHIFT, Right, workspace, e+1"
             "SUPER, 1, workspace, 1"
             "SUPER SHIFT, 1, movetoworkspace, 1"
             "SUPER, 2, workspace, 2"
@@ -70,6 +76,12 @@
             "SUPER SHIFT, 9, movetoworkspace, 9"
             "SUPER, 0, workspace, 10"
             "SUPER SHIFT, 0, movetoworkspace, 10"
+          ];
+
+          windowrulev2 = lib.mkDefault [
+            "float, class:^(kitty)$"
+            "center, class:^(kitty)$"
+            "size 800 500, class:^(kitty)$"
           ];
 
           binde = lib.mkDefault [
