@@ -55,9 +55,10 @@ in {
     };
 
     nixosModules.software-git = {
+      environment.etc."gitignore".text = lib.mkDefault (builtins.concatStringsSep "\n" gitignore);
       programs.git = {
         enable = lib.mkDefault true;
-        config = lib.mkDefault gitconfig;
+        config = lib.mkDefault (gitconfig // {core.excludesfile = "/etc/gitignore";});
       };
     };
   };
