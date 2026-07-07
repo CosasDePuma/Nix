@@ -102,27 +102,10 @@
     specialisation.gaming = {
       inheritParentConfig = true;
       configuration = {
-        environment = {
-          sessionVariables = {
-            GAMEMODERUNEXEC = "1";
-            MANGOHUD = "1";
-            PROTON_ENABLE_WAYLAND = "1";
-            PROTON_USE_WINED3D = "0";
-            SDL_VIDEODRIVER = "wayland";
-            STEAM_USE_WAYLAND = "1";
-          };
-          systemPackages = with pkgs; [
-            mangohud
-            gamemode
-            wayland
-          ];
-        };
-        programs.steam = {
-          dedicatedServer.openFirewall = true;
-          enable = true;
-          extraCompatPackages = with pkgs; [proton-ge-bin];
-          remotePlay.openFirewall = true;
-        };
+        imports = with inputs.self.nixosModules; [rice-gaming];
+        home-manager.sharedModules = with inputs.self.homeManagerModules; [
+          rice-gaming
+        ];
       };
     };
 

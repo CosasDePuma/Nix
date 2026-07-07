@@ -114,16 +114,20 @@
     specialisation.gaming = {
       inheritParentConfig = true;
       configuration = {
-        # TODO: imports = with inputs.self.nixosModules; [rice-gaming];
-        # TODO: home-manager.sharedModules = [...];
+        imports = with inputs.self.nixosModules; [rice-gaming];
+        home-manager.sharedModules = with inputs.self.homeManagerModules; [
+          rice-gaming
+        ];
       };
     };
 
     specialisation.work = {
       inheritParentConfig = true;
       configuration = {
-        # TODO: imports = with inputs.self.nixosModules; [rice-work];
-        # TODO: home-manager.sharedModules = [...];
+        imports = with inputs.self.nixosModules; [rice-work];
+        home-manager.sharedModules = with inputs.self.homeManagerModules; [
+          rice-work
+        ];
       };
     };
   };
