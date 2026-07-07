@@ -124,7 +124,12 @@
     specialisation.work = {
       inheritParentConfig = true;
       configuration = {
-        imports = with inputs.self.nixosModules; [rice-retro];
+        imports = with inputs.self.nixosModules; [
+          rice-retro
+          software-openconnect
+          software-qemu
+          software-teams
+        ];
         home-manager.sharedModules = with inputs.self.homeManagerModules; [
           rice-retro
         ];
