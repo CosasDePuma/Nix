@@ -12,6 +12,7 @@
         "/var/lib/systemd"
         "/etc/NetworkManager/system-connections"
         "/etc/ssh"
+        "/var/lib/libvirt"
       ];
       files = [
         "/etc/machine-id"

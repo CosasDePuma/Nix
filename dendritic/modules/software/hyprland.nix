@@ -101,9 +101,19 @@
       };
     };
 
-    nixosModules.software-hyprland = {
+    nixosModules.software-hyprland = {pkgs, ...}: {
       imports = [inputs.self.nixosModules.settings-wayland];
-      programs.hyprland.enable = lib.mkDefault true;
+      programs = {
+        dconf.enable = lib.mkDefault true;
+        hyprland.enable = lib.mkDefault true;
+      };
+      services.dbus.enable = lib.mkDefault true;
+      xdg.portal = {
+        enable = lib.mkDefault true;
+        extraPortals = with pkgs; [xdg-desktop-portal-hyprland];
+        config.common.default = lib.mkDefault ["hyprland"];
+        xdgOpenUsePortal = lib.mkDefault true;
+      };
     };
   };
 }

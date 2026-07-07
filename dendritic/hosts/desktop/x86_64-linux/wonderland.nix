@@ -14,46 +14,45 @@
       network-dns
       network-firewall
       network-interfaces
+      service-ssh
+      settings-audio
+      settings-fonts
+      settings-greetd
       settings-locale
       settings-nix
       settings-nixpkgs
       settings-wayland
+      software-firefox
       software-homemanager
       software-networkmanager
       software-qemu
       software-sudo
       software-zsh
       # keep-sorted end
-      service-ssh
     ];
-    #disko.devices.disk."main".device = "/dev/nvme0n1";
+
+    # disko.devices.disk."main".device = "/dev/nvme0n1";
     disko.devices.disk."main".device = "/dev/sda";
     networking.hostName = "wonderland";
 
-    environment = {
-      systemPackages = with pkgs; [
-        # wayland / desktop
-        mako
-        niri
-        rofi
-        swww
-        tuigreet
-        uwsm
-        waybar
-        xwayland-satellite
-        # utilities
-        nano
-      ];
-    };
+    # TODO: Extract into rice-wonderland module
+    environment.systemPackages = with pkgs; [
+      mako
+      niri
+      rofi
+      swww
+      tuigreet
+      uwsm
+      waybar
+      xwayland-satellite
+      nano
+    ];
 
-    fonts = {
-      enableDefaultPackages = true;
-      packages = with pkgs; [
-        fira-code
-        fira-code-symbols
-        font-awesome
-      ];
-    };
+    fonts.packages = with pkgs; [
+      fira-code
+      fira-code-symbols
+      font-awesome
+    ];
 
     home-manager = {
       users.rabbit = {
@@ -83,34 +82,20 @@
 
     programs = {
       dconf.enable = true;
-      firefox.enable = true;
       xwayland.enable = true;
     };
 
-    services = {
-      dbus.enable = true;
-      greetd = {
-        enable = true;
-        settings.default_session = {
-          command = "${pkgs.tuigreet}/bin/tuigreet --time --cmd niri-session";
-          user = "greeter";
-        };
-      };
-      pipewire = {
-        enable = true;
-        alsa = {
-          enable = true;
-          support32Bit = true;
-        };
-        pulse.enable = true;
-      };
-      pulseaudio.enable = false;
-      xserver = {
-        enable = true;
-        xkb = {
-          layout = "us,es";
-          options = "grp:lalt_lshift_toggle";
-        };
+    # TODO: Move into rice-wonderland once that module exists
+    services.greetd.settings.default_session = {
+      command = "${pkgs.tuigreet}/bin/tuigreet --time --cmd niri-session";
+      user = "greeter";
+    };
+
+    services.xserver = {
+      enable = true;
+      xkb = {
+        layout = "us,es";
+        options = "grp:lalt_lshift_toggle";
       };
     };
 
@@ -153,14 +138,9 @@
           "wheel"
         ];
       };
-      users.greeter = {
-        isSystemUser = true;
-        group = "greeter";
-        description = "greetd greeter user";
-      };
-      groups.greeter = {};
     };
 
+    # TODO: Move into rice-wonderland once that module exists
     xdg.portal = {
       enable = true;
       config = {

@@ -13,10 +13,14 @@
       network-firewall
       network-interfaces
       service-ssh
+      settings-audio
+      settings-fonts
+      settings-greetd
       settings-locale
       settings-nix
       settings-nixpkgs
       settings-wayland
+      software-firefox
       software-homemanager
       software-hyprland
       software-networkmanager
@@ -44,13 +48,10 @@
       };
     };
 
-    fonts = {
-      enableDefaultPackages = true;
-      packages = with pkgs; [
-        maple-mono
-        nerd-fonts.symbols-only
-      ];
-    };
+    fonts.packages = with pkgs; [
+      maple-mono
+      nerd-fonts.symbols-only
+    ];
 
     home-manager = {
       users.wizard = {
@@ -69,29 +70,9 @@
       ];
     };
 
-    programs = {
-      dconf.enable = true;
-      firefox.enable = true;
-    };
-
-    services = {
-      dbus.enable = true;
-      greetd = {
-        enable = true;
-        settings.default_session = {
-          command = "${pkgs.tuigreet}/bin/tuigreet --time --cmd Hyprland";
-          user = "greeter";
-        };
-      };
-      pipewire = {
-        enable = true;
-        alsa = {
-          enable = true;
-          support32Bit = true;
-        };
-        pulse.enable = true;
-      };
-      pulseaudio.enable = false;
+    services.greetd.settings.default_session = {
+      command = "${pkgs.tuigreet}/bin/tuigreet --time --cmd Hyprland";
+      user = "greeter";
     };
 
     security.pam.sshAgentAuth.enable = true;
@@ -100,37 +81,22 @@
       Defaults    env_keep+="SSH_AUTH_SOCK"
     '';
 
-    users = {
-      users.wizard = {
-        isNormalUser = true;
-        initialPassword = "nixos";
-        description = "Wizard";
-        shell = pkgs.zsh;
-        extraGroups = [
-          "networkmanager"
-          "sshusers"
-          "wheel"
-        ];
-        openssh.authorizedKeys.keys = [
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKh1YtKaItcNzC3RGez38zaJ0geelyrb6AFV73OqLchv"
-        ];
-      };
-      users.greeter = {
-        isSystemUser = true;
-        group = "greeter";
-        description = "greetd greeter user";
-      };
-      groups.greeter = {};
+    users.users.wizard = {
+      isNormalUser = true;
+      initialPassword = "nixos";
+      description = "Wizard";
+      shell = pkgs.zsh;
+      extraGroups = [
+        "networkmanager"
+        "sshusers"
+        "wheel"
+      ];
+      openssh.authorizedKeys.keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKh1YtKaItcNzC3RGez38zaJ0geelyrb6AFV73OqLchv"
+      ];
     };
 
-    xdg.portal = {
-      enable = true;
-      extraPortals = with pkgs; [xdg-desktop-portal-hyprland];
-      config.common.default = ["hyprland"];
-      xdgOpenUsePortal = true;
-    };
-
-    # ── Specialisations ────────────────────────────────────────────────────────
+    # ── Specialisations ──────────────────────────────────────────────────────
 
     specialisation.ai = {
       inheritParentConfig = true;
@@ -165,7 +131,6 @@
   flake.nixosConfigurations.alchemy = inputs.nixpkgs.lib.nixosSystem {
     modules = [
       inputs.agenix.nixosModules.default
-      inputs.home-manager.nixosModules.home-manager
       inputs.self.nixosModules.alchemy
       {nixpkgs.hostPlatform = "x86_64-linux";}
     ];
