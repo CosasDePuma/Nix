@@ -124,9 +124,9 @@
     specialisation.work = {
       inheritParentConfig = true;
       configuration = {
-        imports = with inputs.self.nixosModules; [rice-work];
+        imports = with inputs.self.nixosModules; [rice-retro];
         home-manager.sharedModules = with inputs.self.homeManagerModules; [
-          rice-work
+          rice-retro
         ];
       };
     };
