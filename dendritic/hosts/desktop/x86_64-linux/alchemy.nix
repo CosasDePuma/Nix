@@ -53,7 +53,7 @@
     };
 
     fonts.packages = with pkgs; [
-      maple-mono
+      maple-mono.NF
       nerd-fonts.symbols-only
     ];
 
