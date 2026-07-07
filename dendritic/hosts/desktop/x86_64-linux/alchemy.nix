@@ -21,10 +21,13 @@
       settings-nixpkgs
       settings-wayland
       software-firefox
+      software-git
       software-homemanager
       software-hyprland
       software-networkmanager
+      software-spotify
       software-sudo
+      software-vscode
       software-zsh
       system-impermanence
       # keep-sorted end
@@ -64,6 +67,8 @@
         software-bat
         software-git
         software-lsd
+        software-spotify
+        software-vscode
         software-zoxide
         software-zsh
         # keep-sorted end
