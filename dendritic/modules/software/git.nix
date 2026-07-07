@@ -58,7 +58,6 @@ in {
       programs.git = {
         enable = lib.mkDefault true;
         config = lib.mkDefault gitconfig;
-        ignores = lib.mkDefault gitignore;
       };
     };
   };
