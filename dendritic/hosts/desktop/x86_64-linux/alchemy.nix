@@ -1,0 +1,173 @@
+{inputs, ...}: {
+  flake.nixosModules.alchemy = {pkgs, ...}: {
+    imports = with inputs.self.nixosModules; [
+      # keep-sorted start
+      boot-efi
+      boot-loader-grub
+      cpu-amd
+      disko-impermanence
+      gpu-nvidia
+      hardware-defaults
+      hardware-nvme
+      network-dns
+      network-firewall
+      network-interfaces
+      service-ssh
+      settings-locale
+      settings-nix
+      settings-nixpkgs
+      settings-wayland
+      software-homemanager
+      software-hyprland
+      software-networkmanager
+      software-sudo
+      software-zsh
+      system-impermanence
+      # keep-sorted end
+    ];
+
+    disko.devices.disk."main".device = "/dev/nvme0n1";
+    networking.hostName = "alchemy";
+
+    environment.persistence."/nix/persist" = {
+      users.wizard = {
+        directories = [
+          "Downloads"
+          "Music"
+          "Pictures"
+          "Documents"
+          "Videos"
+          ".config"
+          ".local"
+          ".ssh"
+        ];
+      };
+    };
+
+    fonts = {
+      enableDefaultPackages = true;
+      packages = with pkgs; [
+        maple-mono
+        nerd-fonts.symbols-only
+      ];
+    };
+
+    home-manager = {
+      users.wizard = {
+        home.username = "wizard";
+        home.homeDirectory = "/home/wizard";
+        home.stateVersion = "26.05";
+      };
+      sharedModules = with inputs.self.homeManagerModules; [
+        # keep-sorted start
+        software-bat
+        software-git
+        software-lsd
+        software-zoxide
+        software-zsh
+        # keep-sorted end
+      ];
+    };
+
+    programs = {
+      dconf.enable = true;
+      firefox.enable = true;
+    };
+
+    services = {
+      dbus.enable = true;
+      greetd = {
+        enable = true;
+        settings.default_session = {
+          command = "${pkgs.tuigreet}/bin/tuigreet --time --cmd Hyprland";
+          user = "greeter";
+        };
+      };
+      pipewire = {
+        enable = true;
+        alsa = {
+          enable = true;
+          support32Bit = true;
+        };
+        pulse.enable = true;
+      };
+      pulseaudio.enable = false;
+    };
+
+    security.pam.sshAgentAuth.enable = true;
+    security.pam.services.sudo.sshAgentAuth = true;
+    security.sudo.extraConfig = ''
+      Defaults    env_keep+="SSH_AUTH_SOCK"
+    '';
+
+    users = {
+      users.wizard = {
+        isNormalUser = true;
+        initialPassword = "nixos";
+        description = "Wizard";
+        shell = pkgs.zsh;
+        extraGroups = [
+          "networkmanager"
+          "sshusers"
+          "wheel"
+        ];
+        openssh.authorizedKeys.keys = [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKh1YtKaItcNzC3RGez38zaJ0geelyrb6AFV73OqLchv"
+        ];
+      };
+      users.greeter = {
+        isSystemUser = true;
+        group = "greeter";
+        description = "greetd greeter user";
+      };
+      groups.greeter = {};
+    };
+
+    xdg.portal = {
+      enable = true;
+      extraPortals = with pkgs; [xdg-desktop-portal-hyprland];
+      config.common.default = ["hyprland"];
+      xdgOpenUsePortal = true;
+    };
+
+    # ── Specialisations ────────────────────────────────────────────────────────
+
+    specialisation.ai = {
+      inheritParentConfig = true;
+      configuration = {
+        imports = with inputs.self.nixosModules; [rice-antiquary];
+        home-manager.sharedModules = with inputs.self.homeManagerModules; [
+          rice-antiquary
+          software-claude
+          software-gemini
+          software-opencode
+        ];
+      };
+    };
+
+    specialisation.gaming = {
+      inheritParentConfig = true;
+      configuration = {
+        # TODO: imports = with inputs.self.nixosModules; [rice-gaming];
+        # TODO: home-manager.sharedModules = [...];
+      };
+    };
+
+    specialisation.work = {
+      inheritParentConfig = true;
+      configuration = {
+        # TODO: imports = with inputs.self.nixosModules; [rice-work];
+        # TODO: home-manager.sharedModules = [...];
+      };
+    };
+  };
+
+  flake.nixosConfigurations.alchemy = inputs.nixpkgs.lib.nixosSystem {
+    modules = [
+      inputs.agenix.nixosModules.default
+      inputs.home-manager.nixosModules.home-manager
+      inputs.self.nixosModules.alchemy
+      {nixpkgs.hostPlatform = "x86_64-linux";}
+    ];
+  };
+}
