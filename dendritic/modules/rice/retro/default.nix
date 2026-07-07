@@ -28,7 +28,7 @@
       wayland.windowManager.hyprland = {
         configType = "hyprlang";
         settings = {
-          exec-once = lib.mkDefault [
+          exec-once = lib.mkForce [
             "${pkgs.networkmanagerapplet}/bin/nm-applet"
             "${pkgs.swaybg}/bin/swaybg -i ${./.wallpapers/peak_into_the_system.png} -m fill"
             "${pkgs.quickshell}/bin/quickshell ipc call appLauncher_$(${pkgs.hyprland}/bin/hyprctl monitors -j | ${pkgs.jq}/bin/jq -r '.[] | select(.focused == true) | .name') toggleAppLauncher"
@@ -41,11 +41,11 @@
             "HYPRCURSOR_SIZE,24"
           ];
 
-          animations = {
+          animations = lib.mkForce {
             enabled = false;
           };
 
-          general = {
+          general = lib.mkForce {
             gaps_in = 5;
             gaps_out = 10;
             border_size = 1;
@@ -56,7 +56,7 @@
             allow_tearing = false;
           };
 
-          decoration = {
+          decoration = lib.mkForce {
             rounding = 0;
             active_opacity = 1.0;
             inactive_opacity = 1.0;
@@ -84,7 +84,7 @@
 
       programs.kitty = {
         enable = true;
-        extraConfig = builtins.readFile ./.kitty/default_theme.conf;
+        extraConfig = lib.mkForce (builtins.readFile ./.kitty/default_theme.conf);
       };
 
       xdg.configFile."quickshell".source = ./.quickshell;
