@@ -25,6 +25,7 @@
       software-homemanager
       software-hyprland
       software-networkmanager
+      software-nyxt
       software-spotify
       software-sudo
       software-vscode
@@ -67,6 +68,7 @@
         software-bat
         software-git
         software-lsd
+        software-nyxt
         software-spotify
         software-vscode
         software-zoxide
