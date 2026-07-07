@@ -67,6 +67,7 @@
         # keep-sorted start
         software-bat
         software-git
+        software-hyprland
         software-lsd
         software-nyxt
         software-spotify
