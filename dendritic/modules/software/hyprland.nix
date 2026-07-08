@@ -82,7 +82,7 @@
             "SUPER SHIFT, 0, movetoworkspace, 10"
           ];
 
-          windowrulev2 = lib.mkDefault [
+          windowrule = lib.mkDefault [
             "float, initialClass:^(kitty)$"
             "center, initialClass:^(kitty)$"
             "size 800 500, initialClass:^(kitty)$"
