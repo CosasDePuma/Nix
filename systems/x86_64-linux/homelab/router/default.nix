@@ -4,11 +4,9 @@
   pkgs ? throw "not imported as module",
   stateVersion ? "25.05",
   ...
-}:
-let
+}: let
   domain = "kike.wtf";
-in
-{
+in {
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                   Boot                    ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
@@ -151,48 +149,48 @@ in
     wireguard = {
       enable = true;
       interfaces."wireguard" = {
-        ips = [ "10.10.10.254/24" ];
+        ips = ["10.10.10.254/24"];
         listenPort = 51820;
         privateKeyFile = config.age.secrets."wireguard.key".path;
-        peers =
-          let
-            users = [
-              {
-                name = "pumita-macbook";
-                publicKey = "09SUz/zGOFkZKnV8e8k+MJ4ul97EAvFEm8MN2rjztkQ=";
-              }
-              {
-                name = "pumita-iphone";
-                publicKey = "fLlRUveH+pYk6efVANQh+g3MJXMvG3rAsY4Z1aAff20=";
-              }
-              {
-                name = "pumita-tv";
-                publicKey = "gL2M1YR+FjO9Wq5DjIBcBOtcxw/eyvo6HGv17Q43o2g=";
-              }
-              {
-                name = "family-tv";
-                publicKey = "ByqsQxP2YMKzYob5S0Uq9m8+jORNxcaZAApcSc5oQy0=";
-              }
-              {
-                name = "family-david";
-                publicKey = "ojqm9Pk4bWfAkoIwvEXRKf+bmxrra1C81HHxltsUhEU=";
-              }
-              {
-                name = "friends-dmaestro";
-                publicKey = "7+/GGKXRfKcYGSu/Faj+c5PoEGIdck2VLFUk8IuFE0E=";
-              }
-            ];
-          in
+        peers = let
+          users = [
+            {
+              name = "pumita-macbook";
+              publicKey = "09SUz/zGOFkZKnV8e8k+MJ4ul97EAvFEm8MN2rjztkQ=";
+            }
+            {
+              name = "pumita-iphone";
+              publicKey = "fLlRUveH+pYk6efVANQh+g3MJXMvG3rAsY4Z1aAff20=";
+            }
+            {
+              name = "pumita-tv";
+              publicKey = "gL2M1YR+FjO9Wq5DjIBcBOtcxw/eyvo6HGv17Q43o2g=";
+            }
+            {
+              name = "family-tv";
+              publicKey = "ByqsQxP2YMKzYob5S0Uq9m8+jORNxcaZAApcSc5oQy0=";
+            }
+            {
+              name = "family-david";
+              publicKey = "ojqm9Pk4bWfAkoIwvEXRKf+bmxrra1C81HHxltsUhEU=";
+            }
+            {
+              name = "friends-dmaestro";
+              publicKey = "7+/GGKXRfKcYGSu/Faj+c5PoEGIdck2VLFUk8IuFE0E=";
+            }
+          ];
+        in
           lib.lists.imap1 (i: user: {
             inherit (user) name publicKey;
-            allowedIPs = [ "10.10.10.${builtins.toString i}/32" ];
+            allowedIPs = ["10.10.10.${builtins.toString i}/32"];
             persistentKeepalive = 25;
-          }) users;
+          })
+          users;
       };
     };
     # --- dns
     domain = "home";
-    search = [ "home" ];
+    search = ["home"];
     nameservers = [
       "1.1.1.1"
       "8.8.8.8"
@@ -232,7 +230,6 @@ in
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
   services = {
-
     # ┌──────────────────────────────────────┐
     # │               DDClient               │
     # └──────────────────────────────────────┘
@@ -258,7 +255,7 @@ in
       enable = true;
       resolveLocalQueries = false;
       settings = {
-        address = [ "/${domain}/10.0.10.1" ];
+        address = ["/${domain}/10.0.10.1"];
         bind-dynamic = true;
         interface = [
           "vl10.homelab"
@@ -310,7 +307,7 @@ in
           port = 64022;
         }
       ];
-      ports = [ ];
+      ports = [];
       startWhenNeeded = true;
       settings = {
         Banner = toString ./.ssh/banner.txt;
@@ -356,7 +353,6 @@ in
         X11Forwarding = false;
       };
     };
-
   };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -381,8 +377,8 @@ in
   users = {
     mutableUsers = false;
     groups = {
-      sshuser = { };
-      users = { };
+      sshuser = {};
+      users = {};
     };
     users.router = {
       isNormalUser = true;

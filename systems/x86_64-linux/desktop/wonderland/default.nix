@@ -3,14 +3,12 @@
   lib ? throw "not imported as module",
   pkgs ? throw "not imported as module",
   firefox-addons,
-  homeModules ? [ ],
+  homeModules ? [],
   stateVersion ? "25.05",
   ...
-}:
-let
+}: let
   username = "rabbit";
-in
-{
+in {
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                   Boot                    ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
@@ -20,7 +18,7 @@ in
       systemd-boot.enable = true;
       efi.canTouchEfiVariables = true;
     };
-    kernelParams = [ "nvidia-drm.modeset=1" ];
+    kernelParams = ["nvidia-drm.modeset=1"];
     initrd = {
       availableKernelModules = [
         "xhci_pci"
@@ -37,8 +35,8 @@ in
         "nvidia_drm"
       ];
     };
-    kernelModules = [ "kvm-amd" ];
-    extraModulePackages = [ ];
+    kernelModules = ["kvm-amd"];
+    extraModulePackages = [];
   };
   #endregion
 
@@ -96,7 +94,7 @@ in
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
   #region environment
   environment = {
-    pathsToLink = [ "/share/zsh" ]; # https://nix-community.github.io/home-manager/options.xhtml#opt-programs.zsh.enableCompletion
+    pathsToLink = ["/share/zsh"]; # https://nix-community.github.io/home-manager/options.xhtml#opt-programs.zsh.enableCompletion
     # --- environment variables
     sessionVariables = {
       # nvidia
@@ -127,7 +125,7 @@ in
       nano
 
       # development
-      gemini-cli
+      antigravity-cli
       opencode
 
       # miscellaneous
@@ -144,9 +142,9 @@ in
       enable = true;
       config = {
         common = {
-          default = [ "*" ];
-          "org.freedesktop.impl.portal.ScreenCast" = [ "wlr" ];
-          "org.freedesktop.impl.portal.RemoteDesktop" = [ "gnome" ];
+          default = ["*"];
+          "org.freedesktop.impl.portal.ScreenCast" = ["wlr"];
+          "org.freedesktop.impl.portal.RemoteDesktop" = ["gnome"];
         };
       };
       extraPortals = with pkgs; [
@@ -205,7 +203,7 @@ in
       inherit firefox-addons stateVersion username;
     };
     users."${username}" = {
-      imports = homeModules ++ [ ./home.nix ];
+      imports = homeModules ++ [./home.nix];
     };
   };
   #endregion
@@ -254,8 +252,8 @@ in
     # --- firewall
     firewall = {
       enable = true;
-      allowedTCPPorts = [ ];
-      allowedUDPPorts = [ ];
+      allowedTCPPorts = [];
+      allowedUDPPorts = [];
     };
   };
   #endregion
@@ -274,7 +272,7 @@ in
       options = "--delete-older-than 7d";
       persistent = true;
     };
-    settings.allowed-users = [ "@wheel" ];
+    settings.allowed-users = ["@wheel"];
   };
   #endregion
 
@@ -318,7 +316,6 @@ in
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
   #region services
   services = {
-
     # ┌──────────────────────────────────────┐
     # │                 Dbus                 │
     # └──────────────────────────────────────┘
@@ -375,7 +372,7 @@ in
 
     xserver = {
       enable = true;
-      videoDrivers = [ "nvidia" ];
+      videoDrivers = ["nvidia"];
       xkb = {
         layout = "us,es";
         options = "grp:lalt_lshift_toggle";
@@ -412,7 +409,7 @@ in
           steam = {
             dedicatedServer.openFirewall = true;
             enable = true;
-            extraCompatPackages = with pkgs; [ proton-ge-bin ];
+            extraCompatPackages = with pkgs; [proton-ge-bin];
             remotePlay.openFirewall = true;
           };
         };
@@ -425,14 +422,14 @@ in
   # ┃                  System                   ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
   #region system
-  system = { inherit stateVersion; };
+  system = {inherit stateVersion;};
   #endregion
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                 Systemd                   ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
   #region systemd
-  systemd.tmpfiles.rules = [ "d /var/lib/alsa 0755 root root -" ];
+  systemd.tmpfiles.rules = ["d /var/lib/alsa 0755 root root -"];
   #endregion
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -466,8 +463,8 @@ in
     };
     # --- groups
     groups = {
-      audio = { };
-      greeter = { };
+      audio = {};
+      greeter = {};
     };
   };
   #endregion

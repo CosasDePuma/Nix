@@ -6,11 +6,11 @@
       settings-macos
       settings-nix
       settings-nixpkgs
+      software-antigravity
       software-bat
       software-claude
       software-direnv
       software-discord
-      software-gemini
       software-ghostty
       software-git
       software-helium

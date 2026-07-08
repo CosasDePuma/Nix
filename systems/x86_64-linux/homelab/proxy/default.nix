@@ -4,11 +4,9 @@
   pkgs ? throw "not imported as module",
   stateVersion ? "25.05",
   ...
-}:
-let
+}: let
   domain = "kike.wtf";
-in
-{
+in {
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                   Boot                    ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
@@ -110,8 +108,8 @@ in
     };
     # --- dns
     domain = "home";
-    search = [ "home" ];
-    nameservers = [ "10.0.10.254" ];
+    search = ["home"];
+    nameservers = ["10.0.10.254"];
     # --- firewall
     firewall = {
       enable = true;
@@ -144,7 +142,7 @@ in
         dnsResolver = "1.1.1.1:53";
         email = "acme@${domain}";
         environmentFile = config.age.secrets."acme.env".path;
-        extraDomainNames = [ "*.${domain}" ];
+        extraDomainNames = ["*.${domain}"];
         renewInterval = "90d";
       };
     };
@@ -165,7 +163,6 @@ in
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
   services = {
-
     # ┌──────────────────────────────────────┐
     # │                 Caddy                │
     # └──────────────────────────────────────┘
@@ -181,25 +178,23 @@ in
     # │               Homepage               │
     # └──────────────────────────────────────┘
 
-    homepage-dashboard =
-      let
-        homepageConfig = builtins.fromJSON (builtins.readFile ./.homepage/homepage.json);
-      in
-      {
-        inherit (homepageConfig) services;
-        enable = true;
-        listenPort = 8082;
-        allowedHosts = "*";
-        environmentFiles = [ config.age.secrets."homepage.env".path ];
-        settings = {
-          inherit (homepageConfig) layout;
-          color = "slate";
-          title = "Kike's Homelab";
-          description = "A collection of services running on Kike's Homelab";
-          hideVersion = true;
-          useEqualHeights = true;
-        };
+    homepage-dashboard = let
+      homepageConfig = builtins.fromJSON (builtins.readFile ./.homepage/homepage.json);
+    in {
+      inherit (homepageConfig) services;
+      enable = true;
+      listenPort = 8082;
+      allowedHosts = "*";
+      environmentFiles = [config.age.secrets."homepage.env".path];
+      settings = {
+        inherit (homepageConfig) layout;
+        color = "slate";
+        title = "Kike's Homelab";
+        description = "A collection of services running on Kike's Homelab";
+        hideVersion = true;
+        useEqualHeights = true;
       };
+    };
 
     # ┌──────────────────────────────────────┐
     # │                OpenSSH               │
@@ -215,7 +210,7 @@ in
           port = 64022;
         }
       ];
-      ports = [ ];
+      ports = [];
       startWhenNeeded = true;
       settings = {
         Banner = toString ./.ssh/banner.txt;
@@ -261,14 +256,13 @@ in
         X11Forwarding = false;
       };
     };
-
   };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                  System                   ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-  system = { inherit stateVersion; };
+  system = {inherit stateVersion;};
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                   Users                   ┃
@@ -277,8 +271,8 @@ in
   users = {
     mutableUsers = false;
     groups = {
-      sshuser = { };
-      users = { };
+      sshuser = {};
+      users = {};
     };
     users.proxy = {
       isNormalUser = true;

@@ -62,11 +62,11 @@
       };
       sharedModules = with inputs.self.homeManagerModules; [
         # keep-sorted start
+        software-antigravity
         software-bat
         software-claude
         software-direnv
         software-discord
-        software-gemini
         software-ghostty
         software-git
         software-lsd

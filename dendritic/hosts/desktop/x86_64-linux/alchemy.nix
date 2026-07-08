@@ -37,21 +37,18 @@
 
     disko.devices.disk."main".device = "/dev/nvme0n1";
     networking.hostName = "alchemy";
-
-    environment.persistence."/nix/persist" = {
-      users.wizard = {
-        directories = [
-          "Downloads"
-          "Music"
-          "Pictures"
-          "Documents"
-          "Videos"
-          ".config"
-          ".local"
-          ".ssh"
-        ];
-      };
-    };
+    environment.persistence."/nix/persist".users."wizard".directories = [
+      # keep-sorted start
+      ".config"
+      ".local"
+      ".ssh"
+      "Documents"
+      "Downloads"
+      "Music"
+      "Pictures"
+      "Videos"
+      # keep-sorted end
+    ];
 
     fonts.packages = with pkgs; [
       maple-mono.NF
@@ -59,7 +56,7 @@
     ];
 
     home-manager = {
-      users.wizard = {
+      users."wizard" = {
         home.username = "wizard";
         home.homeDirectory = "/home/wizard";
         home.stateVersion = "26.05";
@@ -67,9 +64,9 @@
       sharedModules = with inputs.self.homeManagerModules; [
         # keep-sorted start
         rice-antiquary
+        software-antigravity
         software-bat
         software-claude
-        software-gemini
         software-git
         software-hyprland
         software-lsd

@@ -4,14 +4,14 @@
   ...
 }: {
   flake = {
-    darwinModules.software-gemini = {
+    darwinModules.software-antigravity = {
       homebrew = {
-        brews = ["gemini-cli"];
-        casks = ["google-gemini"];
+        brews = ["antigravity-cli"];
+        casks = ["antigravity"];
       };
     };
 
-    homeManagerModules.software-gemini = {
+    homeManagerModules.software-antigravity = {
       config,
       pkgs,
       ...
@@ -19,9 +19,10 @@
       imports = with inputs.self.homeManagerModules; [software-mcp];
       config = lib.mkMerge [
         {
-          programs.gemini-cli = {
+          programs.antigravity-cli = {
             context.fileName = lib.mkDefault ''
               AGENTS.md
+              ANTIGRAVITY.md
               CLAUDE.md
               CONTEXT.md
               GEMINI.md
@@ -44,8 +45,8 @@
       ];
     };
 
-    nixosModules.software-gemini = {pkgs, ...}: {
-      environment.systemPackages = with pkgs; [gemini-cli];
+    nixosModules.software-antigravity = {pkgs, ...}: {
+      environment.systemPackages = with pkgs; [antigravity-cli];
     };
   };
 }

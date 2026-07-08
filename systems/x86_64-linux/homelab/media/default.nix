@@ -4,8 +4,7 @@
   pkgs ? throw "not imported as module",
   stateVersion ? "25.05",
   ...
-}:
-{
+}: {
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                   Boot                    ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
@@ -138,8 +137,8 @@
     };
     # --- dns
     domain = "home";
-    search = [ "home" ];
-    nameservers = [ "10.0.10.254" ];
+    search = ["home"];
+    nameservers = ["10.0.10.254"];
     # --- firewall
     firewall = {
       enable = true;
@@ -185,7 +184,6 @@
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
   services = {
-
     # ┌──────────────────────────────────────┐
     # │                 Borg                 │
     # └──────────────────────────────────────┘
@@ -293,7 +291,7 @@
           port = 64022;
         }
       ];
-      ports = [ ];
+      ports = [];
       startWhenNeeded = true;
       settings = {
         Banner = toString ./.ssh/banner.txt;
@@ -339,14 +337,13 @@
         X11Forwarding = false;
       };
     };
-
   };
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                  System                   ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-  system = { inherit stateVersion; };
+  system = {inherit stateVersion;};
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                   Users                   ┃
@@ -355,8 +352,8 @@
   users = {
     mutableUsers = false;
     groups = {
-      sshuser = { };
-      users = { };
+      sshuser = {};
+      users = {};
     };
     users.media = {
       isNormalUser = true;
