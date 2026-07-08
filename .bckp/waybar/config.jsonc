@@ -1,0 +1,63 @@
+[
+    {
+        "layer": "top",
+        "position": "left",
+        "orientation": "vertical",
+        "reload_style_on_change": true,
+
+        "modules-center": ["group/center"],
+
+        "group/center": {
+            "orientation": "inherit",
+            "modules": [
+                "clock",
+                "niri/language",
+                
+                "niri/workspaces",
+
+                "tray",
+                "cpu",
+                "memory",
+                "network"
+            ]
+        },
+
+        "niri/language": {
+            "format": "{short}",
+            "on-click": "hyprctl switchxkblayout next"
+        },
+
+        "niri/workspaces": {
+            "format": " ",
+            "all-outputs": true
+        },
+
+        "clock": {
+            "format": "{:%H\n%M}",
+            "tooltip-format": "{:%a %b %d, %Y}"
+        },
+
+        "cpu": {
+            "format": "",
+            "interval": 10
+        },
+
+        "memory": {
+            "format": "",
+            "interval": 30,
+            "tooltip-format": "RAM: {used} / {total} ({percentage}%)"
+        },
+
+        "network": {
+            "format-ethernet": "",
+            "tooltip-format-ethernet": "{ipaddr}/{cidr} via {ifname}",
+            "tooltip-format-disconnected": "Disconnected",
+            "max-length": 50
+        },
+
+        "tray": {
+            "icon-size": 21,
+            "spacing": 5
+        }
+    }
+]
