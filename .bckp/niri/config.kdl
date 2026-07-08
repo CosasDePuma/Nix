@@ -1,0 +1,225 @@
+// ╔═════════════════════════╗
+// ║         Startup         ║
+// ╚═════════════════════════╝
+
+spawn-at-startup "waybar"
+spawn-at-startup "awww-daemon"
+spawn-at-startup "gsettings" "set" "org.gnome.desktop.interface" "color-scheme" "'prefer-dark'"
+
+// ╔═════════════════════════╗
+// ║       Keybindings       ║
+// ╚═════════════════════════╝
+
+binds {
+    Mod+Q            { close-window;                   }
+    Ctrl+Alt+Delete  { quit;                           }
+
+    Mod+Shift+Slash  { show-hotkey-overlay;            }
+
+    // Apps
+
+    Mod+Return       { spawn "ghostty";                }
+    Mod+B            { spawn "firefox-esr";            }
+    Mod+E            { spawn "dolphin";                }
+
+    // Launchers
+
+    Mod+Space        { spawn "rofi" "-show" "drun";    }
+    Mod+Ctrl+Space   { spawn "rofi" "-show" "ssh" "-terminal" "ghostty"; }
+    Mod+T            { spawn "quickshell" "ipc" "call" "wallpaper-picker" "toggle"; }
+    Mod+Shift+T      { spawn "/bin/sh" "-c" "~/.config/rofi/launchers/theme.sh"; }
+
+    // Layout
+
+    Mod+C            { center-column;                  }
+    Mod+F            { maximize-column;                }
+    Mod+Shift+F      { fullscreen-window;              }
+    Mod+S            { switch-preset-column-width;     }
+    Mod+Shift+S      { toggle-window-floating;         }
+
+    // Windows
+
+    Mod+Left         { focus-column-left;              }
+    Mod+Right        { focus-column-right;             }
+    Mod+Up           { focus-window-up;                }
+    Mod+Down         { focus-window-down;              }
+
+    Mod+Shift+Left   { move-column-left;               }
+    Mod+Shift+Right  { move-column-right;              }
+    Mod+Shift+Up     { move-window-up;                 }
+    Mod+Shift+Down   { move-window-down;               }
+    
+    // Workspaces
+
+    Mod+Tab          { toggle-overview;                }
+    Mod+WheelScrollDown cooldown-ms=150 { focus-workspace-down; }
+    Mod+WheelScrollUp   cooldown-ms=150 { focus-workspace-up; }
+
+    Mod+1            { focus-workspace 1;              }
+    Mod+2            { focus-workspace 2;              }
+    Mod+3            { focus-workspace 3;              }
+    Mod+4            { focus-workspace 4;              }
+    Mod+5            { focus-workspace 5;              }
+    Mod+Alt+Up       { focus-workspace-up;             }
+    Mod+Alt+Down     { focus-workspace-down;           }
+
+    Mod+Shift+1      { move-column-to-workspace 1;     }
+    Mod+Shift+2      { move-column-to-workspace 2;     }
+    Mod+Shift+3      { move-column-to-workspace 3;     }
+    Mod+Shift+4      { move-column-to-workspace 4;     }
+    Mod+Shift+5      { move-column-to-workspace 5;     }
+    Mod+Ctrl+Up      { move-column-to-workspace-up;    }
+    Mod+Ctrl+Down    { move-column-to-workspace-down;  }
+
+    // Audio
+
+    XF86AudioRaiseVolume allow-when-locked=true {
+        spawn "sh" "-c" "cur=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{print int($2*100)}'); [ \"$cur\" -lt 150 ] && wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+ || wpctl set-volume @DEFAULT_AUDIO_SINK@ 1.5"
+    }
+    XF86AudioLowerVolume allow-when-locked=true {
+        spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"
+    }
+    XF86AudioMute allow-when-locked=true {
+        spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"
+    }
+    XF86AudioMicMute allow-when-locked=true {
+        spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"
+    }
+
+    // Brightness
+
+    XF86MonBrightnessDown { spawn "brightnessctl" "set" "2%-"; }
+    XF86MonBrightnessUp   { spawn "brightnessctl" "set" "+2%"; }
+
+
+
+
+
+
+
+
+
+
+    Print       { screenshot; }
+    Ctrl+Print  { screenshot-screen; }
+    Alt+Print   { screenshot-window; }
+
+
+    Mod+Shift+P { power-off-monitors; }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Cursor
+cursor {
+    xcursor-theme "Bibata-Modern-Ice"
+    xcursor-size 24
+}
+
+// Input
+input {
+    touchpad {
+        tap
+        natural-scroll
+    }
+
+    focus-follows-mouse max-scroll-amount="100%"
+}
+
+// Output
+output "eDP-1" {
+    mode "2560x1440@165.003"
+    scale 1.5
+    position x=0 y=0
+}
+
+// ╔═════════════════════════╗
+// ║      Color Scheme       ║
+// ╚═════════════════════════╝
+
+overview {
+    backdrop-color "#0a0a0a"
+}
+
+// Layout
+prefer-no-csd
+layout {
+    background-color "#e6e6e6"
+
+    center-focused-column "never"
+
+    preset-column-widths {
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+    }
+
+    default-column-width { proportion 0.5; }
+
+    focus-ring {
+        off
+    }
+
+    border {
+        width 3
+        active-color "#555555"
+        inactive-color "#14141400"
+    }
+
+    shadow {
+        on
+        softness 30
+        spread 5
+        offset x=0 y=2
+        draw-behind-window true
+        color "#2b2b2b80"
+        inactive-color "#2b2b2b40"
+    }
+
+    gaps 7
+
+    struts {
+        top    20
+        right  20
+        bottom 20
+        left   20
+    }
+}
+
+// Animations
+animations {
+    slowdown 1.0
+}
+
+// Window Rules
+window-rule {
+    match app-id="foot"
+    opacity 1.0
+    draw-border-with-background false
+}
+
+window-rule {
+    geometry-corner-radius 10
+    clip-to-geometry true
+}
+
+// Misc
+screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
+
+hotkey-overlay {
+    skip-at-startup
+}
+
+

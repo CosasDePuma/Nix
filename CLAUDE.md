@@ -1,98 +1,155 @@
-# CLAUDE.md
+# Workflow Guide — Nix Configuration (Dendritic Pattern)
 
-This file provides guidance when working with code in this repository.
+This repository contains Infrastructure as Code (IaC) using Nix, managing both workstations (desktops) and servers. Configuration lives in `dendritic/` and is auto-imported by `flake.nix` via `flake-parts` and `import-tree`.
 
-## Overview
+---
 
-Personal NixOS Flakes configuration managing computers and a multi-system homelab. All systems are declaratively defined — no imperative state outside of `secrets.nix` (age-encrypted).
+## Architecture: Dendritic Pattern
 
-- **Public domain**: kike.wtf
-- **Nixpkgs channel**: nixos-unstable
-- **State version**: 25.05 (or newer)
+The **Dendritic Pattern** is the fundamental rule of this repo: **if you need something, you import it and it works out-of-the-box**. Every module must be fully self-contained. A host file should ideally be a list of imports plus a handful of machine-specific values (disk device, hostname, initial password). Nothing more.
 
-## Common Commands
+> If configuration logic appears inline in a host file and could logically be reused elsewhere, it belongs in a module.
 
-Enter the NixOS management shell first (provides `nh`, `nixfmt-tree`, `statix`, `deadnix`, `agenix`, `nixos-anywhere`):
+---
+
+## Module Structure
+
+All modules live in `dendritic/modules/` under a category subdirectory. Each module file exports its configuration to all applicable platforms inside a `flake = { ... }` block. Only include an attribute if it has actual content — never leave empty placeholders.
+
+```nix
+{ lib, ... }: {
+  flake = {
+    darwinModules.category-name    = { /* macOS config */ };
+    homeManagerModules.category-name = { /* user-level config */ };
+    nixosModules.category-name     = { /* NixOS system config */ };
+  };
+}
+```
+
+### Categories
+
+| Directory   | Scope                                  | Platform        |
+|-------------|----------------------------------------|-----------------|
+| `boot/`     | Boot loaders, EFI, kernel params       | NixOS           |
+| `cpu/`      | CPU microcode, governors               | NixOS           |
+| `disko/`    | Disk partitioning layouts              | NixOS           |
+| `gpu/`      | GPU drivers                            | NixOS           |
+| `hardware/` | Kernel modules, hardware support       | NixOS           |
+| `network/`  | DNS, firewall, interfaces              | NixOS           |
+| `services/` | System services (SSH, etc.)            | NixOS / Darwin  |
+| `settings/` | Global defaults (locale, nix, nixpkgs) | All platforms   |
+| `software/` | Packages and user-level tools          | All platforms   |
+| `system/`   | Composed system-level presets          | NixOS           |
+
+---
+
+## Naming Convention
+
+- **File name**: `category-name.nix` (lowercase, hyphen-separated)
+- **Export key**: matches the file name, e.g. `software-bat`, `network-firewall`, `services-ssh`
+- **Import in host**: `inputs.self.nixosModules.software-bat`
+
+The file name and the export key must match exactly. This is what makes `import-tree` auto-discovery work.
+
+---
+
+## Coding Rules
+
+### Always use `lib.mkDefault`
+
+Every setting in a module must be wrapped in `lib.mkDefault`. This allows hosts to override any default without using `lib.mkForce`, keeping the layering clean.
+
+```nix
+programs.bat.config = {
+  color  = lib.mkDefault "always";
+  paging = lib.mkDefault "never";
+};
+```
+
+### Cross-platform differences stay inside the module
+
+When the NixOS and HomeManager APIs differ (e.g. `programs.bat.settings` vs `programs.bat.config`), handle the difference inside the module — never expose it to the host.
+
+### HomeManager modules may reference `osConfig`
+
+Use `osConfig` to conditionally activate HomeManager config when the corresponding system program is enabled:
+
+```nix
+homeManagerModules.software-foo = { osConfig, lib, ... }: {
+  config = lib.mkIf osConfig.programs.foo.enable {
+    programs.foo.settings = { /* ... */ };
+  };
+};
+```
+
+### Use `lib.mkMerge` for conditional blocks
+
+When a module has both unconditional and conditional parts, use `lib.mkMerge`:
+
+```nix
+config = lib.mkMerge [
+  { /* always-on config */ }
+  (lib.mkIf condition { /* conditional config */ })
+];
+```
+
+### Factories for parameterized modules
+
+When a module needs parameters (e.g. a user with a name, home directory, SSH keys), use the factory pattern under `dendritic/factory/`:
+
+```nix
+config.flake.factory.my-factory = { name, ... }: { lib, ... }: {
+  users.users.${name} = { /* ... */ };
+};
+```
+
+---
+
+## Host Files
+
+A host file in `dendritic/hosts/` should contain:
+
+1. A list of `imports` covering all required behaviour.
+2. Machine-specific values that cannot be abstracted (disk device path, hostname, initial password, static IPs).
+
+**Nothing else.** If you find programs, services, fonts, portal config, or user definitions declared inline in a host file, those are candidates for new modules.
+
+### Current known gaps in `wonderland.nix`
+
+The following inline blocks in `wonderland.nix` should each become their own module:
+
+| Inline config                         | Target module              |
+|---------------------------------------|----------------------------|
+| `environment.sessionVariables` (Wayland vars) | `settings-wayland`   |
+| `environment.systemPackages` (desktop apps)   | `software-niri` (or per-app modules) |
+| `fonts.*`                             | `settings-fonts`           |
+| `programs.dconf`, `programs.firefox`, `programs.xwayland` | `software-dconf`, `software-firefox`, `software-xwayland` |
+| `services.greetd`                     | `services-greetd`          |
+| `services.pipewire` + `services.pulseaudio` | `services-pipewire`   |
+| `services.xserver` (xkb layout)       | `settings-keyboard`        |
+| `xdg.portal.*`                        | `settings-xdg-portal`      |
+| `users.users.rabbit`                  | user factory or dedicated module |
+| `specialisation.gaming`               | `specialisation-gaming`    |
+
+---
+
+## Workflow
+
+Before committing any changes, always run in order:
 
 ```bash
-nix develop .#nixos   # or just: direnv allow (auto-activates via .envrc)
+# 1. Format
+nix fmt -- .
+
+# 2. Validate
+nix flake check
 ```
 
-**Rebuild systems:**
-```bash
-# Local rebuild (wonderland desktop)
-nh os switch .
+Both must pass cleanly.
 
-# Remote rebuild (homelab VMs)
-nixos-rebuild switch --flake .#router     --target-host router.homelab --build-host router.homelab --no-reexec --sudo
-nixos-rebuild switch --flake .#proxy      --target-host proxy.homelab  --build-host proxy.homelab  --no-reexec --sudo
-nixos-rebuild switch --flake .#media      --target-host media.homelab  --build-host media.homelab  --no-reexec --sudo
-...
+---
 
-# macOS (airbender)
-nix run nix-darwin -- switch --flake .#airbender
-```
+## Host Types
 
-**Format & lint:**
-```bash
-nix fmt              # format all .nix files with nixfmt-tree
-statix check .       # lint for anti-patterns
-deadnix .            # find unused bindings
-```
-
-**Secrets (agenix):**
-```bash
-agenix -i ~/.ssh/keys/homelab -e secrets/<name>.age   # edit an encrypted secret
-# Keys are declared in secrets.nix with per-host SSH Ed25519 public keys
-```
-
-**Fresh install on new machine:**
-```bash
-nixos-anywhere --flake .#<system> root@<ip>
-```
-
-## Repository Structure
-
-```
-flake.nix                    # Inputs, all system outputs, devShells, formatter, templates
-secrets.nix                  # Age key declarations (maps secrets → allowed host keys)
-shells/
-  nixos.nix                  # Default devShell: NixOS tooling
-  hacking.nix                # Offensive security tools (nmap, metasploit, etc.)
-  hacking-infra.nix          # Extended infra pentesting (amass, ffuf, feroxbuster, etc.)
-systems/
-  aarch64-darwin/airbender/  # Apple Silicon macOS (Homebrew managed via nix-darwin)
-  x86_64-linux/desktop/wonderland/   # NVIDIA gaming desktop, Niri/Wayland
-  x86_64-linux/homelab/
-    router/                  # Gateway: nftables firewall, WireGuard VPN, DDClient DNS
-    proxy/                   # Caddy reverse proxy, ACME/Let's Encrypt (*.kike.wtf)
-    media/                   # Jellyfin, Radarr, Sonarr, Komga, qBitTorrent + SMB mounts
-    automation/              # n8n workflow engine, HandBrake transcoding + SMB mounts
-templates/workspace/         # Flake template for new dev environments
-```
-
-## Architecture
-
-**Network layout:**
-- VLAN10 (homelab): `10.0.10.0/24` — router `.254`, proxy `.1`, media `.3`, automation `.4`
-- WireGuard VPN: `10.10.10.0/24`
-- TrueNAS NAS: `192.168.1.3` (SMB backend for media and automation)
-- SSH on custom port `64022` for all homelab systems
-
-**Secrets flow:** `secrets.nix` maps each `.age` file to the SSH host keys that can decrypt it. Agenix decrypts at activation using the host's `/etc/ssh/ssh_host_ed25519_key`.
-
-**Wonderland desktop specifics:** Uses `niri` Wayland compositor with NVIDIA open drivers (`nvidia_drm.modeset=1`). Has a `gaming` specialisation that adds Steam + Proton + MangoHUD. Display manager is `greetd`+`tuigreet`.
-
-**Proxy/Caddy:** TLS via DNS-01 challenge (Cloudflare API). Wildcard cert for `*.kike.wtf`. Caddyfile lives at `systems/x86_64-linux/homelab/proxy/.caddy/Caddyfile`.
-
-**Router firewall:** nftables rules at `systems/x86_64-linux/homelab/router/.nftables/tables.nft`. Drop-all policy; VLAN10 hosts can only reach the gateway (not each other) except for explicit SMB rules to TrueNAS.
-
-## Key Inputs
-
-| Input | Purpose |
-|-------|---------|
-| `nixpkgs` | nixos-unstable |
-| `nix-darwin` | macOS system config |
-| `home-manager` | User-level config (used on darwin) |
-| `agenix` | Age-encrypted secrets |
-| `disko` | Declarative disk partitioning (used for fresh installs) |
+- **Desktops**: Personal workstations (`dendritic/hosts/desktop/`), macOS or NixOS.
+- **Homelab servers**: Automation, media, proxy, router, gaming (`dendritic/hosts/homelab/`), always NixOS.

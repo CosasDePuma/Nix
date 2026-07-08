@@ -1,16 +1,29 @@
-**/*~
+# keep-sorted start
 **/*.bck
+**/*.db
 **/*.env
 **/*.local.*
 **/*.log
 **/*.pyc
+**/*.swo
 **/*.swp
+**/*.tsbuildinfo
+**/*~
+**/.DS_Store
+**/.cache/
+**/.claude/
 **/.desktop.ini
 **/.direnv/
-**/.DS_Store
+**/.env.*.local
+**/.env.local
 **/.idea/
 **/__pycache__/
 **/build/
-**/dist/
+**/bun.lockb
+**/coverage/
+**/dist/*
 **/node_modules/
 **/result/
+**/temp/
+**/tmp/
+# keep-sorted end

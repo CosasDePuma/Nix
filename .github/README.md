@@ -1,9 +1,3 @@
-<!--
-    Author: Kike Fontán (@CosasDePuma)
-    Repository: Nix IaC
-    Description: Personal NixOS and nix-darwin flakes configuration managing a multi-system homelab and workstations declaratively, including secrets, services, and network layout.
--->
-
 <div align="center">
 <img src="logo.png" alt="nix" />
 <br/><br/>
