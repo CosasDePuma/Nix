@@ -94,10 +94,10 @@
         };
 
         extraConfig = ''
-          layerrule = blur 1, diinki_celestialantiquity:bars
-          layerrule = ignore_alpha 0.19, diinki_celestialantiquity:bars
-          layerrule = blur 1, diinki_celestialantiquity:no_blur
-          layerrule = ignore_alpha 0.19, diinki_celestialantiquity:no_blur
+          layerrule = blur on, match:namespace diinki_celestialantiquity:bars
+          layerrule = ignore_alpha 0.19, match:namespace diinki_celestialantiquity:bars
+          layerrule = blur on, match:namespace diinki_celestialantiquity:no_blur
+          layerrule = ignore_alpha 0.19, match:namespace diinki_celestialantiquity:no_blur
         '';
       };
 
