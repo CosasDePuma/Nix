@@ -17,7 +17,7 @@
         inputs.self.homeManagerModules.software-hyprshot
       ];
 
-      home.pointerCursor = {
+      home.pointerCursor = lib.mkForce {
         package = pkgs.hackneyed;
         name = "Hackneyed";
         size = 24;
@@ -87,7 +87,7 @@
         extraConfig = lib.mkForce (builtins.readFile ./.kitty/default_theme.conf);
       };
 
-      xdg.configFile."quickshell".source = ./.quickshell;
+      xdg.configFile."quickshell".source = lib.mkForce ./.quickshell;
       xdg.dataFile."icons/RetroismIcons".source = ./.icons/RetroismIcons;
     };
 
