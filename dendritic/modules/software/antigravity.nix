@@ -38,6 +38,7 @@
               privacy.usageStatisticsEnabled = lib.mkDefault false;
             };
           };
+          home.file.".gemini/antigravity-cli/settings.json".force = true;
         }
         (lib.mkIf config.programs.vscode.enable {
           my.vscode-extraExtensions = with pkgs.vscode-extensions; [Google.gemini-cli-vscode-ide-companion];

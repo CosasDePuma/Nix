@@ -30,7 +30,7 @@
       };
 
       wayland.windowManager.hyprland = {
-        configType = "hyprlang";
+        configType = "lua";
         settings = {
           exec-once = lib.mkDefault [
             "${pkgs.networkmanagerapplet}/bin/nm-applet"
@@ -98,10 +98,12 @@
         };
 
         extraConfig = ''
-          layerrule = blur on, match:namespace diinki_celestialantiquity:bars
-          layerrule = ignore_alpha 0.19, match:namespace diinki_celestialantiquity:bars
-          layerrule = blur on, match:namespace diinki_celestialantiquity:no_blur
-          layerrule = ignore_alpha 0.19, match:namespace diinki_celestialantiquity:no_blur
+          hl.layer_rule({ match = { namespace = "diinki_celestialantiquity:bars" }, blur = true })
+          hl.layer_rule({ match = { namespace = "diinki_celestialantiquity:bars" }, ignore_alpha = 0.19 })
+          hl.layer_rule({ match = { namespace = "diinki_celestialantiquity:no_blur" }, blur = true })
+          hl.layer_rule({ match = { namespace = "diinki_celestialantiquity:no_blur" }, ignore_alpha = 0.19 })
+
+          hl.window_rule({ match = { class = "kitty" }, float = true })
         '';
       };
 
@@ -113,6 +115,7 @@
         };
         settings = {
           font_weight = "800";
+          background_opacity = "0.85";
         };
         extraConfig = builtins.readFile ./.kitty/gruvbox.conf;
       };
@@ -127,17 +130,17 @@
         theme = let
           inherit (config.lib.formats.rasi) mkLiteral;
           rofi-bg = pkgs.runCommand "rofi-bg.svg" {} ''
-            sed 's/#000000/#87704f/g' ${./.quickshell/assets/background_pattern_mono_1.svg} > $out
+            sed 's/#000000/#504945/g' ${./.quickshell/assets/background_pattern_mono_1.svg} > $out
           '';
         in {
           "*" = {
-            bg = mkLiteral "#fce2ab33";
-            bg-input = mkLiteral "#181818";
-            fg = mkLiteral "#121212";
-            fg-alt = mkLiteral "#d0daed";
-            fg-accent = mkLiteral "#fccf8a";
-            border-col = mkLiteral "#121212";
-            border-element = mkLiteral "#333333";
+            bg = mkLiteral "#282828cc";
+            bg-input = mkLiteral "#3c3836";
+            fg = mkLiteral "#ebdbb2";
+            fg-alt = mkLiteral "#a89984";
+            fg-accent = mkLiteral "#fabd2f";
+            border-col = mkLiteral "#1d2021";
+            border-element = mkLiteral "#504945";
 
             background-color = mkLiteral "transparent";
             text-color = mkLiteral "@fg";
@@ -170,7 +173,7 @@
           "entry" = {
             text-color = mkLiteral "@fg-accent";
             placeholder = "Search apps...";
-            placeholder-color = mkLiteral "#87704f";
+            placeholder-color = mkLiteral "#7c6f64";
             font = "Recia Bold 17";
             horizontal-align = mkLiteral "0.5";
           };
