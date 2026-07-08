@@ -6,7 +6,6 @@
   flake = {
     homeManagerModules.rice-antiquary = {pkgs, ...}: {
       imports = [
-        inputs.self.homeManagerModules.software-hyprland
         inputs.self.homeManagerModules.software-quickshell
         inputs.self.homeManagerModules.software-mako
         inputs.self.homeManagerModules.software-jq
@@ -31,7 +30,7 @@
           exec-once = lib.mkDefault [
             "${pkgs.networkmanagerapplet}/bin/nm-applet"
             "${pkgs.swaybg}/bin/swaybg -i ${./.wallpapers/georges_riom.png} -m fill"
-            "${pkgs.quickshell}/bin/quickshell ipc call appLauncher_$(${pkgs.hyprland}/bin/hyprctl monitors -j | ${pkgs.jq}/bin/jq -r '.[] | select(.focused == true) | .name') toggleAppLauncher"
+            "${pkgs.quickshell}/bin/quickshell"
             "${pkgs.systemd}/bin/systemctl --user start hyprpolkitagent"
             "${pkgs.hyprland}/bin/hyprctl setcursor Hackneyed 24"
           ];
@@ -119,7 +118,6 @@
 
     nixosModules.rice-antiquary = {
       imports = [
-        inputs.self.nixosModules.software-hyprland
         inputs.self.nixosModules.software-quickshell
         inputs.self.nixosModules.software-mako
         inputs.self.nixosModules.software-jq
