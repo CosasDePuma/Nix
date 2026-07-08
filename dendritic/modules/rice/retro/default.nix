@@ -25,7 +25,7 @@
       };
 
       wayland.windowManager.hyprland = {
-        configType = "lua";
+        configType = "hyprlang";
         settings = {
           exec-once = lib.mkForce [
             "${pkgs.networkmanagerapplet}/bin/nm-applet"

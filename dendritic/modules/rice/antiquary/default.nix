@@ -30,7 +30,7 @@
       };
 
       wayland.windowManager.hyprland = {
-        configType = "lua";
+        configType = "hyprlang";
         settings = {
           exec-once = lib.mkDefault [
             "${pkgs.networkmanagerapplet}/bin/nm-applet"
@@ -98,12 +98,12 @@
         };
 
         extraConfig = ''
-          hl.layer_rule({ match = { namespace = "diinki_celestialantiquity:bars" }, blur = true })
-          hl.layer_rule({ match = { namespace = "diinki_celestialantiquity:bars" }, ignore_alpha = 0.19 })
-          hl.layer_rule({ match = { namespace = "diinki_celestialantiquity:no_blur" }, blur = true })
-          hl.layer_rule({ match = { namespace = "diinki_celestialantiquity:no_blur" }, ignore_alpha = 0.19 })
+          layerrule = blur on, match:namespace diinki_celestialantiquity:bars
+          layerrule = ignore_alpha 0.19, match:namespace diinki_celestialantiquity:bars
+          layerrule = blur on, match:namespace diinki_celestialantiquity:no_blur
+          layerrule = ignore_alpha 0.19, match:namespace diinki_celestialantiquity:no_blur
 
-          hl.window_rule({ match = { class = "kitty" }, float = true })
+          windowrulev2 = float, class:^(kitty)$
         '';
       };
 
