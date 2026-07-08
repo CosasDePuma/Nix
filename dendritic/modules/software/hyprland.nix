@@ -82,11 +82,7 @@
             "SUPER SHIFT, 0, movetoworkspace, 10"
           ];
 
-          windowrule = lib.mkDefault [
-            "float, initialClass:^(kitty)$"
-            "center, initialClass:^(kitty)$"
-            "size 800 500, initialClass:^(kitty)$"
-          ];
+
 
           binde = lib.mkDefault [
             ", XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+"
