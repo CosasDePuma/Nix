@@ -30,7 +30,7 @@
           exec-once = lib.mkForce [
             "${pkgs.networkmanagerapplet}/bin/nm-applet"
             "${pkgs.swaybg}/bin/swaybg -i ${./.wallpapers/peak_into_the_system.png} -m fill"
-            "quickshell"
+            "hyprctl dispatch exec quickshell"
             "${pkgs.systemd}/bin/systemctl --user start hyprpolkitagent"
             "${pkgs.hyprland}/bin/hyprctl setcursor Hackneyed 24"
           ];
