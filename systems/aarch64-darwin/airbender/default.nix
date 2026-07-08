@@ -1,8 +1,4 @@
-{
-  user ? "pumita",
-  ...
-}:
-{
+{user ? "pumita", ...}: {
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                 Homebrew                  ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
@@ -30,24 +26,23 @@
       "zoxide"
       "zsh"
       # --- ai tools
-      "gemini-cli"
+      "antigravity-cli"
       "ollama"
       "opencode"
     ];
 
     # --- graphical applications
-    casks =
-      let
-        appsDir = "/Applications/Homebrew";
-        organize =
-          folder: apps:
-          builtins.map (name: {
-            inherit name;
-            args = {
-              appdir = "${appsDir}/${folder}";
-            };
-          }) apps;
-      in
+    casks = let
+      appsDir = "/Applications/Homebrew";
+      organize = folder: apps:
+        builtins.map (name: {
+          inherit name;
+          args = {
+            appdir = "${appsDir}/${folder}";
+          };
+        })
+        apps;
+    in
       builtins.concatLists [
         (organize "Communication" [
           "discord"
