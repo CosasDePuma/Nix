@@ -24,6 +24,14 @@
                 size = "1M";
                 type = "EF02";
               };
+              BOOT_FS = {
+                size = "1G";
+                content = {
+                  type = "filesystem";
+                  format = "ext4";
+                  mountpoint = "/boot";
+                };
+              };
               NIXOS = {
                 size = "100%";
                 content = {
