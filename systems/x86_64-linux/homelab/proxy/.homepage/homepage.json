@@ -146,35 +146,6 @@
                             ]
                         }
                     }
-                },
-                {
-                    "n8n": {
-                        "icon": "sh-n8n",
-                        "description": "Workflow automation tool",
-                        "href": "https://automate.kike.wtf",
-                        "siteMonitor": "https://automate.kike.wtf",
-                        "widget": {
-                            "type": "customapi",
-                            "url": "https://automate.kike.wtf/webhook/stats",
-                            "mappings": [
-                                {
-                                    "field": "workflows",
-                                    "label": "Workflows",
-                                    "format": "number"
-                                },
-                                {
-                                    "field": "executions",
-                                    "label": "Executions",
-                                    "format": "number"
-                                },
-                                {
-                                    "field": "errors",
-                                    "label": "Errors",
-                                    "format": "number"
-                                }
-                            ]
-                        }
-                    }
                 }
             ]
         }
