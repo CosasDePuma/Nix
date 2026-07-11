@@ -11,7 +11,6 @@
       service-caddy
       service-homepage
       service-n8n
-      service-podman
       (inputs.self.factory.homelab-user {
         name = "services";
         description = "Services management user";
@@ -81,7 +80,6 @@
         allowedTCPPorts = [
           443
           5678 # n8n
-          25565 # gaming
         ];
       };
     };
