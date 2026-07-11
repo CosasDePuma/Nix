@@ -6,6 +6,7 @@
         settings-locale
         settings-nix
         settings-nixpkgs
+        system-impermanence
       ];
 
       age.identityPaths = builtins.map (key: key.path) config.services.openssh.hostKeys;
@@ -28,7 +29,7 @@
                 content = {
                   type = "filesystem";
                   format = "ext4";
-                  mountpoint = "/";
+                  mountpoint = "/nix";
                   extraArgs = [
                     "-L"
                     "NIXOS"
@@ -37,6 +38,14 @@
               };
             };
           };
+        };
+        nodev."/" = {
+          fsType = "tmpfs";
+          mountOptions = [
+            "defaults"
+            "size=2G"
+            "mode=755"
+          ];
         };
         nodev."/tmp".fsType = "tmpfs";
       };

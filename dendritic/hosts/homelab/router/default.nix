@@ -141,6 +141,15 @@
       };
     };
 
+    environment.persistence."/nix/persist" = {
+      directories = [
+        "/var/lib/ddclient"
+        "/var/lib/dnsmasq"
+        "/var/lib/adguardhome"
+        "/root"
+      ];
+    };
+
     nixpkgs.config.allowUnfree = false;
 
     services = {
