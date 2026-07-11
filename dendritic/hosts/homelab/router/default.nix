@@ -14,12 +14,6 @@
       settings-nix
       settings-nixpkgs
       system-impermanence
-      (inputs.self.factory.homelab-user {
-        name = "router";
-        description = "Router management user";
-        home = "/home/users/router";
-        authorizedKeysFile = ./.ssh/authorized_keys;
-      })
     ];
 
     age.identityPaths = builtins.map (key: key.path) config.services.openssh.hostKeys;
@@ -35,6 +29,20 @@
       groups = {
         "sshuser" = {};
         "users" = {};
+      };
+      users."router" = {
+        isNormalUser = true;
+        description = "Router management user";
+        home = "/home/users/router";
+        uid = 1000;
+        group = "users";
+        useDefaultShell = true;
+        initialPassword = null;
+        extraGroups = [
+          "wheel"
+          "sshusers"
+        ];
+        openssh.authorizedKeys.keys = pkgs.lib.strings.splitString "\n" (builtins.readFile ./.ssh/authorized_keys);
       };
     };
 

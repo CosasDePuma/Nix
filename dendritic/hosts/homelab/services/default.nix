@@ -16,12 +16,6 @@
       service-caddy
       service-homepage
       service-n8n
-      (inputs.self.factory.homelab-user {
-        name = "services";
-        description = "Services management user";
-        home = "/home/users/services";
-        authorizedKeysFile = ./.ssh/authorized_keys;
-      })
     ];
 
     age.identityPaths = builtins.map (key: key.path) config.services.openssh.hostKeys;
@@ -38,6 +32,20 @@
       groups = {
         "sshuser" = {};
         "users" = {};
+      };
+      users."services" = {
+        isNormalUser = true;
+        description = "Services management user";
+        home = "/home/users/services";
+        uid = 1000;
+        group = "users";
+        useDefaultShell = true;
+        initialPassword = null;
+        extraGroups = [
+          "wheel"
+          "sshusers"
+        ];
+        openssh.authorizedKeys.keys = pkgs.lib.strings.splitString "\n" (builtins.readFile ./.ssh/authorized_keys);
       };
     };
 

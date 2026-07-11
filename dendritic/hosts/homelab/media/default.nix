@@ -15,12 +15,6 @@
       service-komga
       service-qbittorrent
       service-borgbackup
-      (inputs.self.factory.homelab-user {
-        name = "media";
-        description = "Media management user";
-        home = "/home/users/media";
-        authorizedKeysFile = ./.ssh/authorized_keys;
-      })
     ];
 
     age.identityPaths = builtins.map (key: key.path) config.services.openssh.hostKeys;
@@ -33,6 +27,20 @@
       groups = {
         "sshuser" = {};
         "users" = {};
+      };
+      users."media" = {
+        isNormalUser = true;
+        description = "Media management user";
+        home = "/home/users/media";
+        uid = 1000;
+        group = "users";
+        useDefaultShell = true;
+        initialPassword = null;
+        extraGroups = [
+          "wheel"
+          "sshusers"
+        ];
+        openssh.authorizedKeys.keys = pkgs.lib.strings.splitString "\n" (builtins.readFile ./.ssh/authorized_keys);
       };
     };
 
