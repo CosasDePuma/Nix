@@ -84,6 +84,15 @@
       };
     };
 
+    environment.persistence."/nix/persist" = {
+      directories = [
+        "/var/lib/caddy"
+        "/var/lib/n8n"
+        "/var/lib/containers"
+        "/root"
+      ];
+    };
+
     nixpkgs.config.allowUnfree = true;
 
     security.acme = {

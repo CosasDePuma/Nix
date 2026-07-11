@@ -80,6 +80,15 @@
       };
     };
 
+    environment.persistence."/nix/persist" = {
+      directories = [
+        "/var/lib/jellyfin"
+        "/var/lib/komga"
+        "/var/lib/qbittorrent"
+        "/root"
+      ];
+    };
+
     nixpkgs.config.allowUnfree = false;
 
     system.autoUpgrade = {
