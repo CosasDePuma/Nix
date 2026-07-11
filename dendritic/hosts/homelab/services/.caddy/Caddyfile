@@ -66,11 +66,6 @@ kike.wtf:443 {
     import logs homepage
     reverse_proxy http://127.0.0.1:8082
 }
-automate.kike.wtf:443 {
-    import defaults
-    import logs n8n
-    reverse_proxy http://127.0.0.1:5678
-}
 books.kike.wtf:443 {
     import defaults
     import logs komga

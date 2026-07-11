@@ -18,7 +18,7 @@
     ];
 
     age.identityPaths = builtins.map (key: key.path) config.services.openssh.hostKeys;
-    age.secrets."smb.creds".file = ./.smb/smb.creds.age;
+    # age.secrets."smb.creds".file = ./.smb/smb.creds.age;
 
     hardware.enableAllHardware = true;
 
@@ -52,23 +52,23 @@
       wget
     ];
 
-    fileSystems = builtins.listToAttrs (
-      builtins.map (share: {
-        name = "/mnt/${share}";
-        value = {
-          device = "//192.168.1.3/${share}";
-          fsType = "cifs";
-          options = [
-            "credentials=${config.age.secrets."smb.creds".path}"
-            "noauto"
-            "x-systemd.automount"
-            "x-systemd.device-timeout=5s"
-            "x-systemd.idle-timeout=60"
-            "x-systemd.mount-timeout=5s"
-          ];
-        };
-      }) ["backups" "media"]
-    );
+    # fileSystems = builtins.listToAttrs (
+    #   builtins.map (share: {
+    #     name = "/mnt/${share}";
+    #     value = {
+    #       device = "//192.168.1.3/${share}";
+    #       fsType = "cifs";
+    #       options = [
+    #         "credentials=${config.age.secrets."smb.creds".path}"
+    #         "noauto"
+    #         "x-systemd.automount"
+    #         "x-systemd.device-timeout=5s"
+    #         "x-systemd.idle-timeout=60"
+    #         "x-systemd.mount-timeout=5s"
+    #       ];
+    #     };
+    #   }) ["backups" "media"]
+    # );
 
     networking = {
       hostName = "media";

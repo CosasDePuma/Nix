@@ -4,14 +4,14 @@ let
     automation = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF5MEUY8ks+UAOo3u2EeLEsoJX1yK6nki5hZ7jhuj7NZ @homelab.automation";
     media = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBxJgKzncwws+pz1JJxPO2TOdU1Qvvi/IwByMHrBwTw7 @homelab.media";
     proxy = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOxYJhovcbELqZzBf+NR95qNRBa003w7kZtqpWEwr7bP @homelab.proxy";
-    router = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMH4o2Q4cwq9GvJ2+MgErC5Odtf+WPbvz3H7KbOyOhoA @homelab.router";
+    router = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDnVQKprt/2/Tj+00/MUemfNJ1XalPmz5LJABFGUxSLF @homelab.router";
   };
 in {
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                Automation                 ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-  "modules/hosts/automation/.smb/smb.creds.age".publicKeys = [
+  "dendritic/hosts/homelab/services/.smb/smb.creds.age".publicKeys = [
     nixos
     vm-homelab.automation
   ];
@@ -20,7 +20,7 @@ in {
   # ┃                   Media                   ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-  "modules/hosts/media/.smb/smb.creds.age".publicKeys = [
+  "dendritic/hosts/homelab/media/.smb/smb.creds.age".publicKeys = [
     nixos
     vm-homelab.media
   ];
@@ -29,11 +29,11 @@ in {
   # ┃                   Proxy                   ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-  "modules/hosts/proxy/.acme/acme.env.age".publicKeys = [
+  "dendritic/hosts/homelab/services/.acme/acme.env.age".publicKeys = [
     nixos
     vm-homelab.proxy
   ];
-  "modules/hosts/proxy/.homepage/homepage.env.age".publicKeys = [
+  "dendritic/hosts/homelab/services/.homepage/homepage.env.age".publicKeys = [
     nixos
     vm-homelab.proxy
   ];
@@ -42,12 +42,12 @@ in {
   # ┃                   Router                  ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-  "modules/hosts/router/.ddclient/cloudflare.key.age".publicKeys = [
+  "dendritic/hosts/homelab/router/.ddclient/cloudflare.key.age".publicKeys = [
     nixos
     vm-homelab.router
   ];
-  "modules/hosts/router/.wireguard/wireguard-profiles.conf.age".publicKeys = [nixos];
-  "modules/hosts/router/.wireguard/wireguard.key.age".publicKeys = [
+  "dendritic/hosts/homelab/router/.wireguard/wireguard-profiles.conf.age".publicKeys = [nixos];
+  "dendritic/hosts/homelab/router/.wireguard/wireguard.key.age".publicKeys = [
     nixos
     vm-homelab.router
   ];

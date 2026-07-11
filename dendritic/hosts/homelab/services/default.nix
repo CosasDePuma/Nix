@@ -7,23 +7,24 @@
     domain = "kike.wtf";
   in {
     imports = with inputs.self.nixosModules; [
+      # keep-sorted start
       disko-impermanence-server
+      service-caddy
+      service-homepage
       service-ssh
       settings-locale
       settings-nix
       settings-nixpkgs
       system-impermanence
-      service-caddy
-      service-homepage
-      service-n8n
+      # keep-sorted end
     ];
 
     age.identityPaths = builtins.map (key: key.path) config.services.openssh.hostKeys;
-    age.secrets = {
-      "acme.env".file = ./.acme/acme.env.age;
-      "homepage.env".file = ./.homepage/homepage.env.age;
-      "smb.creds".file = ./.smb/smb.creds.age;
-    };
+    # age.secrets = {
+    #   "acme.env".file = ./.acme/acme.env.age;
+    #   "homepage.env".file = ./.homepage/homepage.env.age;
+    #   "smb.creds".file = ./.smb/smb.creds.age;
+    # };
 
     hardware.enableAllHardware = true;
 
@@ -60,23 +61,23 @@
       cifs-utils
     ];
 
-    fileSystems = builtins.listToAttrs (
-      builtins.map (share: {
-        name = "/mnt/${share}";
-        value = {
-          device = "//192.168.1.3/${share}";
-          fsType = "cifs";
-          options = [
-            "credentials=${config.age.secrets."smb.creds".path}"
-            "noauto"
-            "x-systemd.automount"
-            "x-systemd.device-timeout=5s"
-            "x-systemd.idle-timeout=60"
-            "x-systemd.mount-timeout=5s"
-          ];
-        };
-      }) ["backups" "media"]
-    );
+    # fileSystems = builtins.listToAttrs (
+    #   builtins.map (share: {
+    #     name = "/mnt/${share}";
+    #     value = {
+    #       device = "//192.168.1.3/${share}";
+    #       fsType = "cifs";
+    #       options = [
+    #         "credentials=${config.age.secrets."smb.creds".path}"
+    #         "noauto"
+    #         "x-systemd.automount"
+    #         "x-systemd.device-timeout=5s"
+    #         "x-systemd.idle-timeout=60"
+    #         "x-systemd.mount-timeout=5s"
+    #       ];
+    #     };
+    #   }) ["backups" "media"]
+    # );
 
     networking = {
       hostName = "services";
@@ -102,7 +103,6 @@
         enable = true;
         allowedTCPPorts = [
           443
-          5678 # n8n
         ];
       };
     };
@@ -110,7 +110,6 @@
     environment.persistence."/nix/persist" = {
       directories = [
         "/var/lib/caddy"
-        "/var/lib/n8n"
         "/var/lib/containers"
         "/root"
       ];
@@ -127,7 +126,7 @@
         dnsProvider = "cloudflare";
         dnsResolver = "1.1.1.1:53";
         email = "acme@${domain}";
-        environmentFile = config.age.secrets."acme.env".path;
+        # environmentFile = config.age.secrets."acme.env".path;
         extraDomainNames = ["*.${domain}"];
         renewInterval = "90d";
       };

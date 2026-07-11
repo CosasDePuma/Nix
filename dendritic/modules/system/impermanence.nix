@@ -16,7 +16,6 @@
           "/var/lib/nixos"
           "/var/lib/systemd"
           "/etc/NetworkManager/system-connections"
-          "/etc/ssh"
         ]
         ++ lib.optional config.virtualisation.libvirtd.enable "/var/lib/libvirt";
       files = [
