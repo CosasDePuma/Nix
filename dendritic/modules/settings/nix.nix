@@ -28,7 +28,7 @@
           auto-optimise-store = lib.mkDefault true;
         };
       };
-      system.stateVersion = lib.mkDefault "25.05";
+      system.stateVersion = lib.mkDefault "26.05";
     };
   };
 }
