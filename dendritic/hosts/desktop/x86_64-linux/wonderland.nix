@@ -58,7 +58,7 @@
       users.rabbit = {
         home.username = "rabbit";
         home.homeDirectory = "/home/rabbit";
-        home.stateVersion = "25.05";
+        home.stateVersion = "26.05";
       };
       sharedModules = with inputs.self.homeManagerModules; [
         # keep-sorted start
