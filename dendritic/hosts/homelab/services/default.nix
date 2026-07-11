@@ -7,7 +7,12 @@
     domain = "kike.wtf";
   in {
     imports = with inputs.self.nixosModules; [
-      server-defaults
+      disko-impermanence-server
+      service-ssh
+      settings-locale
+      settings-nix
+      settings-nixpkgs
+      system-impermanence
       service-caddy
       service-homepage
       service-n8n
@@ -19,10 +24,21 @@
       })
     ];
 
+    age.identityPaths = builtins.map (key: key.path) config.services.openssh.hostKeys;
     age.secrets = {
       "acme.env".file = ./.acme/acme.env.age;
       "homepage.env".file = ./.homepage/homepage.env.age;
       "smb.creds".file = ./.smb/smb.creds.age;
+    };
+
+    hardware.enableAllHardware = true;
+
+    users = {
+      mutableUsers = false;
+      groups = {
+        "sshuser" = {};
+        "users" = {};
+      };
     };
 
     disko.devices.nodev."/tmp".mountOptions = [
