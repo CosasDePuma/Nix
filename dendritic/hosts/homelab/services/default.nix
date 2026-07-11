@@ -1,5 +1,5 @@
 {inputs, ...}: {
-  flake.nixosModules.proxy = {
+  flake.nixosModules.services = {
     config,
     pkgs,
     ...
@@ -8,10 +8,14 @@
   in {
     imports = with inputs.self.nixosModules; [
       server-defaults
+      service-caddy
+      service-homepage
+      service-n8n
+      service-podman
       (inputs.self.factory.homelab-user {
-        name = "proxy";
-        description = "Proxy management user";
-        home = "/home/users/proxy";
+        name = "services";
+        description = "Services management user";
+        home = "/home/users/services";
         authorizedKeysFile = ./.ssh/authorized_keys;
       })
     ];
@@ -19,6 +23,7 @@
     age.secrets = {
       "acme.env".file = ./.acme/acme.env.age;
       "homepage.env".file = ./.homepage/homepage.env.age;
+      "smb.creds".file = ./.smb/smb.creds.age;
     };
 
     disko.devices.nodev."/tmp".mountOptions = [
@@ -29,11 +34,31 @@
     environment.systemPackages = with pkgs; [
       curl
       openssl
+      cifs-utils
+      handbrake
     ];
 
+    fileSystems = builtins.listToAttrs (
+      builtins.map (share: {
+        name = "/mnt/${share}";
+        value = {
+          device = "//192.168.1.3/${share}";
+          fsType = "cifs";
+          options = [
+            "credentials=${config.age.secrets."smb.creds".path}"
+            "noauto"
+            "x-systemd.automount"
+            "x-systemd.device-timeout=5s"
+            "x-systemd.idle-timeout=60"
+            "x-systemd.mount-timeout=5s"
+          ];
+        };
+      }) ["backups" "media"]
+    );
+
     networking = {
-      hostName = "proxy";
-      hostId = builtins.substring 0 8 (builtins.hashString "md5" "proxy");
+      hostName = "services";
+      hostId = builtins.substring 0 8 (builtins.hashString "md5" "services");
       usePredictableInterfaceNames = false;
       interfaces."eth0" = {
         useDHCP = false;
@@ -53,11 +78,15 @@
       nameservers = ["10.0.10.254"];
       firewall = {
         enable = true;
-        allowedTCPPorts = [443];
+        allowedTCPPorts = [
+          443
+          5678 # n8n
+          25565 # gaming
+        ];
       };
     };
 
-    nixpkgs.config.allowUnfree = false;
+    nixpkgs.config.allowUnfree = true;
 
     security.acme = {
       acceptTerms = true;
@@ -74,32 +103,7 @@
       };
     };
 
-    services = {
-      caddy = {
-        enable = true;
-        enableReload = true;
-        logFormat = "level INFO";
-        configFile = ./.caddy/Caddyfile;
-      };
-
-      homepage-dashboard = let
-        homepageConfig = builtins.fromJSON (builtins.readFile ./.homepage/homepage.json);
-      in {
-        inherit (homepageConfig) services;
-        enable = true;
-        listenPort = 8082;
-        allowedHosts = "*";
-        environmentFiles = [config.age.secrets."homepage.env".path];
-        settings = {
-          inherit (homepageConfig) layout;
-          color = "slate";
-          title = "Kike's Homelab";
-          description = "A collection of services running on Kike's Homelab";
-          hideVersion = true;
-          useEqualHeights = true;
-        };
-      };
-    };
+    services.caddy.configFile = ./.caddy/Caddyfile;
 
     system.autoUpgrade = {
       enable = false;
@@ -110,5 +114,5 @@
     };
   };
 
-  flake.nixosConfigurations = inputs.self.lib.mkNixos "x86_64-linux" "proxy";
+  flake.nixosConfigurations = inputs.self.lib.mkNixos "x86_64-linux" "services";
 }
