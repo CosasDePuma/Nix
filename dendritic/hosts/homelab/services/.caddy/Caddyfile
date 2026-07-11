@@ -69,12 +69,12 @@ kike.wtf:443 {
 automate.kike.wtf:443 {
     import defaults
     import logs n8n
-    reverse_proxy http://10.0.10.4:5678
+    reverse_proxy http://127.0.0.1:5678
 }
 books.kike.wtf:443 {
     import defaults
     import logs komga
-    reverse_proxy http://10.0.10.3:25600
+    reverse_proxy http://10.0.10.2:25600
     request_body {
         max_size 100MB
     }
@@ -82,35 +82,13 @@ books.kike.wtf:443 {
 magnet.kike.wtf:443 {
     import defaults
     import logs deluge
-    reverse_proxy http://10.0.10.3:8080
+    reverse_proxy http://10.0.10.2:8080
 }
-requester.kike.wtf:443 {
-    import defaults
-    import logs arr
 
-    @movies path_regexp /movies(/.*)?$
-    handle @movies {
-        reverse_proxy http://10.0.10.3:7878
-    }
-
-    @series path_regexp /series(/.*)?$
-    handle @series {
-        reverse_proxy http://10.0.10.3:8989
-    }
-
-    @torrents path_regexp ^/torrents(/.*)?$
-    handle @torrents {
-        reverse_proxy http://10.0.10.3:9696
-    }
-
-    handle {
-        abort
-    }
-}
 streaming.kike.wtf:443 {
     import defaults
     import logs jellyfin
-    reverse_proxy http://10.0.10.3:8096
+    reverse_proxy http://10.0.10.2:8096
     request_body {
         max_size 100MB
     }

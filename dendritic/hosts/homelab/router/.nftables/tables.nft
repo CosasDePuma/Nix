@@ -79,8 +79,8 @@ table ip nat {
         # ┃           Port Forwarding 61640           ┃
         # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-        iifname "eth0" tcp dport 61640 dnat to 10.0.10.3:61640 comment "Forward TCP qBitTorrent Seeder to 10.0.10.3";
-        iifname "eth0" udp dport 61640 dnat to 10.0.10.3:61640 comment "Forward UDP qBitTorrent Seeder to 10.0.10.3";
+        iifname "eth0" tcp dport 61640 dnat to 10.0.10.2:61640 comment "Forward TCP qBitTorrent Seeder to 10.0.10.2";
+        iifname "eth0" udp dport 61640 dnat to 10.0.10.2:61640 comment "Forward UDP qBitTorrent Seeder to 10.0.10.2";
     }
     chain postrouting {
         type nat hook postrouting priority filter; policy accept;
