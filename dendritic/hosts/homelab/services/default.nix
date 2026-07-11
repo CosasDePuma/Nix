@@ -34,7 +34,6 @@
       curl
       openssl
       cifs-utils
-      handbrake
     ];
 
     fileSystems = builtins.listToAttrs (
