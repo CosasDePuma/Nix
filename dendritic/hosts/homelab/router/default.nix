@@ -8,7 +8,12 @@
     domain = "kike.wtf";
   in {
     imports = with inputs.self.nixosModules; [
-      server-defaults
+      disko-impermanence-server
+      service-ssh
+      settings-locale
+      settings-nix
+      settings-nixpkgs
+      system-impermanence
       (inputs.self.factory.homelab-user {
         name = "router";
         description = "Router management user";
@@ -17,9 +22,20 @@
       })
     ];
 
+    age.identityPaths = builtins.map (key: key.path) config.services.openssh.hostKeys;
     age.secrets = {
       "cloudflare.key".file = ./.ddclient/cloudflare.key.age;
       "wireguard.key".file = ./.wireguard/wireguard.key.age;
+    };
+
+    hardware.enableAllHardware = true;
+
+    users = {
+      mutableUsers = false;
+      groups = {
+        "sshuser" = {};
+        "users" = {};
+      };
     };
 
     boot.kernel.sysctl = {

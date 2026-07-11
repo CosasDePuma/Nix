@@ -5,7 +5,12 @@
     ...
   }: {
     imports = with inputs.self.nixosModules; [
-      server-defaults
+      disko-impermanence-server
+      service-ssh
+      settings-locale
+      settings-nix
+      settings-nixpkgs
+      system-impermanence
       service-jellyfin
       service-komga
       service-qbittorrent
@@ -18,7 +23,18 @@
       })
     ];
 
+    age.identityPaths = builtins.map (key: key.path) config.services.openssh.hostKeys;
     age.secrets."smb.creds".file = ./.smb/smb.creds.age;
+
+    hardware.enableAllHardware = true;
+
+    users = {
+      mutableUsers = false;
+      groups = {
+        "sshuser" = {};
+        "users" = {};
+      };
+    };
 
     environment.systemPackages = with pkgs; [
       cifs-utils
