@@ -108,6 +108,11 @@
 
     nixpkgs.config.allowUnfree = false;
 
+    systemd.services."serial-getty@ttyS0" = {
+      enable = true;
+      wantedBy = ["multi-user.target"];
+    };
+
     system.autoUpgrade = {
       enable = false;
       flake = "github:cosasdepuma/nix";
