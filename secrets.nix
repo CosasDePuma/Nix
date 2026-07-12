@@ -5,6 +5,7 @@ let
     media = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICBekVv5frPrfFD9JtEJGZp7YXmq3HqjGdZiznseUXgv root@media";
     router = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDnVQKprt/2/Tj+00/MUemfNJ1XalPmz5LJABFGUxSLF @homelab.router";
     services = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGilrsstiK7+oQVu0dQxuSOV5Y/ooge99afqDOPnC3pd root@paradis";
+    work = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDx0Lv1z58633FZ92WeCtiXsJhu2pJ8G77ZqVdhKN3d7 root@work";
   };
 in {
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
