@@ -2,9 +2,9 @@ let
   nixos = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP9RzisL6wVQK3scDyEPEpFgrcdFYkW9LssnWlORGXof nixos";
   vm-homelab = {
     automation = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF5MEUY8ks+UAOo3u2EeLEsoJX1yK6nki5hZ7jhuj7NZ @homelab.automation";
-    media = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBxJgKzncwws+pz1JJxPO2TOdU1Qvvi/IwByMHrBwTw7 @homelab.media";
-    proxy = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOxYJhovcbELqZzBf+NR95qNRBa003w7kZtqpWEwr7bP @homelab.proxy";
+    media = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICBekVv5frPrfFD9JtEJGZp7YXmq3HqjGdZiznseUXgv root@media";
     router = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDnVQKprt/2/Tj+00/MUemfNJ1XalPmz5LJABFGUxSLF @homelab.router";
+    services = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGilrsstiK7+oQVu0dQxuSOV5Y/ooge99afqDOPnC3pd root@paradis";
   };
 in {
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -31,11 +31,11 @@ in {
 
   "dendritic/hosts/homelab/services/.acme/acme.env.age".publicKeys = [
     nixos
-    vm-homelab.proxy
+    vm-homelab.services
   ];
   "dendritic/hosts/homelab/services/.homepage/homepage.env.age".publicKeys = [
     nixos
-    vm-homelab.proxy
+    vm-homelab.services
   ];
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
