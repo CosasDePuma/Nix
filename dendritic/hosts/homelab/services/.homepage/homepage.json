@@ -8,11 +8,6 @@
             "style": "row",
             "columns": "2"
         },
-        "MediaRequester": {
-            "style": "row",
-            "columns": "2",
-            "header": false
-        },
         "Misc.": {
             "style": "row",
             "columns": "2"
@@ -81,44 +76,6 @@
                                 "libraries",
                                 "series",
                                 "books"
-                            ]
-                        }
-                    }
-                }
-            ]
-        },
-        {
-            "MediaRequester": [
-                {
-                    "Radarr": {
-                        "icon": "sh-radarr",
-                        "description": "Movie collection manager",
-                        "href": "https://requester.kike.wtf/movies",
-                        "siteMonitor": "https://requester.kike.wtf/movies",
-                        "widget": {
-                            "type": "radarr",
-                            "url": "https://requester.kike.wtf/movies",
-                            "key": "{{HOMEPAGE_VAR_RADARR_API}}",
-                            "fields": [
-                                "wanted",
-                                "queued"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "Sonarr": {
-                        "icon": "sh-sonarr",
-                        "description": "TV series collection manager",
-                        "href": "https://requester.kike.wtf/series",
-                        "siteMonitor": "https://requester.kike.wtf/series",
-                        "widget": {
-                            "type": "sonarr",
-                            "url": "https://requester.kike.wtf/series",
-                            "key": "{{HOMEPAGE_VAR_SONARR_API}}",
-                            "fields": [
-                                "wanted",
-                                "queued"
                             ]
                         }
                     }
