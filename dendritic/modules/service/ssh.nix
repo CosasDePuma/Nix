@@ -11,6 +11,7 @@
     }: {
       services.openssh.openFirewall = lib.mkDefault true;
       security.pam.sshAgentAuth.enable = lib.mkDefault true;
+      security.pam.services.sudo.sshAgentAuth = lib.mkDefault true;
       services.openssh = {
         enable = lib.mkDefault true;
         allowSFTP = lib.mkDefault true;
