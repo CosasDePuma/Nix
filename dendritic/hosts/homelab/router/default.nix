@@ -8,12 +8,14 @@
     domain = "kike.wtf";
   in {
     imports = with inputs.self.nixosModules; [
+      # keep-sorted start
       disko-impermanence-server
       service-ssh
       settings-locale
       settings-nix
       settings-nixpkgs
       system-impermanence
+      # keep-sorted end
     ];
 
     age.identityPaths = builtins.map (key: key.path) config.services.openssh.hostKeys;
@@ -129,18 +131,6 @@
                 name = "pumita-tv";
                 publicKey = "gL2M1YR+FjO9Wq5DjIBcBOtcxw/eyvo6HGv17Q43o2g=";
               }
-              {
-                name = "family-tv";
-                publicKey = "ByqsQxP2YMKzYob5S0Uq9m8+jORNxcaZAApcSc5oQy0=";
-              }
-              {
-                name = "family-david";
-                publicKey = "ojqm9Pk4bWfAkoIwvEXRKf+bmxrra1C81HHxltsUhEU=";
-              }
-              {
-                name = "friends-dmaestro";
-                publicKey = "7+/GGKXRfKcYGSu/Faj+c5PoEGIdck2VLFUk8IuFE0E=";
-              }
             ];
           in
             lib.lists.imap1 (i: user: {
@@ -167,7 +157,6 @@
 
     environment.persistence."/nix/persist" = {
       directories = [
-        "/var/lib/ddclient"
         "/var/lib/dnsmasq"
         "/var/lib/adguardhome"
         "/root"
