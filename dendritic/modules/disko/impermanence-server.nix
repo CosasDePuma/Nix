@@ -9,6 +9,7 @@
     ];
     config = {
       boot.loader.grub.enable = true;
+      fileSystems."/nix".neededForBoot = lib.mkDefault true;
       disko.devices = {
         disk."main" = {
           device = lib.mkDefault "/dev/sda";
@@ -34,6 +35,7 @@
                   type = lib.mkDefault "filesystem";
                   format = lib.mkDefault "ext4";
                   mountpoint = lib.mkDefault "/nix";
+                  mountOptions = lib.mkDefault ["defaults"];
                   extraArgs = lib.mkDefault [
                     "-L"
                     "NIXOS"
