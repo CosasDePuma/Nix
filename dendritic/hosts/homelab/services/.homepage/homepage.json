@@ -6,11 +6,7 @@
         },
         "Media": {
             "style": "row",
-            "columns": "2"
-        },
-        "Misc.": {
-            "style": "row",
-            "columns": "2"
+            "columns": "3"
         }
     },
     "services": [
@@ -79,11 +75,7 @@
                             ]
                         }
                     }
-                }
-            ]
-        },
-        {
-            "Misc.": [
+                },
                 {
                     "qBitTorrent": {
                         "icon": "sh-qbittorrent",
