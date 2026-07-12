@@ -35,7 +35,7 @@
         uid = 1000;
         group = "users";
         useDefaultShell = true;
-        initialPassword = "nixos";
+        initialPassword = null;
         extraGroups = [
           "wheel"
           "sshusers"
