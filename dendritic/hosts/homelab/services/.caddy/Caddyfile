@@ -88,6 +88,11 @@ streaming.kike.wtf:443 {
         max_size 100MB
     }
 }
+slides.kike.wtf:443 {
+    import defaults
+    import logs presenton
+    reverse_proxy http://10.0.10.3:3000
+}
 :443 {
     abort
 }
