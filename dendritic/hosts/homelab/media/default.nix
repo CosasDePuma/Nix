@@ -107,6 +107,7 @@
     environment.persistence."/nix/persist" = {
       directories = [
         "/etc/ssh"
+        "/var/cache/jellyfin"
         "/var/lib/jellyfin"
         "/var/lib/komga"
         "/var/lib/qbittorrent"
