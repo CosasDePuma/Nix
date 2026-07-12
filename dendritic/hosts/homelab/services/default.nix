@@ -120,6 +120,7 @@
 
     security.acme = {
       acceptTerms = true;
+      defaults.server = "https://acme-v02.api.letsencrypt.org/directory";
       certs."${domain}" = {
         inherit domain;
         inherit (config.services.caddy) group;
