@@ -23,7 +23,6 @@
     age.secrets = {
       "acme.env".file = ./.acme/acme.env.age;
       "homepage.env".file = ./.homepage/homepage.env.age;
-      "smb.creds".file = ./.smb/smb.creds.age;
     };
 
     hardware.enableAllHardware = true;
