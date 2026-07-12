@@ -1,7 +1,6 @@
 {inputs, ...}: {
   flake.nixosModules.media = {
     config,
-    lib,
     pkgs,
     ...
   }: {
@@ -22,8 +21,6 @@
     age.secrets."smb.creds".file = ./.smb/smb.creds.age;
 
     hardware.enableAllHardware = true;
-
-    security.sudo.wheelNeedsPassword = lib.mkDefault false;
 
     users = {
       mutableUsers = false;
