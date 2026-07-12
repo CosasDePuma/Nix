@@ -1,6 +1,7 @@
 {inputs, ...}: {
   flake.nixosModules.services = {
     config,
+    lib,
     pkgs,
     ...
   }: let
@@ -27,6 +28,8 @@
     };
 
     hardware.enableAllHardware = true;
+
+    security.sudo.wheelNeedsPassword = lib.mkDefault false;
 
     users = {
       mutableUsers = false;
