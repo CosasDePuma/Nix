@@ -13,7 +13,7 @@ in {
 
   "dendritic/hosts/homelab/services/.smb/smb.creds.age".publicKeys = [
     nixos
-    vm-homelab.automation
+    vm-homelab.services
   ];
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
