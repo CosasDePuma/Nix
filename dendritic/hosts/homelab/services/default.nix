@@ -127,7 +127,7 @@
         dnsProvider = "cloudflare";
         dnsResolver = "1.1.1.1:53";
         email = "acme@${domain}";
-        # environmentFile = config.age.secrets."acme.env".path;
+        environmentFile = config.age.secrets."acme.env".path;
         extraDomainNames = ["*.${domain}"];
         renewInterval = "90d";
       };
