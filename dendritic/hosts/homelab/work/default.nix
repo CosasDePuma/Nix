@@ -14,6 +14,7 @@
     ];
 
     age.identityPaths = builtins.map (key: key.path) config.services.openssh.hostKeys;
+    age.secrets."gemini.key".file = ./.presenton/gemini.key.age;
 
     hardware.enableAllHardware = true;
 
@@ -56,6 +57,9 @@
           ports = ["3000:3000"];
           volumes = [
             "/var/lib/presenton:/app/data"
+          ];
+          environmentFiles = [
+            config.age.secrets."gemini.key".path
           ];
           environment = {
             NODE_ENV = "production";
