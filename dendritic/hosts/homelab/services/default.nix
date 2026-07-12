@@ -31,7 +31,7 @@
     users = {
       mutableUsers = false;
       groups = {
-        "sshuser" = {};
+        "sshusers" = {};
         "users" = {};
       };
       users."services" = {

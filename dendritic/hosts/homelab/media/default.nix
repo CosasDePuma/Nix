@@ -25,7 +25,7 @@
     users = {
       mutableUsers = false;
       groups = {
-        "sshuser" = {};
+        "sshusers" = {};
         "users" = {};
       };
       users."media" = {
