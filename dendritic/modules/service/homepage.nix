@@ -1,5 +1,5 @@
 {lib, ...}: {
-  flake.nixosModules.service-homepage = _: let
+  flake.nixosModules.service-homepage = {config, ...}: let
     homepageConfig = builtins.fromJSON (builtins.readFile ../../hosts/homelab/services/.homepage/homepage.json);
   in {
     services.homepage-dashboard = {
@@ -7,7 +7,7 @@
       enable = lib.mkDefault true;
       listenPort = lib.mkDefault 8082;
       allowedHosts = lib.mkDefault "*";
-      # environmentFiles = [config.age.secrets."homepage.env".path];
+      environmentFiles = [config.age.secrets."homepage.env".path];
       settings = {
         inherit (homepageConfig) layout;
         color = lib.mkDefault "slate";
