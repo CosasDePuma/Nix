@@ -7,6 +7,10 @@
         "Media": {
             "style": "row",
             "columns": "3"
+        },
+        "Work": {
+            "style": "row",
+            "columns": "1"
         }
     },
     "services": [
@@ -94,6 +98,18 @@
                                 "download"
                             ]
                         }
+                    }
+                }
+            ]
+        },
+        {
+            "Work": [
+                {
+                    "Presenton": {
+                        "icon": "si-slides",
+                        "description": "Presentation tool",
+                        "href": "https://slides.kike.wtf",
+                        "siteMonitor": "https://slides.kike.wtf"
                     }
                 }
             ]
