@@ -170,7 +170,6 @@
         enable = true;
         domains = [
           "vpn.${domain}"
-          "minecraft.${domain}"
         ];
         interval = "1h";
         protocol = "cloudflare";
