@@ -48,6 +48,7 @@ table inet filter {
         
         iifname "vl10.homelab" oifname "vl10.homelab" ip daddr 10.0.10.254 counter accept comment "Allow Homelab traffic to Homelab router";
         iifname "vl10.homelab" oifname "vl10.homelab" tcp dport 64022 counter accept comment "Allow SSH between Homelab machines";
+        iifname "vl10.homelab" oifname "vl10.homelab" ip saddr 10.0.10.1 tcp dport { 3000, 8080, 8096, 25600 } counter accept comment "Allow services to access service ports on other VMs";
         iifname "vl10.homelab" oifname "vl10.homelab" counter drop comment "Block other Homelab traffic between machines";
 
         iifname "vl10.homelab" oifname "eth0" ip daddr 192.168.1.3 tcp dport { 139, 445 } counter accept comment "Allow Homelab VLAN to SMB server TCP";
