@@ -68,22 +68,7 @@
       hostName = "work";
       hostId = builtins.substring 0 8 (builtins.hashString "md5" "work");
       usePredictableInterfaceNames = false;
-      interfaces."eth0" = {
-        useDHCP = false;
-        ipv4.addresses = [
-          {
-            address = "10.0.10.3";
-            prefixLength = 24;
-          }
-        ];
-      };
-      defaultGateway = {
-        interface = "eth0";
-        address = "10.0.10.254";
-      };
-      domain = "home";
-      search = ["home"];
-      nameservers = ["10.0.10.254"];
+      interfaces."eth0".useDHCP = true;
       firewall = {
         enable = true;
         allowedTCPPorts = [
