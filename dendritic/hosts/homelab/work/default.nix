@@ -99,6 +99,11 @@
         "/var/lib/presenton"
         "/root"
       ];
+      users.work = {
+        directories = [
+          ".ssh"
+        ];
+      };
     };
 
     nixpkgs.config.allowUnfree = false;
