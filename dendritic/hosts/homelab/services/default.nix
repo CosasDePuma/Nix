@@ -109,6 +109,7 @@
 
     environment.persistence."/nix/persist" = {
       directories = [
+        "/etc/ssh"
         "/var/lib/caddy"
         "/var/lib/containers"
         "/root"
