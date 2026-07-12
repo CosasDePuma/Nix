@@ -15,8 +15,6 @@
 
     age.identityPaths = builtins.map (key: key.path) config.services.openssh.hostKeys;
 
-    disko.devices.disk.main.device = "/dev/vda";
-
     hardware.enableAllHardware = true;
 
     users = {
