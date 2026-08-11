@@ -22,7 +22,9 @@
                 seatonjiang.gitmoji-vscode
                 tamasfe.even-better-toml
               ]
-              ++ config.my.vscode-extraExtensions;
+              ++ config.my.vscode-extraExtensions
+              ++ lib.optional (config.programs.claude-code.enable or false) anthropic.claude-code
+              ++ lib.optional (config.programs.antigravity-cli.enable or false) Google.gemini-cli-vscode-ide-companion;
             userSettings = {
               "terminal.integrated.fontFamily" = "'FiraCode Nerd Font Mono', monospace";
               "explorer.fileNesting.enabled" = true;

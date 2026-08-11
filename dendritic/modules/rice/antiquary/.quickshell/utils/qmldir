@@ -1,4 +1,0 @@
-module Utils
-singleton Fuzzy 1.0 Fuzzy.qml
-singleton AppSearch 1.0 AppSearch.qml
-singleton TextUtils 1.0 TextUtils.qml

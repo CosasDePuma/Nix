@@ -1,5 +1,9 @@
 {lib, ...}: {
-  flake.nixosModules.software-qemu = {pkgs, ...}: {
+  flake.nixosModules.software-qemu = {
+    config,
+    pkgs,
+    ...
+  }: {
     boot.initrd.kernelModules = [
       "virtio_blk"
       "virtio_pci"
@@ -23,10 +27,12 @@
         vhostUserPackages = lib.mkDefault (with pkgs; [virtiofsd]);
       };
     };
-    environment.persistence."/nix/persist" = {
-      directories = [
-        "/var/lib/libvirt"
-      ];
+    environment.persistence = lib.mkIf (config ? environment.persistence) {
+      "/nix/persist" = {
+        directories = [
+          "/var/lib/libvirt"
+        ];
+      };
     };
   };
 }

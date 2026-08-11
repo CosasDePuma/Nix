@@ -1,11 +1,15 @@
-{inputs, ...}: {
+{
+  inputs,
+  lib,
+  ...
+}: {
   flake.nixosModules.system-impermanence = {
     imports = [
       inputs.impermanence.nixosModules.impermanence
     ];
 
     environment.persistence."/nix/persist" = {
-      hideMounts = true;
+      hideMounts = lib.mkDefault true;
       directories = [
         "/var/log"
         "/var/lib/nixos"
