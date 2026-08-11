@@ -17,6 +17,9 @@
             exec start-hyprland
           fi
         '';
+        shellGlobalAliases = {
+          "--yolo" = lib.mkDefault "--dangerously-skip-permissions";
+        };
       };
     };
 
@@ -27,6 +30,9 @@
         autosuggestions = {
           enable = lib.mkDefault true;
           strategy = lib.mkDefault ["history"];
+        };
+        shellGlobalAliases = {
+          "--yolo" = lib.mkDefault "--dangerously-skip-permissions";
         };
       };
     };

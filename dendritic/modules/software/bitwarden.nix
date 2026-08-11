@@ -3,7 +3,7 @@
     darwinModules.software-bitwarden = {
       homebrew = {
         brews = ["bitwarden-cli"];
-        masApps."bitwarden" = lib.mkDefault 1137397744;
+        masApps."bitwarden" = lib.mkDefault 1352778147;
       };
     };
 

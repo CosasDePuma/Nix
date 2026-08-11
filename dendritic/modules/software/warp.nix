@@ -5,7 +5,7 @@
 }: let
   warpSettings = ''
     [appearance.input]
-    input_mode = "pinned_to_top"
+    input_mode = "waterfall"
 
     [appearance.text]
     font_name = "FiraCode Nerd Font Mono"
@@ -15,11 +15,16 @@
     [terminal.input]
     honor_ps1 = true
     input_box_type_setting = "classic"
+
+    [warp_drive]
+    enabled = false
+
+    [agents.warp_agent.other]
+    show_conversation_history = false
   '';
 in {
   flake = {
     darwinModules.software-warp = {
-      imports = [inputs.self.darwinModules.fonts-firacode];
       homebrew.casks = ["warp"];
     };
 
@@ -29,13 +34,13 @@ in {
         then ".warp/settings.toml"
         else ".config/warp-terminal/settings.toml";
     in {
+      imports = [inputs.self.homeManagerModules.fonts-firacode];
       home.file.${settingsPath} = {
         text = lib.mkDefault warpSettings;
       };
     };
 
     nixosModules.software-warp = {pkgs, ...}: {
-      imports = [inputs.self.nixosModules.fonts-firacode];
       environment.systemPackages = with pkgs; [warp-terminal];
     };
   };

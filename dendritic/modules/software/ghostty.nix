@@ -5,11 +5,11 @@
 }: {
   flake = {
     darwinModules.software-ghostty = {
-      imports = [inputs.self.darwinModules.fonts-firacode];
       homebrew.casks = ["ghostty"];
     };
 
     homeManagerModules.software-ghostty = {osConfig, ...}: {
+      imports = [inputs.self.homeManagerModules.fonts-firacode];
       programs.ghostty = {
         enable = lib.mkDefault true;
         enableBashIntegration = lib.mkDefault osConfig.programs.bash.enable;
@@ -28,7 +28,6 @@
     };
 
     nixosModules.software-ghostty = {pkgs, ...}: {
-      imports = [inputs.self.nixosModules.fonts-firacode];
       environment.systemPackages = with pkgs; [ghostty];
     };
   };

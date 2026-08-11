@@ -15,6 +15,14 @@ in {
 
     homeManagerModules.software-direnv = {osConfig, ...}: {
       programs.direnv = direnv osConfig;
+      xdg.configFile."direnv/direnv.toml" = {
+        text = lib.mkDefault ''
+          [global]
+          hide_env_diff = true
+          log_filter    = "/^loading/"
+          strict_env    = true
+        '';
+      };
     };
 
     nixosModules.software-direnv = {config, ...}: {

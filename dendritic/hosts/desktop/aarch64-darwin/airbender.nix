@@ -4,21 +4,16 @@
   in {
     imports = with inputs.self.darwinModules; [
       # keep-sorted start
-      fonts-jetbrains
       service-ssh
       settings-locale
       settings-macos
       settings-nix
       settings-nixpkgs
-      software-chezmoi
+      software-bitwarden
       software-cleanmymac
-      software-ghostty
-      software-herdr
       software-homebrew
       software-homemanager
       software-obsidian
-      software-ollama
-      software-pi
       software-steam
       software-sudo
       software-unar
@@ -35,18 +30,25 @@
         # keep-sorted start
         software-antigravity
         software-bat
-        software-bitwarden
+        software-chezmoi
         software-claude
+        software-curl
         software-direnv
         software-discord
         software-git
         software-herdr
+        software-hushlogin
         software-lsd
+        software-ollama
         software-opencode
+        software-openspec
+        software-pi
         software-spotify
+        software-ssh-client
         software-starship
         software-vscode
         software-warp
+        software-wget
         software-zoxide
         software-zsh
         # keep-sorted end

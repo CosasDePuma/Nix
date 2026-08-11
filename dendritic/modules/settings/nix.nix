@@ -7,6 +7,7 @@
           auto-optimise-store = lib.mkDefault false;
           experimental-features = ["nix-command" "flakes"];
           extra-platforms = ["aarch64-darwin"];
+          warn-dirty = lib.mkDefault false;
         };
       };
       system.stateVersion = lib.mkDefault 6;
@@ -24,6 +25,7 @@
           allowed-users = ["@wheel"];
           auto-optimise-store = lib.mkDefault true;
           experimental-features = ["nix-command" "flakes"];
+          warn-dirty = lib.mkDefault false;
         };
       };
       system.stateVersion = lib.mkDefault "26.05";
