@@ -29,7 +29,7 @@
         # keep-sorted start
         meta-ai
         meta-terminal
-        software-chezmoi
+        profile-cosasdepuma
         software-discord
         software-spotify
         software-vscode

@@ -2,6 +2,13 @@
   sshClientConfig = darwin:
     lib.mkDefault (lib.concatStringsSep "\n" ([
         (lib.optionalString darwin "Include ~/.orbstack/ssh/config")
+        "Include ~/.ssh/config.d/*"
+        ""
+        "Host github.com"
+        "  HostName github.com"
+        "  User git"
+        "  IdentityFile ~/.ssh/keys/pumita"
+        ""
         "Host *"
         "  AddKeysToAgent        yes"
         "  IdentitiesOnly        yes"
