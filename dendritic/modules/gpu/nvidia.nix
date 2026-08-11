@@ -1,5 +1,5 @@
 {lib, ...}: {
-  flake.nixosModules.gpu-nvidia = {config, ...}: {
+  flake.nixosModules.gpu-nvidia = _: {
     boot = {
       initrd.kernelModules = [
         "nvidia"
@@ -16,14 +16,17 @@
     };
     hardware = {
       nvidia = {
+        branch = lib.mkDefault "production";
+        forceFullCompositionPipeline = lib.mkDefault true;
         modesetting.enable = lib.mkDefault true;
-        package = lib.mkDefault config.boot.kernelPackages.nvidiaPackages.latest;
+        nvidiaPersistenced = lib.mkDefault true;
+        nvidiaSettings = lib.mkDefault true;
+        open = lib.mkDefault true;
         powerManagement = {
           enable = lib.mkDefault false;
           finegrained = lib.mkDefault false;
         };
-        open = lib.mkDefault true;
-        nvidiaSettings = lib.mkDefault true;
+        videoAcceleration = lib.mkDefault true;
       };
       graphics = {
         enable = lib.mkDefault true;

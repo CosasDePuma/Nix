@@ -115,22 +115,28 @@ config = lib.mkMerge [
 ];
 ```
 
-### Custom options inside a module
+### No custom options; derive from imports
 
-When a module needs its own knobs (e.g. extending package lists from other modules), declare them with `options.my.<name>` in the same module:
+Do **not** declare `options.my.*` knobs. Modules set sensible defaults directly with `lib.mkDefault` (scalars) or plain values (lists/attrsets, which merge with `concatLists`). Hosts tune behaviour by setting the underlying option directly in their host file.
 
 ```nix
-homeManagerModules.software-vscode = { config, lib, pkgs, ... }: {
-  options.my.vscode-extraExtensions = lib.mkOption {
-    type = lib.types.listOf lib.types.package;
-    default = [];
-    description = "Additional VSCode extensions to install.";
-  };
-  config.programs.vscode = {
+flake.nixosModules.software-ollama = {config, pkgs, ...}: {
+  services.ollama = {
     enable = lib.mkDefault true;
-    extensions = with pkgs.vscode-extensions; [ ... ] ++ config.my.vscode-extraExtensions;
+    package = lib.mkDefault (
+      if builtins.elem "nvidia" (config.boot.initrd.kernelModules or [])
+      then pkgs.ollama-cuda
+      else pkgs.ollama
+    );
   };
 };
+```
+
+When a module's behaviour depends on another module (e.g. pick a GPU backend because `gpu-nvidia` was imported), detect it through the config the other module sets — never through a custom option or an unconditional import. The `or false` / `?` existence guards make the check robust when the module is absent.
+
+```nix
+# host that imported gpu-nvidia:
+services.ollama.package = pkgs.ollama-cuda;
 ```
 
 ### Dependencies between modules

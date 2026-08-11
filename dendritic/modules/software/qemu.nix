@@ -1,9 +1,5 @@
 {lib, ...}: {
-  flake.nixosModules.software-qemu = {
-    config,
-    pkgs,
-    ...
-  }: {
+  flake.nixosModules.software-qemu = {pkgs, ...}: {
     boot.initrd.kernelModules = [
       "virtio_blk"
       "virtio_pci"
@@ -20,18 +16,16 @@
     networking.firewall.trustedInterfaces = lib.mkDefault ["virbr0"];
     virtualisation.libvirtd = {
       enable = lib.mkDefault true;
+      onBoot = lib.mkDefault "start";
+      onShutdown = lib.mkDefault "shutdown";
+      parallelShutdown = lib.mkDefault 0;
+      shutdownTimeout = lib.mkDefault 300;
+      firewallBackend = lib.mkDefault "nftables";
       qemu = {
         package = lib.mkDefault pkgs.qemu_kvm;
         runAsRoot = lib.mkDefault true;
         swtpm.enable = lib.mkDefault true;
         vhostUserPackages = lib.mkDefault (with pkgs; [virtiofsd]);
-      };
-    };
-    environment.persistence = lib.mkIf (config ? environment.persistence) {
-      "/nix/persist" = {
-        directories = [
-          "/var/lib/libvirt"
-        ];
       };
     };
   };

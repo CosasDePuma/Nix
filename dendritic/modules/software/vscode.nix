@@ -22,7 +22,6 @@
                 seatonjiang.gitmoji-vscode
                 tamasfe.even-better-toml
               ]
-              ++ config.my.vscode-extraExtensions
               ++ lib.optional (config.programs.claude-code.enable or false) anthropic.claude-code
               ++ lib.optional (config.programs.antigravity-cli.enable or false) Google.gemini-cli-vscode-ide-companion;
             userSettings = {
@@ -38,15 +37,6 @@
           extras
         ];
     in {
-      options.my.vscode-extraExtensions = lib.mkOption {
-        type = lib.types.listOf lib.types.package;
-        default = [];
-        description = "Additional VSCode extensions to install.";
-        example = with pkgs.vscode-extensions; [
-          "ms-python.python"
-          "esbenp.prettier-vscode"
-        ];
-      };
       config.programs.vscode = {
         enable = lib.mkDefault true;
         profiles = {

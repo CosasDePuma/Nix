@@ -4,6 +4,7 @@
       # keep-sorted start
       fonts-firacode
       fonts-jetbrains
+      service-ssh
       settings-locale
       settings-macos
       settings-nix
