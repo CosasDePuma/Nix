@@ -21,7 +21,6 @@
           settings = {
             autoshare = lib.mkDefault false;
             autoupdate = lib.mkDefault true;
-            plugin = lib.mkDefault ["@warp-dot-dev/opencode-warp"];
             permission = {
               bash = {
                 "*" = lib.mkDefault "ask";
