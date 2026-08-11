@@ -4,10 +4,17 @@
   ...
 }: let
   warpSettings = ''
+    [appearance.input]
+    input_mode = "pinned_to_top"
+
     [appearance.text]
     font_name = "FiraCode Nerd Font Mono"
     font_size = 15.0
     ligature_rendering_enabled = true
+
+    [terminal.input]
+    honor_ps1 = true
+    input_box_type_setting = "classic"
   '';
 in {
   flake = {

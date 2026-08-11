@@ -13,6 +13,7 @@
       software-chezmoi
       software-cleanmymac
       software-ghostty
+      software-herdr
       software-homebrew
       software-homemanager
       software-obsidian
@@ -39,6 +40,7 @@
         software-direnv
         software-discord
         software-git
+        software-herdr
         software-lsd
         software-opencode
         software-spotify
