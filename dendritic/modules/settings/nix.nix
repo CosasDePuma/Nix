@@ -10,6 +10,7 @@
           warn-dirty = lib.mkDefault false;
         };
       };
+      nixpkgs.config.allowUnfree = lib.mkDefault true;
       system.stateVersion = lib.mkDefault 6;
     };
 
@@ -28,6 +29,7 @@
           warn-dirty = lib.mkDefault false;
         };
       };
+      nixpkgs.config.allowUnfree = lib.mkDefault true;
       system.stateVersion = lib.mkDefault "26.05";
     };
   };
