@@ -3,20 +3,17 @@
     darwinModules.settings-nix = {
       nix = {
         enable = lib.mkDefault false;
-        extraOptions = lib.mkDefault ''
-          experimental-features = nix-command flakes
-          extra-platforms = x86_64-darwin aarch64-darwin
-        '';
-        settings.auto-optimise-store = lib.mkDefault false;
+        settings = {
+          auto-optimise-store = lib.mkDefault false;
+          experimental-features = ["nix-command" "flakes"];
+          extra-platforms = ["aarch64-darwin"];
+        };
       };
       system.stateVersion = lib.mkDefault 6;
     };
 
     nixosModules.settings-nix = {
       nix = {
-        extraOptions = lib.mkDefault ''
-          experimental-features = nix-command flakes
-        '';
         gc = {
           automatic = lib.mkDefault true;
           dates = lib.mkDefault "weekly";
@@ -24,11 +21,12 @@
           persistent = lib.mkDefault true;
         };
         settings = {
-          allowed-users = lib.mkDefault ["@wheel"];
+          allowed-users = ["@wheel"];
           auto-optimise-store = lib.mkDefault true;
+          experimental-features = ["nix-command" "flakes"];
         };
       };
-      system.stateVersion = lib.mkDefault "25.05";
+      system.stateVersion = lib.mkDefault "26.05";
     };
   };
 }

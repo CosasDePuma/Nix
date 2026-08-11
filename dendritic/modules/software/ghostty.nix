@@ -1,6 +1,11 @@
-{lib, ...}: {
+{
+  inputs,
+  lib,
+  ...
+}: {
   flake = {
     darwinModules.software-ghostty = {
+      imports = [inputs.self.darwinModules.fonts-firacode];
       homebrew.casks = ["ghostty"];
     };
 
@@ -23,6 +28,7 @@
     };
 
     nixosModules.software-ghostty = {pkgs, ...}: {
+      imports = [inputs.self.nixosModules.fonts-firacode];
       environment.systemPackages = with pkgs; [ghostty];
     };
   };

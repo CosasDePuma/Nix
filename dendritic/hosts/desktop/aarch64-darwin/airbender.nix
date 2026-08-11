@@ -1,8 +1,9 @@
 {inputs, ...}: {
-  flake.darwinModules.airbender = {config, ...}: {
+  flake.darwinModules.airbender = {config, ...}: let
+    hostName = "airbender";
+  in {
     imports = with inputs.self.darwinModules; [
       # keep-sorted start
-      fonts-firacode
       fonts-jetbrains
       service-ssh
       settings-locale
@@ -20,6 +21,7 @@
       software-steam
       software-sudo
       software-unar
+      software-warp
       software-whatsapp
       software-wireguard
       software-wisprflow
@@ -27,7 +29,7 @@
     ];
 
     home-manager.users.${config.system.primaryUser} = {
-      home.stateVersion = "25.05";
+      home.stateVersion = "26.11";
       imports = with inputs.self.homeManagerModules; [
         # keep-sorted start
         software-antigravity
@@ -42,10 +44,17 @@
         software-spotify
         software-starship
         software-vscode
+        software-warp
         software-zoxide
         software-zsh
         # keep-sorted end
       ];
+    };
+
+    networking = {
+      inherit hostName;
+      computerName = hostName;
+      localHostName = hostName;
     };
 
     system.primaryUser = "pumita";
