@@ -3,9 +3,7 @@
   lib,
   ...
 }: {
-  flake.homeManagerModules.profile-cosasdepuma = {config, ...}: let
-    home = config.home.homeDirectory;
-  in {
+  flake.homeManagerModules.profile-cosasdepuma = {config, ...}: {
     imports = [inputs.agenix.homeManagerModules.default];
 
     programs.git.settings.user = {
@@ -23,12 +21,12 @@
     age.secrets = {
       "ssh-keys-homelab" = {
         file = ./.ssh/keys/homelab.age;
-        path = "${home}/.ssh/keys/homelab";
+        path = "${config.home.homeDirectory}/.ssh/keys/homelab";
         mode = "0400";
       };
       "ssh-keys-pumita" = {
         file = ./.ssh/keys/pumita.age;
-        path = "${home}/.ssh/keys/pumita";
+        path = "${config.home.homeDirectory}/.ssh/keys/pumita";
         mode = "0400";
       };
     };
@@ -37,8 +35,8 @@
       ".ssh/config.d/homelab".source = ./.ssh/config.d/homelab;
       ".ssh/keys/homelab.pub".text = builtins.readFile ./.ssh/keys/homelab.pub;
       ".ssh/keys/pumita.pub".text = builtins.readFile ./.ssh/keys/pumita.pub;
-      ".ssh/id_ed25519".source = config.lib.file.mkOutOfStoreSymlink "${home}/.ssh/keys/pumita";
-      ".ssh/id_ed25519.pub".source = config.lib.file.mkOutOfStoreSymlink "${home}/.ssh/keys/pumita.pub";
+      ".ssh/id_ed25519".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.ssh/keys/pumita";
+      ".ssh/id_ed25519.pub".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.ssh/keys/pumita.pub";
     };
   };
 }
