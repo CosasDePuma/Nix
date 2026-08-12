@@ -4,6 +4,20 @@ This repository is Infrastructure as Code (IaC) using Nix. It manages workstatio
 
 ---
 
+## ⚖️ Contributing Rules
+
+Before making any change, **read [CONTRIBUTING.md](CONTRIBUTING.md) fully** — it is mandatory reading for every human and AI agent. It defines the rules you must follow:
+
+- Never work or commit directly on `main` — every change goes on a dedicated `type/short-description` branch (e.g. `feat/x`, `fix/y`, `chore/z`).
+- Never merge without explicit consent from the project lead; merges use `--no-ff`.
+- Every commit follows **Conventional Commits** with a **mandatory scope** (`type(scope): imperative description`).
+- Never append `Co-Authored-By:` trailers to commit messages.
+- All checks must pass before any change is complete.
+
+When in doubt about the git workflow, defer to `CONTRIBUTING.md` over anything in this file.
+
+---
+
 ## Architecture: Dendritic Pattern
 
 The **Dendritic Pattern** is the fundamental rule of this repo: **if you need something, you import it and it works out-of-the-box**. Every module must be fully self-contained. A host file should ideally be a list of imports plus a handful of machine-specific values (disk device, hostname, initial password). Nothing more.
@@ -164,7 +178,7 @@ A host file in `dendritic/hosts/` should contain:
 
 ## Workflow
 
-Before committing any changes, always run in order:
+Follow the branch and commit conventions in [CONTRIBUTING.md](CONTRIBUTING.md). Before committing any changes, always run in order:
 
 ```bash
 # 1. Format

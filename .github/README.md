@@ -9,8 +9,7 @@
 
 ## ✨ About This Repo
 
-This repository contains my personal Infrastructure as Code (IaC) configurations using [Nix](https://nixos.org/) [Flakes](https://nixos.wiki/wiki/Flakes). It helps me manage, reproduce, and share my development environments and system setups with ease.
-
+Personal Infrastructure as Code (IaC) using [Nix](https://nixos.org/) [Flakes](https://nixos.wiki/wiki/Flakes). It manages my desktops (macOS via nix-darwin + Home Manager) and servers (NixOS) from a single, reproducible flake.
 
 ## 🦄 Why Nix?
 
@@ -18,44 +17,59 @@ This repository contains my personal Infrastructure as Code (IaC) configurations
 - Effortless rollbacks and upgrades.
 - Clean and isolated environments.
 
+## 🧬 Architecture: the Dendritic Pattern
+
+Configuration lives in `dendritic/` and is auto-imported by `flake.nix` via `flake-parts` and `import-tree`. If you need something, you import its module and it works out of the box.
+
+```text
+dendritic/
+├── hosts/                  # machine-specific values (hostname, user, disk)
+│   └── desktop/aarch64-darwin/airbender/
+└── modules/                # self-contained, reusable modules
+    ├── boot/  cpu/  disko/  gpu/  hardware/  network/  service/
+    ├── settings/           # global defaults (locale, nix, nixpkgs)
+    ├── software/           # packages & user tools
+    ├── meta/               # metapaquetes (meta-terminal, meta-ai)
+    ├── profile/            # user profiles (cosasdepuma)
+    └── system/             # composed system presets
+```
+
+Each module exports its config for the platforms it applies to — **NixOS**, **Home Manager**, and **nix-darwin** — and hosts just import what they need. Secrets are managed with [agenix](https://github.com/ryantm/agenix) (`secrets.nix` + `.age` files).
+
 ## 💡 Get Started
 
 ```sh
-# -- install nix (for non-NixOS systems)
-sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --no-daemon
+# -- bootstrap a new workspace from the flake template
+nix flake init -t github:cosasdepuma/nix#workspace
 
-# -- bootstrap a flake structure like this
-nix flake init -t github:cosasdepuma/nix#flake
+# -- enter the nix development environment
+nix develop
 
-# -- open a nixos development environment
-nix develop github:cosasdepuma/nix
-
-# ... and much more!
+# -- format & validate
+nix fmt -- .
+nix flake check
 ```
 
 ## 🧩 What's inside?
 
-```rb
+```text
+├───checks                 # per-system checks (treefmt)
 ├───darwinConfigurations
-│   └───airbender: Darwin configuration
+│   └───airbender          # nix-darwin + Home Manager (aarch64-darwin)
+├───darwinModules          # auto-imported nix-darwin modules
 ├───devShells
-│   ├───aarch64-darwin
-│   │   ├───default: development environment 'nixos'
-│       └───hacking-infra: development environment 'hacking-infra'
-│   │   └───nixos: development environment 'nixos'
-│   └───x86_64-linux
-│       ├───default: development environment 'nixos'
-│       └───hacking-infra: development environment 'hacking-infra'
-│       └───nixos: development environment 'nixos'
-├───formatter
-│   ├───aarch64-darwin: package 'nixfmt-tree'
-│   └───x86_64-linux: package 'nixfmt-tree'
-├───nixosConfigurations
-│   └───wonderland: NixOS configuration
+│   ├───default            # nix development environment
+│   └───nixos              # nixos-rebuild / nh development environment
+├───formatter              # treefmt (alejandra, deadnix, statix, keep-sorted)
+├───homeManagerModules     # auto-imported Home Manager modules
+├───nixosModules           # auto-imported NixOS modules
 └───templates
-    └───flake: template: Flake template
-    └───shell: template: Shell template for development environments
+    └───workspace          # Flake template for a new workspace
 ```
+
+## 🤝 Contributing
+
+Read [CONTRIBUTING.md](../CONTRIBUTING.md) before making any change — it applies to every human and AI agent that touches this repo.
 
 ---
 

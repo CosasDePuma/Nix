@@ -3,4 +3,7 @@
 /**/result*
 
 # Folders
+/**/.claude/
 /**/.direnv/
+/**/.opencode/
+/**/.pi/

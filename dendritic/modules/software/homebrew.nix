@@ -12,5 +12,6 @@
       };
     };
     environment.variables.HOMEBREW_NO_ANALYTICS = lib.mkDefault "1";
+    environment.systemPath = lib.mkBefore ["/opt/homebrew/bin"];
   };
 }
