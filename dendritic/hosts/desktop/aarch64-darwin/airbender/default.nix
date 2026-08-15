@@ -4,6 +4,7 @@
   in {
     imports = with inputs.self.darwinModules; [
       # keep-sorted start
+      meta-lang-javascript
       service-ssh
       settings-locale
       settings-macos
