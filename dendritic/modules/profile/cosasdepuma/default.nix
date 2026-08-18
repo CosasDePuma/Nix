@@ -24,11 +24,6 @@
         path = "${config.home.homeDirectory}/.ssh/keys/homelab";
         mode = "0400";
       };
-      "ssh-keys-pumita" = {
-        file = ./.ssh/keys/pumita.age;
-        path = "${config.home.homeDirectory}/.ssh/keys/pumita";
-        mode = "0400";
-      };
     };
 
     home.file = {

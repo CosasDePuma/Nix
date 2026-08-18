@@ -56,9 +56,14 @@ in {
   #   ];
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  # ┃             Airbender (SSH)               ┃
+  # ┃                 Profiles                  ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
+  # --- cosasdepuma
   "dendritic/modules/profile/cosasdepuma/.ssh/keys/homelab.age".publicKeys = [pumita];
   "dendritic/modules/profile/cosasdepuma/.ssh/keys/pumita.age".publicKeys = [pumita];
+
+  # --- work
+  "dendritic/modules/profile/work/.ssh/config.d/work.age".publicKeys = [pumita];
+  "dendritic/modules/profile/work/.ssh/keys/work.age".publicKeys = [pumita];
 }

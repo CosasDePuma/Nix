@@ -24,14 +24,14 @@
             permission = {
               bash = {
                 "*" = lib.mkDefault "ask";
-                "*sh" = lib.mkDefault "deny";
+                #                "*sh" = lib.mkDefault "deny";
                 "doas *" = lib.mkDefault "deny";
                 "sh" = lib.mkDefault "deny";
                 "su" = lib.mkDefault "deny";
                 "sudo *" = lib.mkDefault "deny";
               };
               edit = lib.mkDefault "ask";
-              external_directory = lib.mkDefault "deny";
+              external_directory = lib.mkDefault "ask";
               read = {
                 "*" = lib.mkDefault "allow";
                 "*.cert" = lib.mkDefault "deny";

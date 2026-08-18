@@ -5,15 +5,18 @@
     imports = with inputs.self.darwinModules; [
       # keep-sorted start
       meta-lang-javascript
+      meta-office
       service-ssh
       settings-locale
       settings-macos
       settings-nix
       software-bitwarden
+      software-burpsuite
       software-cleanmymac
       software-homebrew
       software-homemanager
       software-obsidian
+      software-podman
       software-steam
       software-sudo
       software-unar
@@ -31,6 +34,7 @@
         meta-ai
         meta-terminal
         profile-cosasdepuma
+        profile-work
         software-discord
         software-spotify
         software-vscode
