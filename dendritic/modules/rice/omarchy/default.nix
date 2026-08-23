@@ -103,11 +103,11 @@
           };
 
           bind = [
-            {_args = ["SUPER + RETURN" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("warp-terminal")'')];}
-            {_args = ["SUPER + SPACE" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("omarchy-menu")'')];}
-            {_args = ["SUPER + V" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("omarchy-menu-clipboard")'')];}
-            {_args = ["SUPER + COMMA" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("omarchy-theme-switcher")'')];}
-            {_args = ["SUPER + ESCAPE" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("omarchy-system-lock")'')];}
+            {_args = ["SUPER + RETURN" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${pkgs.warp-terminal}/bin/warp-terminal")'')];}
+            {_args = ["SUPER + SPACE" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${omarchy-menu}/bin/omarchy-menu")'')];}
+            {_args = ["SUPER + V" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${omarchy-menu-clipboard}/bin/omarchy-menu-clipboard")'')];}
+            {_args = ["SUPER + COMMA" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${omarchy-theme-switcher}/bin/omarchy-theme-switcher")'')];}
+            {_args = ["SUPER + ESCAPE" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${omarchy-system-lock}/bin/omarchy-system-lock")'')];}
           ];
         };
       };
