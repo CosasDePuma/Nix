@@ -9,6 +9,10 @@
       wayland.windowManager.hyprland = {
         enable = lib.mkDefault true;
         configType = lib.mkDefault "lua";
+        # uwsm owns graphical-session.target when managing the session;
+        # this integration stop/starts a bound target mid-startup and tears
+        # the uwsm envelope down with it.
+        systemd.enable = lib.mkDefault false;
         settings = {
           config = {
             input = {
