@@ -30,48 +30,39 @@
       wayland.windowManager.hyprland = {
         enable = lib.mkDefault true;
         settings = {
-          general = {
-            gaps_in = lib.mkDefault 6;
-            gaps_out = lib.mkDefault 12;
-            border_size = lib.mkDefault 2;
-            "col.active_border" = lib.mkDefault "rgba(7aa2f7ee) rgba(bb9af7ee) 45deg";
-            "col.inactive_border" = lib.mkDefault "rgba(414868aa)";
-            layout = lib.mkDefault "dwindle";
-          };
-
-          decoration = {
-            rounding = lib.mkDefault 10;
-            blur = {
-              enabled = lib.mkDefault true;
-              size = lib.mkDefault 6;
-              passes = lib.mkDefault 2;
+          config = {
+            general = {
+              gaps_in = lib.mkDefault 6;
+              gaps_out = lib.mkDefault 12;
+              border_size = lib.mkDefault 2;
+              "col.active_border" = lib.mkDefault (
+                lib.generators.mkLuaInline ''{colors = {"rgba(7aa2f7ee)", "rgba(bb9af7ee)"}, angle = 45}''
+              );
+              "col.inactive_border" = lib.mkDefault "rgba(414868aa)";
+              layout = lib.mkDefault "dwindle";
             };
-            shadow = {
-              enabled = lib.mkDefault true;
-              range = lib.mkDefault 15;
-              render_power = lib.mkDefault 3;
+
+            decoration = {
+              rounding = lib.mkDefault 10;
+              blur = {
+                enabled = lib.mkDefault true;
+                size = lib.mkDefault 6;
+                passes = lib.mkDefault 2;
+              };
+              shadow = {
+                enabled = lib.mkDefault true;
+                range = lib.mkDefault 15;
+                render_power = lib.mkDefault 3;
+              };
             };
           };
 
           bind = [
-            "SUPER, Return, exec, warp-terminal"
-            "SUPER, SPACE, exec, omarchy-menu"
-            "SUPER, Q, killactive,"
-            "SUPER SHIFT, SPACE, togglefloating,"
-            "SUPER, F, fullscreen,"
-            "SUPER, V, exec, omarchy-menu-clipboard"
-            "SUPER, Comma, exec, omarchy-theme-switcher"
-            "SUPER, Escape, exec, omarchy-system-lock"
-            "SUPER, 1, workspace, 1"
-            "SUPER SHIFT, 1, movetoworkspace, 1"
-            "SUPER, 2, workspace, 2"
-            "SUPER SHIFT, 2, movetoworkspace, 2"
-            "SUPER, 3, workspace, 3"
-            "SUPER SHIFT, 3, movetoworkspace, 3"
-            "SUPER, 4, workspace, 4"
-            "SUPER SHIFT, 4, movetoworkspace, 4"
-            "SUPER, 5, workspace, 5"
-            "SUPER SHIFT, 5, movetoworkspace, 5"
+            {_args = ["SUPER + RETURN" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("warp-terminal")'')];}
+            {_args = ["SUPER + SPACE" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("omarchy-menu")'')];}
+            {_args = ["SUPER + V" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("omarchy-menu-clipboard")'')];}
+            {_args = ["SUPER + COMMA" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("omarchy-theme-switcher")'')];}
+            {_args = ["SUPER + ESCAPE" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("omarchy-system-lock")'')];}
           ];
         };
       };
