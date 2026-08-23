@@ -1,42 +1,64 @@
 {inputs, ...}: {
   flake.nixosModules.wonderland = {
-    imports = with inputs.self.nixosModules; [
-      # keep-sorted start
-      boot-loader-grub
-      disko-efi
-      hardware-defaults
-      meta-ai
-      meta-terminal
-      rice-omarchy
-      service-ssh
-      settings-locale
-      settings-nix
-      software-homemanager
-      software-sudo
-      software-warp
-      # keep-sorted end
-    ];
-
-    home-manager.users.wizard = {
-      home.stateVersion = "26.11";
-      imports = with inputs.self.homeManagerModules; [
-        # keep-sorted start
-        meta-ai
-        meta-terminal
-        profile-cosasdepuma
-        rice-omarchy
-        software-warp
-        # keep-sorted end
-      ];
+    boot.loader = {
+      efi.canTouchEfiVariables = true;
+      grub = {
+        enable = true;
+        device = "nodev";
+        efiSupport = true;
+      };
     };
 
-    networking.hostName = "wonderland";
+    disko.devices.disk.main = {
+      device = "/dev/sda";
+      type = "disk";
+      content = {
+        type = "gpt";
+        partitions = {
+          ESP = {
+            size = "512M";
+            type = "EF00";
+            content = {
+              type = "filesystem";
+              format = "vfat";
+              mountpoint = "/boot";
+              mountOptions = ["fmask=0077" "dmask=0077"];
+            };
+          };
+          root = {
+            size = "100%";
+            content = {
+              type = "filesystem";
+              format = "ext4";
+              mountpoint = "/";
+              extraArgs = ["-L" "NIXOS"];
+            };
+          };
+        };
+      };
+    };
 
-    disko.devices.disk.main.device = "/dev/sda";
+    i18n.defaultLocale = "en_US.UTF-8";
+
+    networking = {
+      hostName = "wonderland";
+      networkmanager.enable = true;
+    };
+
+    services = {
+      desktopManager.gnome.enable = true;
+      displayManager.gdm.enable = true;
+      xserver.enable = true;
+    };
+
+    system.stateVersion = "26.11";
+
+    time.timeZone = "Europe/Madrid";
 
     users.users.wizard = {
+      initialPassword = "wizard";
       isNormalUser = true;
-      extraGroups = ["wheel" "networkmanager" "video" "audio" "sshusers"];
+      extraGroups = ["wheel" "networkmanager" "video" "audio"];
     };
   };
 
