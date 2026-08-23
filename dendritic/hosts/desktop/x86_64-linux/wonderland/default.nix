@@ -2,10 +2,13 @@
   flake.nixosModules.wonderland = {
     imports = with inputs.self.nixosModules; [
       # keep-sorted start
+      disko-impermanence
       hardware-defaults
+      hardware-nvme
       meta-ai
       service-ssh
       settings-nix
+      system-impermanence
       # keep-sorted end
     ];
 
@@ -18,34 +21,18 @@
       };
     };
 
-    disko.devices.disk.main = {
-      device = "/dev/disk/by-id/nvme-eui.0025384b51424d22";
-      type = "disk";
-      content = {
-        type = "gpt";
-        partitions = {
-          ESP = {
-            size = "512M";
-            type = "EF00";
-            content = {
-              type = "filesystem";
-              format = "vfat";
-              mountpoint = "/boot";
-              mountOptions = ["fmask=0077" "dmask=0077"];
-            };
-          };
-          root = {
-            size = "100%";
-            content = {
-              type = "filesystem";
-              format = "ext4";
-              mountpoint = "/";
-              extraArgs = ["-L" "NIXOS"];
-            };
-          };
-        };
-      };
-    };
+    disko.devices.disk.main.device = "/dev/disk/by-id/nvme-eui.0025384b51424d22";
+
+    environment.persistence."/nix/persist".users.wizard.directories = [
+      "Downloads"
+      "Documents"
+      "Music"
+      "Pictures"
+      "Videos"
+      ".config"
+      ".local"
+      ".ssh"
+    ];
 
     i18n.defaultLocale = "en_US.UTF-8";
 
