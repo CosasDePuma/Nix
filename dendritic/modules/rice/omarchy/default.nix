@@ -13,7 +13,7 @@
         inputs.self.homeManagerModules.software-hyprland
         inputs.self.homeManagerModules.software-quickshell
         inputs.self.homeManagerModules.settings-wayland
-        inputs.self.homeManagerModules.software-ghostty
+        inputs.self.homeManagerModules.software-warp
         inputs.self.homeManagerModules.software-starship
         inputs.self.homeManagerModules.software-swaybg
       ];
@@ -21,6 +21,7 @@
       # Environment variables for Omarchy desktop ecosystem
       home.sessionVariables = {
         OMARCHY_PATH = lib.mkDefault "${config.home.homeDirectory}/.config/omarchy";
+        TERMINAL = lib.mkDefault "warp-terminal";
         XDG_CURRENT_DESKTOP = lib.mkDefault "Hyprland";
         XDG_SESSION_DESKTOP = lib.mkDefault "Hyprland";
       };
@@ -53,7 +54,7 @@
           };
 
           bind = [
-            "SUPER, Return, exec, ghostty"
+            "SUPER, Return, exec, warp-terminal"
             "SUPER, SPACE, exec, omarchy-menu"
             "SUPER, Q, killactive,"
             "SUPER SHIFT, SPACE, togglefloating,"
@@ -147,7 +148,7 @@
         inputs.self.nixosModules.software-hyprland
         inputs.self.nixosModules.software-quickshell
         inputs.self.nixosModules.settings-wayland
-        inputs.self.nixosModules.software-ghostty
+        inputs.self.nixosModules.software-warp
         inputs.self.nixosModules.software-starship
         inputs.self.nixosModules.software-swaybg
         inputs.self.nixosModules.fonts-jetbrains
