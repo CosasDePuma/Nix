@@ -12,24 +12,6 @@
       ...
     }: {
       imports = [inputs.self.homeManagerModules.settings-wayland];
-<<<<<<< HEAD
-      wayland.windowManager.hyprland = {
-        enable = lib.mkDefault true;
-        configType = lib.mkDefault "lua";
-        # uwsm owns graphical-session.target when managing the session;
-        # this integration stop/starts a bound target mid-startup and tears
-        # the uwsm envelope down with it.
-        systemd.enable = lib.mkDefault false;
-        settings = {
-          config = {
-            input = {
-              kb_layout = lib.mkDefault "us,se";
-              kb_options = lib.mkDefault "grp:alt_shift_toggle";
-              follow_mouse = lib.mkDefault 1;
-              sensitivity = lib.mkDefault 0;
-              touchpad = {
-                natural_scroll = lib.mkDefault false;
-=======
       config = lib.mkMerge [
         {
           wayland.windowManager.hyprland = {
@@ -67,7 +49,6 @@
                   force_default_wallpaper = lib.mkDefault 0;
                   disable_hyprland_logo = lib.mkDefault true;
                 };
->>>>>>> 4194435 (refactor(hyprland): own the vt1 auto-start hook)
               };
 
               env = lib.mkDefault [
@@ -76,7 +57,7 @@
               ];
 
               bind = [
-                {_args = ["SUPER + RETURN" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("kitty")'')];}
+                {_args = ["SUPER + RETURN" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${pkgs.kitty}/bin/kitty")'')];}
                 {_args = ["SUPER + Q" (lib.generators.mkLuaInline "hl.dsp.window.close()")];}
                 {_args = ["SUPER + SHIFT + SPACE" (lib.generators.mkLuaInline ''hl.dsp.window.float({action = "toggle"})'')];}
                 {_args = ["SUPER + F" (lib.generators.mkLuaInline "hl.dsp.window.fullscreen()")];}
@@ -100,12 +81,12 @@
                 {_args = ["SUPER + SHIFT + 9" (lib.generators.mkLuaInline ''hl.dsp.window.move({workspace = "9", follow = true})'')];}
                 {_args = ["SUPER + 0" (lib.generators.mkLuaInline ''hl.dsp.focus({workspace = "10"})'')];}
                 {_args = ["SUPER + SHIFT + 0" (lib.generators.mkLuaInline ''hl.dsp.window.move({workspace = "10", follow = true})'')];}
-                {_args = ["XF86AudioRaiseVolume" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+")'') {repeating = true;}];}
-                {_args = ["XF86AudioLowerVolume" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-")'') {repeating = true;}];}
-                {_args = ["XF86AudioMute" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle")'')];}
-                {_args = ["XF86AudioMicMute" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle")'')];}
-                {_args = ["XF86MonBrightnessUp" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("brightnessctl s 10%+")'') {repeating = true;}];}
-                {_args = ["XF86MonBrightnessDown" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("brightnessctl s 10%-")'') {repeating = true;}];}
+                {_args = ["XF86AudioRaiseVolume" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${pkgs.wireplumber}/bin/wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+")'') {repeating = true;}];}
+                {_args = ["XF86AudioLowerVolume" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${pkgs.wireplumber}/bin/wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-")'') {repeating = true;}];}
+                {_args = ["XF86AudioMute" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${pkgs.wireplumber}/bin/wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle")'')];}
+                {_args = ["XF86AudioMicMute" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${pkgs.wireplumber}/bin/wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle")'')];}
+                {_args = ["XF86MonBrightnessUp" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${pkgs.brightnessctl}/bin/brightnessctl s 10%+")'') {repeating = true;}];}
+                {_args = ["XF86MonBrightnessDown" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${pkgs.brightnessctl}/bin/brightnessctl s 10%-")'') {repeating = true;}];}
                 {
                   _args = [
                     "SUPER + mouse:272"
