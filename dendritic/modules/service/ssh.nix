@@ -90,9 +90,14 @@ in {
           UsePAM = lib.mkDefault true;
           X11Forwarding = lib.mkDefault false;
           AllowUsers = lib.mkDefault (
-            lib.attrsets.mapAttrsToList (name: _: name) (
-              lib.attrsets.filterAttrs (_: v: builtins.elem "sshusers" v.extraGroups) config.users.users
-            )
+            let
+              allowed = lib.attrsets.mapAttrsToList (name: _: name) (
+                lib.attrsets.filterAttrs (_: v: builtins.elem "sshusers" (v.extraGroups or [])) config.users.users
+              );
+            in
+              if allowed == []
+              then null
+              else allowed
           );
           Banner = lib.mkDefault (builtins.toString (
             pkgs.writeText "ssh-banner" ''

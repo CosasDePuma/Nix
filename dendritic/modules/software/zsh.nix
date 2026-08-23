@@ -31,7 +31,7 @@
           enable = lib.mkDefault true;
           strategy = lib.mkDefault ["history"];
         };
-        shellGlobalAliases = {
+        shellAliases = {
           "--yolo" = lib.mkDefault "--dangerously-skip-permissions";
         };
       };
