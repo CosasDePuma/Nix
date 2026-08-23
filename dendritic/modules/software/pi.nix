@@ -5,7 +5,17 @@
     };
 
     homeManagerModules.software-pi = {
-      programs.pi-coding-agent.enable = lib.mkDefault true;
+      programs.pi-coding-agent = {
+        enable = lib.mkDefault true;
+        settings = {
+          enableInstallTelemetry = lib.mkForce false;
+          packages = [
+            "npm:pi-blackhole"
+            # "npm:pi-hermes-memory"
+            "npm:pi-mcp-adapter"
+          ];
+        };
+      };
     };
 
     nixosModules.software-pi = {pkgs, ...}: {
