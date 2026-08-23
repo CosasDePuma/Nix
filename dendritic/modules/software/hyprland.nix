@@ -9,6 +9,10 @@
       wayland.windowManager.hyprland = {
         enable = lib.mkDefault true;
         configType = lib.mkDefault "lua";
+        # uwsm owns graphical-session.target when managing the session;
+        # this integration stop/starts a bound target mid-startup and tears
+        # the uwsm envelope down with it.
+        systemd.enable = lib.mkDefault false;
         settings = {
           config = {
             input = {
@@ -101,7 +105,10 @@
     };
 
     nixosModules.software-hyprland = {pkgs, ...}: {
-      imports = [inputs.self.nixosModules.settings-wayland];
+      imports = [
+        inputs.self.nixosModules.settings-wayland
+        inputs.self.nixosModules.software-uwsm
+      ];
       programs.hyprland = {
         enable = lib.mkDefault true;
         withUWSM = lib.mkDefault true;
