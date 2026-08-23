@@ -14,6 +14,7 @@
       settings-nix
       software-homemanager
       software-networkmanager
+      software-ssh
       system-impermanence
       # keep-sorted end
     ];
@@ -52,6 +53,9 @@
       initialPassword = "wizard";
       isNormalUser = true;
       extraGroups = ["wheel" "networkmanager" "video" "audio" "sshusers"];
+      openssh.authorizedKeys.keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKh1YtKaItcNzC3RGez38zaJ0geelyrb6AFV73OqLchv"
+      ];
     };
   };
 
