@@ -1,5 +1,13 @@
 {inputs, ...}: {
   flake.nixosModules.wonderland = {
+    imports = with inputs.self.nixosModules; [
+      # keep-sorted start
+      meta-ai
+      service-ssh
+      settings-nix
+      # keep-sorted end
+    ];
+
     boot.loader = {
       efi.canTouchEfiVariables = true;
       grub = {
@@ -58,7 +66,7 @@
     users.users.wizard = {
       initialPassword = "wizard";
       isNormalUser = true;
-      extraGroups = ["wheel" "networkmanager" "video" "audio"];
+      extraGroups = ["wheel" "networkmanager" "video" "audio" "sshusers"];
     };
   };
 
