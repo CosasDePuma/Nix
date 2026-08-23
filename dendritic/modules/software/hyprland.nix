@@ -105,7 +105,10 @@
     };
 
     nixosModules.software-hyprland = {pkgs, ...}: {
-      imports = [inputs.self.nixosModules.settings-wayland];
+      imports = [
+        inputs.self.nixosModules.settings-wayland
+        inputs.self.nixosModules.software-uwsm
+      ];
       programs.hyprland = {
         enable = lib.mkDefault true;
         withUWSM = lib.mkDefault true;
