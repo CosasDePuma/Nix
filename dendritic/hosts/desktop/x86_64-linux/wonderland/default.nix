@@ -56,6 +56,7 @@
     services = {
       desktopManager.gnome.enable = true;
       displayManager.gdm.enable = true;
+      openssh.settings.PasswordAuthentication = true;
       xserver.enable = true;
     };
 
