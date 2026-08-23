@@ -157,7 +157,10 @@
 
       # System level services for Omarchy rice
       security.pam.services.hyprlock = {};
-      services.upower.enable = lib.mkDefault true;
+      services = {
+        displayManager.gdm.enable = lib.mkDefault true;
+        upower.enable = lib.mkDefault true;
+      };
       hardware.bluetooth.enable = lib.mkDefault true;
 
       # System packages available globally

@@ -2,23 +2,31 @@
   flake.nixosModules.wonderland = {
     imports = with inputs.self.nixosModules; [
       # keep-sorted start
+      boot-efi
+      boot-loader-grub
       disko-impermanence
       hardware-defaults
       hardware-nvme
       meta-ai
+      rice-omarchy
       service-ssh
+      settings-locale
       settings-nix
+      software-homemanager
+      software-networkmanager
       system-impermanence
       # keep-sorted end
     ];
 
-    boot.loader = {
-      efi.canTouchEfiVariables = true;
-      grub = {
-        enable = true;
-        device = "nodev";
-        efiSupport = true;
-      };
+    home-manager.users.wizard = {
+      home.stateVersion = "26.11";
+      imports = with inputs.self.homeManagerModules; [
+        # keep-sorted start
+        meta-ai
+        meta-terminal
+        rice-omarchy
+        # keep-sorted end
+      ];
     };
 
     disko.devices.disk.main.device = "/dev/disk/by-id/nvme-eui.0025384b51424d22";
@@ -34,23 +42,11 @@
       ".ssh"
     ];
 
-    i18n.defaultLocale = "en_US.UTF-8";
+    networking.hostName = "wonderland";
 
-    networking = {
-      hostName = "wonderland";
-      networkmanager.enable = true;
-    };
-
-    services = {
-      desktopManager.gnome.enable = true;
-      displayManager.gdm.enable = true;
-      openssh.settings.PasswordAuthentication = true;
-      xserver.enable = true;
-    };
+    services.openssh.settings.PasswordAuthentication = true;
 
     system.stateVersion = "26.11";
-
-    time.timeZone = "Europe/Madrid";
 
     users.users.wizard = {
       initialPassword = "wizard";
