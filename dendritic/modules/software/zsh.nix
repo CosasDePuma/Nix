@@ -4,7 +4,7 @@
       homebrew.brews = ["zsh"];
     };
 
-    homeManagerModules.software-zsh = {
+    homeManagerModules.software-zsh = {pkgs, ...}: {
       programs.zsh = {
         enable = lib.mkDefault true;
         enableCompletion = lib.mkDefault true;
@@ -14,7 +14,7 @@
         };
         loginExtra = lib.mkDefault ''
           if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" = 1 ]; then
-            exec start-hyprland
+            exec ${pkgs.uwsm}/bin/uwsm start -e -D Hyprland hyprland.desktop
           fi
         '';
         shellGlobalAliases = {
