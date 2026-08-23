@@ -2,6 +2,7 @@
   flake.nixosModules.wonderland = {
     imports = with inputs.self.nixosModules; [
       # keep-sorted start
+      hardware-defaults
       meta-ai
       service-ssh
       settings-nix
