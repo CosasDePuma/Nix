@@ -8,7 +8,52 @@
       config,
       pkgs,
       ...
-    }: {
+    }: let
+      omarchy-menu = pkgs.writeShellApplication {
+        name = "omarchy-menu";
+        runtimeInputs = [pkgs.fuzzel];
+        text = ''
+          exec fuzzel --prompt "▶ "
+        '';
+      };
+
+      omarchy-menu-clipboard = pkgs.writeShellApplication {
+        name = "omarchy-menu-clipboard";
+        runtimeInputs = [pkgs.cliphist pkgs.fuzzel pkgs.wl-clipboard];
+        text = ''
+          entry=$(cliphist list | fuzzel --dmenu --prompt "📋 ") || exit 0
+          printf '%s\n' "$entry" | cliphist decode | wl-copy
+        '';
+      };
+
+      omarchy-system-lock = pkgs.writeShellApplication {
+        name = "omarchy-system-lock";
+        runtimeInputs = [pkgs.hyprlock];
+        text = ''
+          exec hyprlock
+        '';
+      };
+
+      omarchy-theme-switcher = pkgs.writeShellApplication {
+        name = "omarchy-theme-switcher";
+        runtimeInputs = [pkgs.coreutils pkgs.fuzzel pkgs.libnotify pkgs.procps pkgs.swaybg];
+        text = ''
+          theme_dir="$HOME/.config/omarchy/themes"
+          if [ ! -d "$theme_dir" ]; then
+            notify-send "Omarchy" "No themes installed yet"
+            exit 0
+          fi
+          theme=$(find "$theme_dir" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort | fuzzel --dmenu --prompt "🎨 ") || exit 0
+          wallpaper=$(find "$theme_dir/$theme" -type f \( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' \) | head -n 1)
+          if [ -n "$wallpaper" ]; then
+            pkill -x swaybg 2>/dev/null || true
+            nohup swaybg -i "$wallpaper" -m fill >/dev/null 2>&1 &
+          fi
+          printf '%s\n' "$theme" > "$HOME/.config/omarchy/current-theme"
+          notify-send "Omarchy" "Theme: $theme"
+        '';
+      };
+    in {
       imports = [
         inputs.self.homeManagerModules.software-hyprland
         inputs.self.homeManagerModules.software-quickshell
@@ -110,24 +155,45 @@
       };
 
       # Omarchy essential tools in user space
-      home.packages = with pkgs; [
-        brightnessctl
-        fzf
-        grim
-        gum
-        hypridle
-        hyprlock
-        hyprsunset
-        imagemagick
-        jq
-        libnotify
-        pamixer
-        playerctl
-        slurp
-        swaybg
-        wireplumber
-        wl-clipboard
-      ];
+      home.packages =
+        [
+          omarchy-menu
+          omarchy-menu-clipboard
+          omarchy-system-lock
+          omarchy-theme-switcher
+        ]
+        ++ (with pkgs; [
+          brightnessctl
+          fzf
+          grim
+          gum
+          hypridle
+          hyprlock
+          hyprsunset
+          imagemagick
+          jq
+          libnotify
+          pamixer
+          playerctl
+          slurp
+          swaybg
+          wireplumber
+          wl-clipboard
+        ]);
+
+      # Clipboard history daemon feeding omarchy-menu-clipboard
+      systemd.user.services.omarchy-cliphist = {
+        Unit = {
+          Description = "Omarchy clipboard history";
+          PartOf = ["graphical-session.target"];
+          After = ["graphical-session.target"];
+        };
+        Service = {
+          ExecStart = "${pkgs.wl-clipboard}/bin/wl-paste --watch ${pkgs.cliphist}/bin/cliphist store";
+          Restart = "on-failure";
+        };
+        Install.WantedBy = ["graphical-session.target"];
+      };
     };
 
     nixosModules.rice-omarchy = {

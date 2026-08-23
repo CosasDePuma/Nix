@@ -45,8 +45,6 @@
 
     networking.hostName = "wonderland";
 
-    services.openssh.settings.PasswordAuthentication = true;
-
     system.stateVersion = "26.11";
 
     users.users.wizard = {
