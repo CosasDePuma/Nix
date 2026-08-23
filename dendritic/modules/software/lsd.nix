@@ -27,10 +27,10 @@
     nixosModules.software-lsd = {pkgs, ...}: {
       environment.systemPackages = with pkgs; [lsd];
       programs.zsh.shellAliases = {
-        ls = lib.mkDefault "${pkgs.lsd}/bin/lsd --color=always";
-        l = lib.mkDefault "${pkgs.lsd}/bin/lsd --color=always -l";
-        ll = lib.mkDefault "${pkgs.lsd}/bin/lsd --color=always -al";
-        la = lib.mkDefault "${pkgs.lsd}/bin/lsd --color=always -a";
+        ls = lib.mkForce "${pkgs.lsd}/bin/lsd --color=always";
+        l = lib.mkForce "${pkgs.lsd}/bin/lsd --color=always -l";
+        ll = lib.mkForce "${pkgs.lsd}/bin/lsd --color=always -al";
+        la = lib.mkForce "${pkgs.lsd}/bin/lsd --color=always -a";
       };
     };
   };
