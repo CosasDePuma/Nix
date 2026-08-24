@@ -31,9 +31,6 @@
     [warp_drive]
     enabled = false
 
-    [warpify.ssh]
-    enable_ssh_warpification = false
-
     [agents]
     cloud_conversation_storage_enabled = false
 
