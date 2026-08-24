@@ -1,10 +1,10 @@
 _: {
   flake = {
-    # Windows 11 under QEMU/KVM inside an OCI container, Omarchy-style: the
-    # disk lives in a mounted host folder (also reachable from the guest as
-    # the \\host.lan\Data share), the box starts on demand and stops again
-    # when the RDP session ends.
-    nixosModules.software-windows = {
+    # Windows 11 under QEMU/KVM inside an OCI container: the disk lives in a
+    # mounted host folder (also reachable from the guest as the
+    # \\host.lan\Data share), the box starts on demand and stops again when
+    # the RDP session ends.
+    nixosModules.software-windowsvm = {
       config,
       lib,
       ...
@@ -22,20 +22,36 @@ _: {
     in {
       boot.kernelModules = ["kvm-intel" "kvm-amd"];
 
+      # windows-vm drives the container through its systemd unit rather than
+      # raw docker commands: autoRemoveOnStop means the container only ever
+      # exists while docker-windows.service is running, so "docker start" on
+      # a stopped/removed container always fails. Starting/stopping that
+      # unit needs root; grant it to the docker group without a password,
+      # since the launcher runs from a desktop entry with no TTY to prompt.
+      security.polkit.extraConfig = ''
+        polkit.addRule(function(action, subject) {
+          if (action.id == "org.freedesktop.systemd1.manage-units" &&
+              action.lookup("unit") == "docker-windows.service" &&
+              subject.isInGroup("docker")) {
+            return polkit.Result.YES;
+          }
+        });
+      '';
+
       virtualisation.docker.enable = lib.mkDefault true;
       virtualisation.oci-containers.backend = lib.mkDefault "docker";
       virtualisation.oci-containers.containers.windows = {
         image = lib.mkDefault "ghcr.io/dockur/windows:latest";
         autoStart = lib.mkDefault false;
-        devices = lib.mkDefault [
+        devices = [
           "/dev/kvm:/dev/kvm"
           "/dev/net/tun:/dev/net/tun"
         ];
-        ports = lib.mkDefault [
+        ports = [
           "127.0.0.1:3389:3389"
           "127.0.0.1:8006:8006"
         ];
-        volumes = lib.mkDefault ["${sharedDir}:/data"];
+        volumes = ["${sharedDir}:/data"];
         environment = {
           RAM_SIZE = lib.mkDefault "8G";
           CPU_CORES = lib.mkDefault "4";
@@ -45,19 +61,14 @@ _: {
       };
     };
 
-    homeManagerModules.software-windows = {pkgs, ...}: let
-      omarchy-windows = pkgs.writeShellApplication {
-        name = "omarchy-windows";
-        runtimeInputs = [pkgs.coreutils pkgs.docker pkgs.freerdp pkgs.libnotify];
+    homeManagerModules.software-windowsvm = {pkgs, ...}: let
+      windows-vm = pkgs.writeShellApplication {
+        name = "windows-vm";
+        runtimeInputs = [pkgs.coreutils pkgs.freerdp pkgs.libnotify pkgs.systemd];
         text = ''
-          if ! docker inspect windows > /dev/null 2>&1; then
-            notify-send "Omarchy" "Windows container not found"
+          if ! systemctl start docker-windows.service; then
+            notify-send "Windows VM" "Failed to start Windows container"
             exit 1
-          fi
-
-          state=$(docker inspect windows --format '{{.State.Running}}')
-          if [ "$state" != "true" ]; then
-            docker start windows > /dev/null
           fi
 
           # Wait for the RDP port; the first boot installs Windows itself and
@@ -72,7 +83,7 @@ _: {
             sleep 1
           done
           if [ -z "$ready" ]; then
-            notify-send "Omarchy" "Windows did not expose RDP in time"
+            notify-send "Windows VM" "Windows did not expose RDP in time"
             exit 1
           fi
 
@@ -81,17 +92,17 @@ _: {
           status=$?
 
           # Release RAM and CPU once the RDP session is over
-          docker stop windows > /dev/null
+          systemctl stop docker-windows.service
           exit "$status"
         '';
       };
     in {
-      home.packages = [omarchy-windows];
+      home.packages = [windows-vm];
 
       xdg.desktopEntries.windows = {
         name = "Windows 11";
         genericName = "Virtual Machine";
-        exec = "${omarchy-windows}/bin/omarchy-windows";
+        exec = "${windows-vm}/bin/windows-vm";
         terminal = false;
         categories = ["System"];
         startupNotify = false;
