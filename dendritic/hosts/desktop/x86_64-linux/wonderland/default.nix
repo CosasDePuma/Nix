@@ -9,6 +9,7 @@
       hardware-nvme
       meta-ai
       rice-omarchy
+      service-rdp
       service-ssh
       settings-locale
       settings-nix
