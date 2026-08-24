@@ -57,6 +57,7 @@
       imports = [
         inputs.self.homeManagerModules.software-hyprland
         inputs.self.homeManagerModules.software-mako
+        inputs.self.homeManagerModules.software-omarchy-shell
         inputs.self.homeManagerModules.software-quickshell
         inputs.self.homeManagerModules.settings-wayland
         inputs.self.homeManagerModules.software-warp
@@ -64,9 +65,10 @@
         inputs.self.homeManagerModules.software-swaybg
       ];
 
-      # Environment variables for Omarchy desktop ecosystem
+      # Environment variables for Omarchy desktop ecosystem. OMARCHY_PATH
+      # itself is owned by software-omarchy-shell (it points at the
+      # vendored shell app, not this ~/.config/omarchy config dir).
       home.sessionVariables = {
-        OMARCHY_PATH = lib.mkDefault "${config.home.homeDirectory}/.config/omarchy";
         TERMINAL = lib.mkDefault "warp-terminal";
         XDG_CURRENT_DESKTOP = lib.mkDefault "Hyprland";
         XDG_SESSION_DESKTOP = lib.mkDefault "Hyprland";

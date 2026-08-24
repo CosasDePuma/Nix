@@ -58,6 +58,111 @@ in {
         };
       };
 
+      # --- omarchy-shell (the bar). Renders the bar-relevant sections of
+      # upstream's default/themed/shell.toml.tpl by hand, substituting our
+      # palette for its {{ token }} placeholders; "hyprland.active-border"
+      # style values are left as literal strings, which is how the shell
+      # itself resolves them (Commons/Color.qml recurses into
+      # [hyprland].active-border rather than expecting a hex value there).
+      # Sections not on the bar's surface (polkit, lock, image-picker) are
+      # left out.
+      home.file.".local/state/omarchy/current/theme/colors.toml".source = ./colors.toml;
+      home.file.".local/state/omarchy/current/theme/shell.toml".text = ''
+        [bar]
+        background       = "${colors.background}"
+        background-alpha = 1.0
+        text             = "${colors.foreground}"
+        active           = "${colors.red}"
+        scale-with-font  = true
+        size-horizontal  = 26
+        size-vertical    = 28
+
+        [hyprland]
+        active-border            = "${colors.accent}"
+        active-border-foreground = "${colors.foreground}"
+
+        [controls]
+        normal-color        = "${colors.foreground}"
+        normal-fill-alpha   = 0.04
+        normal-border       = "${colors.foreground}"
+        normal-border-width = 1
+        normal-border-alpha = 0.4
+        hover-cursor-color        = "${colors.foreground}"
+        hover-cursor-fill-alpha   = 0.08
+        hover-cursor-border       = "${colors.foreground}"
+        hover-cursor-border-width = 1
+        hover-cursor-border-alpha = 0.25
+        focus-color        = "${colors.foreground}"
+        focus-fill-alpha   = 0.08
+        focus-border       = "${colors.foreground}"
+        focus-border-width = 1
+        focus-border-alpha = 0.25
+        selected-color        = "${colors.foreground}"
+        selected-fill-alpha   = 0.18
+        selected-border       = "${colors.foreground}"
+        selected-border-width = 0
+        selected-border-alpha = 1.0
+        pressed-fill-alpha   = 0.22
+        selection-fill-alpha = 0.35
+
+        [spacing]
+        scale = 1.0
+        scale-with-font = true
+
+        [font]
+        base-size = 12
+
+        [popups]
+        background       = "${colors.background}"
+        background-alpha = 1.0
+        text             = "${colors.foreground}"
+        border           = "hyprland.active-border"
+        border-alpha     = 1.0
+
+        [tooltip]
+        background       = "${colors.background}"
+        background-alpha = 0.97
+        text             = "${colors.foreground}"
+        border           = "hyprland.active-border-foreground"
+        border-alpha     = 1.0
+
+        [notifications]
+        background       = "${colors.background}"
+        background-alpha = 1.0
+        text             = "${colors.foreground}"
+        border           = "hyprland.active-border"
+        border-alpha     = 1.0
+        countdown        = "${colors.accent}"
+
+        [launcher]
+        background                = "${colors.background}"
+        background-alpha          = 0.95
+        text                      = "${colors.foreground}"
+        border                    = "hyprland.active-border-foreground"
+        border-alpha              = 1.0
+        scrim                     = "${colors.background}"
+        scrim-alpha               = 0.5
+        selected-background       = "${colors.foreground}"
+        selected-background-alpha = 0.08
+        selected-text             = "${colors.accent}"
+        selected-border           = "hyprland.active-border-foreground"
+        selected-border-alpha     = 0.25
+
+        [menu]
+        background                = "${colors.background}"
+        background-alpha          = 1.0
+        text                      = "${colors.foreground}"
+        border                    = "hyprland.active-border-foreground"
+        border-alpha              = 1.0
+        scrim                     = "${colors.background}"
+        scrim-alpha               = 0.5
+        selected-background       = "${colors.foreground}"
+        selected-background-alpha = 0.08
+        selected-text             = "${colors.accent}"
+        selected-border           = "hyprland.active-border-foreground"
+        selected-border-alpha     = 0.25
+      '';
+
       # --- wallpaper
       systemd.user.services.wallpaper = {
         Unit = {
