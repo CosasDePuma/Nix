@@ -7,7 +7,10 @@ in {
     lib,
     pkgs,
     ...
-  }:
+  }: let
+    # fuzzel.ini wants bare RRGGBBAA, no leading #.
+    hex = c: lib.removePrefix "#" c;
+  in
     # --- hyprland
     lib.mkIf (config.wayland.windowManager.hyprland.enable or false) {
       wayland.windowManager.hyprland.settings.config.general = {
@@ -25,6 +28,27 @@ in {
         border-size = 2;
         border-radius = 10;
         progress-color = "over ${colors.dark_foreground}";
+      };
+
+      # --- fuzzel (SUPER + SPACE launcher, also used by the clipboard and
+      # theme-switcher menus)
+      programs.fuzzel.settings = {
+        colors = {
+          background = "${hex colors.dark_background}ee";
+          text = hex colors.foreground;
+          prompt = hex colors.accent;
+          placeholder = hex colors.muted;
+          input = hex colors.foreground;
+          match = hex colors.dark_foreground;
+          selection = "${hex colors.selection}cc";
+          selection-text = hex colors.bright_foreground;
+          selection-match = hex colors.accent;
+          border = hex colors.accent;
+        };
+        border = {
+          width = 2;
+          radius = 10;
+        };
       };
 
       # --- wallpaper

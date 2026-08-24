@@ -72,6 +72,11 @@
         XDG_SESSION_DESKTOP = lib.mkDefault "Hyprland";
       };
 
+      # omarchy-menu et al. shell out to the bare fuzzel binary, but it still
+      # reads ~/.config/fuzzel/fuzzel.ini, so managing it here themes every
+      # launcher invocation for free.
+      programs.fuzzel.enable = lib.mkDefault true;
+
       # Hyprland custom configuration in Omarchy style
       wayland.windowManager.hyprland = {
         enable = lib.mkDefault true;
