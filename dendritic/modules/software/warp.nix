@@ -16,6 +16,10 @@
     honor_ps1 = true
     input_box_type_setting = "classic"
 
+    [privacy]
+    telemetry_enabled = false
+    crash_reporting_enabled = false
+
     [warp_drive]
     enabled = false
 
