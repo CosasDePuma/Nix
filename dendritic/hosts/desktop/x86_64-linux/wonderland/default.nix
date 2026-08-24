@@ -9,8 +9,8 @@
       hardware-nvme
       meta-ai
       rice-omarchy
+      service-rdp
       service-ssh
-      service-vnc
       settings-locale
       settings-nix
       software-brave
