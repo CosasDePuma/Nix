@@ -10,6 +10,39 @@ in {
   }: let
     # fuzzel.ini wants bare RRGGBBAA, no leading #.
     hex = c: lib.removePrefix "#" c;
+    warpSettingsPath =
+      if pkgs.stdenv.hostPlatform.isDarwin
+      then ".warp/settings.toml"
+      else ".config/warp-terminal/settings.toml";
+    warpThemesDir =
+      if pkgs.stdenv.hostPlatform.isDarwin
+      then ".warp/themes"
+      else ".local/share/warp-terminal/themes";
+    warpTheme = ''
+      accent: "${colors.accent}"
+      background: "${colors.background}"
+      details: darker
+      foreground: "${colors.foreground}"
+      terminal_colors:
+        normal:
+          black: "${colors.darker_background}"
+          red: "${colors.red}"
+          green: "${colors.green}"
+          yellow: "${colors.yellow}"
+          blue: "${colors.blue}"
+          magenta: "${colors.magenta}"
+          cyan: "${colors.cyan}"
+          white: "${colors.light_foreground}"
+        bright:
+          black: "${colors.muted}"
+          red: "${colors.bright_red}"
+          green: "${colors.bright_green}"
+          yellow: "${colors.bright_yellow}"
+          blue: "${colors.bright_blue}"
+          magenta: "${colors.bright_magenta}"
+          cyan: "${colors.bright_cyan}"
+          white: "${colors.bright_foreground}"
+    '';
   in
     # --- hyprland
     lib.mkIf (config.wayland.windowManager.hyprland.enable or false) {
@@ -161,6 +194,19 @@ in {
         selected-text             = "${colors.accent}"
         selected-border           = "hyprland.active-border-foreground"
         selected-border-alpha     = 0.25
+      '';
+
+      # --- warp
+      # software-warp.nix's own home.file.${settingsPath}.text has no
+      # mkDefault (see the comment there): this is a second, same-priority
+      # definition of that same path, so home-manager's types.lines merge
+      # concatenates it onto the base settings instead of one replacing
+      # the other.
+      home.file."${warpThemesDir}/osaka-jade.yaml".text = warpTheme;
+      home.file.${warpSettingsPath}.text = ''
+
+        [appearance.themes]
+        theme = { custom = { name = "Osaka Jade", path = "~/${warpThemesDir}/osaka-jade.yaml" } }
       '';
 
       # --- wallpaper

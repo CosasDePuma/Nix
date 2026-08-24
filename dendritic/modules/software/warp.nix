@@ -54,9 +54,13 @@ in {
       imports = [inputs.self.homeManagerModules.fonts-firacode];
       config = lib.mkMerge [
         {
-          home.file.${settingsPath} = {
-            text = lib.mkDefault warpSettings;
-          };
+          # No mkDefault: home.file.<path>.text is types.lines, which
+          # concatenates same-priority definitions instead of picking a
+          # winner. That's what lets a theme module append its own
+          # [appearance.themes] block here without replacing this one --
+          # mkDefault would drop this whole definition the moment anything
+          # else set the same path at normal priority.
+          home.file.${settingsPath}.text = warpSettings;
         }
         (lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
           # Warp stages downloaded updates under this dir before offering to
