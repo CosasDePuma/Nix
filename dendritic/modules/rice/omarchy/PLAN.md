@@ -83,6 +83,8 @@ Omarchy utiliza una capa modular en Lua (`~/.config/hypr/*.lua` y `default/hypr/
   - Configurar el lanzador dinámico basado en `gum` / `fzf` / `rofi` / `walker` para aplicaciones, atajos, emojis y portapapeles.
 - [ ] **Gestión de Portapapeles**:
   - Integrar `wl-clipboard` con `cliphist` para persistir el historial del portapapeles en `omarchy-menu-clipboard`.
+- [ ] **Endurecimiento de Ejecución de Comandos**:
+  - Evaluar `\exec` / `command exec` y rutas absolutas del store dentro de los scripts `omarchy-*` para impedir secuestro de PATH mediante aliases, funciones o binarios sombra. Los lanzadores críticos ya resuelven por ruta de store; aplazado hasta revisar el resto de scripts.
 
 ---
 
