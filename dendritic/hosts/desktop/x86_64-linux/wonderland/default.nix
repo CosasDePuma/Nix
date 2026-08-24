@@ -15,6 +15,7 @@
       software-homemanager
       software-networkmanager
       software-ssh
+      software-windows
       system-impermanence
       # keep-sorted end
     ];
@@ -26,6 +27,7 @@
         meta-ai
         meta-terminal
         rice-omarchy
+        software-windows
         # keep-sorted end
       ];
     };
@@ -50,7 +52,7 @@
     users.users.wizard = {
       initialPassword = "wizard";
       isNormalUser = true;
-      extraGroups = ["wheel" "networkmanager" "video" "audio" "sshusers"];
+      extraGroups = ["wheel" "networkmanager" "video" "audio" "sshusers" "docker"];
       openssh.authorizedKeys.keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKh1YtKaItcNzC3RGez38zaJ0geelyrb6AFV73OqLchv"
       ];
