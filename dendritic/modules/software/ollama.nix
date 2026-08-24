@@ -5,8 +5,13 @@
     };
 
     homeManagerModules.software-ollama = {osConfig, ...}: {
+      # A NixOS system-level ollama (nixosModules.software-ollama) already
+      # binds 127.0.0.1:11434; running the home-manager one too fails with
+      # "address already in use" for whichever starts second. Only default
+      # this one on when there's no system-level ollama to collide with
+      # (e.g. Darwin, where software-ollama has no service of its own).
       services.ollama = {
-        enable = lib.mkDefault true;
+        enable = lib.mkDefault (!(osConfig.services.ollama.enable or false));
         acceleration = lib.mkDefault (
           if builtins.elem "nvidia" (osConfig.boot.initrd.kernelModules or [])
           then "cuda"
@@ -37,7 +42,7 @@
       # ReadWritePaths includes the models dir, which must exist before the
       # service's namespace setup runs.
       systemd.tmpfiles.rules = [
-        "d ${config.services.ollama.models} 0700 ${config.services.ollama.user} ${config.services.ollama.group} -"
+        "d ${config.services.ollama.modelsDir} 0700 ${config.services.ollama.user} ${config.services.ollama.group} -"
       ];
     };
   };
