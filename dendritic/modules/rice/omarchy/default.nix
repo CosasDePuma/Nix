@@ -80,10 +80,6 @@
               gaps_in = lib.mkDefault 6;
               gaps_out = lib.mkDefault 12;
               border_size = lib.mkDefault 2;
-              "col.active_border" = lib.mkDefault (
-                lib.generators.mkLuaInline ''{colors = {"rgba(7aa2f7ee)", "rgba(bb9af7ee)"}, angle = 45}''
-              );
-              "col.inactive_border" = lib.mkDefault "rgba(414868aa)";
               layout = lib.mkDefault "dwindle";
             };
 

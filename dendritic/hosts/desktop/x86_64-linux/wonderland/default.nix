@@ -28,6 +28,7 @@
         meta-terminal
         rice-omarchy
         software-windows
+        themes-osaka-jade
         # keep-sorted end
       ];
     };
