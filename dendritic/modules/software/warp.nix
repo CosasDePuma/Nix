@@ -83,18 +83,28 @@ in {
       environment.systemPackages = with pkgs; [warp-terminal];
 
       # Unlike on Darwin, Warp on Linux never stages an update locally --
-      # it only polls releases.warp.dev and shows the "new version" nag
+      # it only polls for a new version and shows the "new version" nag
       # straight off that response (confirmed via its own log: "Starting
       # autoupdate polling loop" / "Checking for update on channel stable").
       # There's no local write step to lock down, so block the check itself.
+      #
+      # releases.warp.dev alone isn't enough: it only serves the actual
+      # update *download*. The version-check response that drives the nag
+      # ("Received channel versions from Warp server") comes back over
+      # app.warp.dev, the main API server -- confirmed live, the nag kept
+      # firing with releases.warp.dev blocked. Blocking app.warp.dev too
+      # kills whatever else routes through it (auth/sync/AI features,
+      # anything not on the separate rtc./sessions. subdomains) -- accepted
+      # tradeoff to actually stop the nag, not an accident.
+      #
       # networking.hosts entries are multi-owner/additive (any module may
       # want to blackhole a different host under the same IP), so no
-      # mkDefault here. Needs both families: releases.warp.dev has AAAA
-      # records too, and NSS falls through to real DNS per-family when
-      # /etc/hosts only covers one of them.
+      # mkDefault here. Needs both families per host: AAAA records exist
+      # too, and NSS falls through to real DNS per-family when /etc/hosts
+      # only covers one of them.
       networking.hosts = {
-        "127.0.0.1" = ["releases.warp.dev"];
-        "::1" = ["releases.warp.dev"];
+        "127.0.0.1" = ["releases.warp.dev" "app.warp.dev"];
+        "::1" = ["releases.warp.dev" "app.warp.dev"];
       };
     };
   };
