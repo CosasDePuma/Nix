@@ -87,9 +87,15 @@ in {
       # straight off that response (confirmed via its own log: "Starting
       # autoupdate polling loop" / "Checking for update on channel stable").
       # There's no local write step to lock down, so block the check itself.
-      # networking.hosts."127.0.0.1" is multi-owner/additive (any module may
-      # want to blackhole a different host under it), so no mkDefault here.
-      networking.hosts."127.0.0.1" = ["releases.warp.dev"];
+      # networking.hosts entries are multi-owner/additive (any module may
+      # want to blackhole a different host under the same IP), so no
+      # mkDefault here. Needs both families: releases.warp.dev has AAAA
+      # records too, and NSS falls through to real DNS per-family when
+      # /etc/hosts only covers one of them.
+      networking.hosts = {
+        "127.0.0.1" = ["releases.warp.dev"];
+        "::1" = ["releases.warp.dev"];
+      };
     };
   };
 }
