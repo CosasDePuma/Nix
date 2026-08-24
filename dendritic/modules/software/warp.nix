@@ -16,12 +16,26 @@
     honor_ps1 = true
     input_box_type_setting = "classic"
 
+    [general]
+    show_changelog_after_update = false
+    snackbar_enabled = false
+
     [privacy]
     telemetry_enabled = false
     crash_reporting_enabled = false
 
+    [privacy.secret_redaction]
+    enabled = true
+    hide_secrets_in_block_list = true
+
     [warp_drive]
     enabled = false
+
+    [warpify.ssh]
+    enable_ssh_warpification = false
+
+    [agents]
+    cloud_conversation_storage_enabled = false
 
     [agents.warp_agent]
     is_any_ai_enabled = false
