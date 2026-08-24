@@ -23,6 +23,9 @@
     [warp_drive]
     enabled = false
 
+    [agents.warp_agent]
+    is_any_ai_enabled = false
+
     [agents.warp_agent.other]
     show_conversation_history = false
 
