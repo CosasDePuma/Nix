@@ -12,6 +12,7 @@
       service-ssh
       settings-locale
       settings-nix
+      software-brave
       software-homemanager
       software-networkmanager
       software-ssh
@@ -27,6 +28,7 @@
         meta-ai
         meta-terminal
         rice-omarchy
+        software-brave
         software-windowsvm
         themes-osakajade
         # keep-sorted end
