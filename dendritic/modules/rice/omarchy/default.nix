@@ -55,6 +55,7 @@
       };
     in {
       imports = [
+        inputs.self.homeManagerModules.fonts-jetbrains
         inputs.self.homeManagerModules.software-hyprland
         inputs.self.homeManagerModules.software-mako
         inputs.self.homeManagerModules.software-omarchy-shell
