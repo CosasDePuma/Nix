@@ -4,7 +4,9 @@
       # keep-sorted start
       boot-efi
       boot-loader-grub
+      cpu-amd
       disko-impermanence
+      gpu-nvidia
       hardware-defaults
       hardware-nvme
       meta-ai
