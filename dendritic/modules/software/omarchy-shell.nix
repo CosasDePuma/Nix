@@ -39,6 +39,12 @@ in {
         StartLimitBurst = 10;
       };
       Service = {
+        # systemd --user services don't inherit home.sessionVariables (those
+        # land in ~/.zshenv, read only by login shells), so OMARCHY_PATH has
+        # to be set here too -- both for this script's own "$OMARCHY_PATH"
+        # and because shell.qml itself reads it via Quickshell.env() in the
+        # spawned process.
+        Environment = ["OMARCHY_PATH=${vendor}"];
         ExecStart = "${omarchy-shell}/bin/omarchy-shell";
         Restart = "on-failure";
         RestartSec = "2s";
