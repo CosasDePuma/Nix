@@ -15,7 +15,7 @@
       software-homemanager
       software-networkmanager
       software-ssh
-      software-windows
+      software-windowsvm
       system-impermanence
       # keep-sorted end
     ];
@@ -27,8 +27,8 @@
         meta-ai
         meta-terminal
         rice-omarchy
-        software-windows
-        themes-osaka-jade
+        software-windowsvm
+        themes-osakajade
         # keep-sorted end
       ];
     };
