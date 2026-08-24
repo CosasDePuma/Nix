@@ -44,19 +44,47 @@ When a platform is not applicable (e.g. a NixOS-only service), simply omit it. M
 
 ### Categories
 
-| Directory   | Scope                                  | Platform        |
-|-------------|----------------------------------------|-----------------|
-| `boot/`     | Boot loaders, EFI, kernel params       | NixOS           |
-| `cpu/`      | CPU microcode, governors               | NixOS           |
-| `disko/`    | Disk partitioning layouts              | NixOS           |
-| `gpu/`      | GPU drivers                            | NixOS           |
-| `hardware/` | Kernel modules, hardware support       | NixOS           |
-| `network/`  | DNS, firewall, interfaces              | NixOS           |
-| `rice/`     | Desktop theming, full rice presets     | NixOS           |
-| `service/`  | System services (SSH, etc.)            | NixOS / Darwin  |
-| `settings/` | Global defaults (locale, nix, nixpkgs) | All platforms   |
-| `software/` | Packages and user-level tools          | All platforms   |
-| `system/`   | Composed system-level presets          | NixOS           |
+| Directory   | Scope                                       | Platform             |
+|-------------|----------------------------------------------|----------------------|
+| `boot/`     | Boot loaders, EFI, kernel params              | NixOS                |
+| `cpu/`      | CPU microcode, governors                      | NixOS                |
+| `disko/`    | Disk partitioning layouts                     | NixOS                |
+| `fonts/`    | Font packages                                 | All platforms        |
+| `gpu/`      | GPU drivers                                   | NixOS                |
+| `hardware/` | Kernel modules, hardware support              | NixOS                |
+| `meta/`     | Bundles that import a set of `software-*` modules together | All platforms |
+| `network/`  | DNS, firewall, interfaces                     | NixOS                |
+| `profile/`  | Personal identity: git signature, SSH keys, secrets (`age.secrets`) | Home Manager |
+| `rice/`     | Desktop structure/behaviour presets (keybinds, launchers, session) — theme-agnostic | NixOS / Home Manager |
+| `service/`  | System-level services (sshd hardening, etc.)  | NixOS / Darwin       |
+| `settings/` | Global defaults (locale, nix, nixpkgs)        | All platforms        |
+| `software/` | Packages and user-level tools                 | All platforms        |
+| `system/`   | Composed system-level presets                 | NixOS                |
+| `themes/`   | Per-theme palettes/wallpapers that self-configure whichever supported software is detected on the host | Home Manager |
+
+> **`service/` vs `software/` for the same program** (e.g. SSH): `service/` holds the
+> system-facing side — the daemon, its hardening, firewall exposure (`service-ssh` configures
+> and hardens `sshd`). `software/` holds the user-facing side — client config and CLI tooling
+> (`software-ssh` configures the SSH *client*: `~/.ssh/config`, agent, `sshpass`). If a program
+> has both a service and a client story, expect two modules, one per category, not one module
+> straddling both.
+
+> **`profile/` holds identity, not tooling.** Anything that only makes sense for one specific
+> person — a Git name/email, a private SSH key, an `age` secret — belongs in a `profile-*`
+> module, never inside a `software-*`/`meta-*` module. `software-*` modules must stay reusable
+> by any user on any host; if a module needs to reference "the" SSH identity for a host,
+> compose it by importing the right `profile-*` module instead of inlining the value.
+
+> **`themes/` self-detects, it is never imported by the software it themes.** A `themes-*`
+> module (e.g. `themes-osakajade`) is a standalone leaf: hosts import it directly, and it
+> reads `config` to decide what to theme — `lib.mkIf (config.wayland.windowManager.hyprland.enable
+> or false) { ... }` for Hyprland, and so on per supported program — instead of declaring
+> `imports = [software-hyprland]` and assuming that program is present. This is the same
+> "detect through config, never an unconditional import" rule from *No custom options; derive
+> from imports* below, applied to theming: a host without Hyprland gets no Hyprland config from
+> the theme, silently, rather than an eval error or a forced dependency. Assets a theme needs
+> (palette, wallpapers) are vendored alongside its `default.nix`, pinned to a specific upstream
+> version — never read from a live path outside the repo (e.g. a scratch clone under `/tmp`).
 
 ---
 
@@ -90,6 +118,19 @@ flake.darwinModules.software-foo = {
   homebrew.brews = ["foo"];
 };
 ```
+
+**This only applies to *additive* lists** — keys another module or a host may plausibly want to
+extend rather than replace wholesale (`home.packages`, `environment.systemPackages`,
+`homebrew.brews`, container `devices`/`ports`/`volumes`, shell integration `flags`/`options`).
+For those, `mkDefault` is wrong because a host adding an item at normal priority would wipe out
+the module's items instead of appending to them.
+
+It does **not** apply to *single-owner* lists — a list-valued option that only one module ever
+sets, where a host overriding it means "replace this wholesale," not "add to it": DNS
+`nameservers`/`search` (`network-dns`), disk `mountOptions`/`extraArgs` (`disko-*`), the sshd
+`ports` list (`service-ssh`). There, `lib.mkDefault` is correct and desired — it lets a host swap
+the whole list without `lib.mkForce`, exactly like a scalar. Judge each list on "could a second
+module reasonably want to add to this same key," not on whether it's syntactically a list.
 
 ### Cross-platform differences stay inside the module
 
