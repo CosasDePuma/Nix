@@ -56,6 +56,7 @@
     in {
       imports = [
         inputs.self.homeManagerModules.software-hyprland
+        inputs.self.homeManagerModules.software-mako
         inputs.self.homeManagerModules.software-quickshell
         inputs.self.homeManagerModules.settings-wayland
         inputs.self.homeManagerModules.software-warp
@@ -177,6 +178,28 @@
           wl-clipboard
         ]);
 
+      # services.mako only installs the package and writes the config; it
+      # starts nothing on its own, so notify-send has no D-Bus name to
+      # reach without this unit.
+      systemd.user.services.mako = {
+        Unit = {
+          Description = "Mako notification daemon";
+          PartOf = ["graphical-session.target"];
+          After = ["graphical-session.target"];
+          # uwsm imports WAYLAND_DISPLAY into the systemd user manager after
+          # activating the target, so the first start(s) can race it. Widen
+          # the burst window instead of failing permanently.
+          StartLimitIntervalSec = 60;
+          StartLimitBurst = 10;
+        };
+        Service = {
+          ExecStart = "${config.services.mako.package}/bin/mako";
+          Restart = "on-failure";
+          RestartSec = "2s";
+        };
+        Install.WantedBy = ["graphical-session.target"];
+      };
+
       # Clipboard history daemon feeding omarchy-menu-clipboard
       systemd.user.services.omarchy-cliphist = {
         Unit = {
@@ -199,6 +222,7 @@
     }: {
       imports = [
         inputs.self.nixosModules.software-hyprland
+        inputs.self.nixosModules.software-mako
         inputs.self.nixosModules.software-quickshell
         inputs.self.nixosModules.settings-wayland
         inputs.self.nixosModules.software-warp

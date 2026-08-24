@@ -2,12 +2,13 @@ _: let
   colors = builtins.fromTOML (builtins.readFile ./colors.toml);
   wallpaper = ./backgrounds/1-glowing-city.webp;
 in {
-  flake.homeManagerModules.themes-osaka-jade = {
+  flake.homeManagerModules.themes-osakajade = {
     config,
     lib,
     pkgs,
     ...
   }:
+    # --- hyprland
     lib.mkIf (config.wayland.windowManager.hyprland.enable or false) {
       wayland.windowManager.hyprland.settings.config.general = {
         "col.active_border" = lib.mkDefault (
@@ -16,14 +17,22 @@ in {
         "col.inactive_border" = lib.mkDefault "${colors.selection}aa";
       };
 
-      systemd.user.services.themes-osaka-jade-wallpaper = {
+      # --- mako
+      services.mako.settings = {
+        background-color = "${colors.dark_background}ee";
+        text-color = colors.foreground;
+        border-color = colors.accent;
+        border-size = 2;
+        border-radius = 10;
+        progress-color = "over ${colors.dark_foreground}";
+      };
+
+      # --- wallpaper
+      systemd.user.services.wallpaper = {
         Unit = {
-          Description = "Osaka Jade wallpaper";
+          Description = "Wallpaper";
           PartOf = ["graphical-session.target"];
           After = ["graphical-session.target"];
-          # uwsm imports WAYLAND_DISPLAY into the systemd user manager after
-          # activating the target, so the first start(s) can race it. Widen
-          # the burst window instead of failing permanently.
           StartLimitIntervalSec = 60;
           StartLimitBurst = 10;
         };
