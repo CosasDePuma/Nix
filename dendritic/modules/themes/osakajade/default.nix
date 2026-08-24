@@ -26,12 +26,12 @@ in {
       # like it belongs, even though upstream now renders these itself
       # through Quickshell instead of mako.
       services.mako.settings = {
-        background-color = "${hex colors.background}ff";
-        text-color = hex colors.foreground;
-        border-color = hex colors.accent;
+        background-color = "${colors.background}ff";
+        text-color = colors.foreground;
+        border-color = colors.accent;
         border-size = 2;
         border-radius = 10;
-        progress-color = "over ${hex colors.accent}";
+        progress-color = "over ${colors.accent}";
       };
 
       # --- fuzzel (SUPER + SPACE launcher, also used by the clipboard and
