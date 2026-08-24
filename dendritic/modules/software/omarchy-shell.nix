@@ -8,7 +8,11 @@ in {
   }: let
     omarchy-shell = pkgs.writeShellApplication {
       name = "omarchy-shell";
-      runtimeInputs = [pkgs.quickshell];
+      # inotify-tools/libxkbcommon are generic tools the shell shells out to
+      # (plugin hot-reload watching, keyboard layout listing) -- unlike the
+      # omarchy-* scripts, these aren't distro-specific, so there's no
+      # reason not to have them.
+      runtimeInputs = [pkgs.quickshell pkgs.inotify-tools pkgs.libxkbcommon];
       text = ''
         # Matches upstream's own launcher: the store path is read-only and
         # immutable, so there is nothing for Quickshell's file watcher to
