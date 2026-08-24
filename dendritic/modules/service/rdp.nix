@@ -49,6 +49,9 @@ _: {
         Type = "oneshot";
         RemainAfterExit = true;
       };
+      # grdctl --system shells out to pkexec internally even when the
+      # caller is already root; without this it's not on the unit's PATH.
+      path = [pkgs.polkit];
       script = ''
         ${pkgs.gnome-remote-desktop}/bin/grdctl --system rdp set-port 3390
         ${pkgs.gnome-remote-desktop}/bin/grdctl --system rdp set-credentials \
