@@ -8,7 +8,6 @@
       config,
       lib,
       pkgs,
-      osConfig ? {},
       ...
     }: {
       imports = [inputs.self.homeManagerModules.settings-wayland];
@@ -112,34 +111,30 @@
           };
         }
 
-        # Auto-launch the compositor session from a free VT. Through uwsm when
-        # the system module provides it (degrading to the direct launcher if
-        # uwsm fails), or straight to the launcher otherwise.
-        (lib.mkIf (config.programs.zsh.enable or false) (
-          if (osConfig.programs.uwsm.enable or false)
-          then {
-            programs.zsh.loginExtra = lib.mkDefault ''
-              if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" = 1 ]; then
-                ${pkgs.uwsm}/bin/uwsm start -D Hyprland || exec ${config.wayland.windowManager.hyprland.finalPackage}/bin/start-hyprland
-              fi
-            '';
-          }
-          else {
-            programs.zsh.loginExtra = lib.mkDefault ''
-              if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" = 1 ]; then
-                exec ${config.wayland.windowManager.hyprland.finalPackage}/bin/start-hyprland
-              fi
-            '';
-          }
-        ))
+        # Auto-launch the compositor session from a free VT, always through
+        # uwsm (degrading to the direct launcher if uwsm itself fails).
+        (lib.mkIf (config.programs.zsh.enable or false) {
+          programs.zsh.loginExtra = lib.mkDefault ''
+            if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" = 1 ]; then
+              ${pkgs.uwsm}/bin/uwsm start -D Hyprland || exec ${config.wayland.windowManager.hyprland.finalPackage}/bin/start-hyprland
+            fi
+          '';
+        })
       ];
     };
 
     nixosModules.software-hyprland = {pkgs, ...}: {
-      imports = [
-        inputs.self.nixosModules.settings-wayland
-        inputs.self.nixosModules.software-uwsm
-      ];
+      imports = [inputs.self.nixosModules.settings-wayland];
+
+      # Hyprland always launches through uwsm, never bare. The hyprland
+      # package ships both hyprland.desktop and hyprland-uwsm.desktop; drop
+      # the bare one so greeters only offer the uwsm-managed session. Other
+      # compositors' session entries are left untouched.
+      programs.uwsm.enable = lib.mkDefault true;
+      environment.extraSetup = ''
+        rm -f "$out"/share/wayland-sessions/hyprland.desktop
+      '';
+
       programs.hyprland = {
         enable = lib.mkDefault true;
         withUWSM = lib.mkDefault true;
