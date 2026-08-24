@@ -163,6 +163,39 @@ homeManagerModules.software-claude = { inputs, ... }: {
 };
 ```
 
+### Never hardcode usernames, home paths or machine-specific values
+
+Modules are shared across hosts and users. A literal like `/home/wizard/...`
+or `USERNAME = "wizard"` inside a module breaks every other host and leaks a
+personal value into reusable code. Derive user-specific values from the
+configuration instead — e.g. discover the primary interactive user through
+`config.users.users` and fall back to a generic state directory when none can
+be determined:
+
+```nix
+nixosModules.software-windows = {config, lib, ...}: let
+  normalUsers = lib.attrNames
+    (lib.filterAttrs (_: user: user.isNormalUser or false) config.users.users);
+  primaryUser = lib.head (normalUsers ++ [null]);
+  sharedDir =
+    if primaryUser == null then "/var/lib/windows"
+    else "/home/${primaryUser}/Windows";
+in {
+  # volumes = lib.mkDefault [ "${sharedDir}:/data" ];
+};
+```
+
+If a value truly cannot be derived, it is machine-specific: move it to the
+host file, where per-host values belong.
+
+### Reference executables by store path in generated config
+
+When a module generates scripts, keybinds or launchers that invoke external
+programs, interpolate the store path (`${pkgs.foo}/bin/foo`) instead of a bare
+name. The reference puts the binary in the closure, so the shortcut can never
+point at a missing program or at whichever version happens to be on `$PATH`.
+Pure dispatchers that run no external command need nothing.
+
 ---
 
 ## Host Files
