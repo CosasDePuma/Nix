@@ -1,9 +1,5 @@
 let
   pumita = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKh1YtKaItcNzC3RGez38zaJ0geelyrb6AFV73OqLchv pumita";
-  # System-level secrets (decrypted at NixOS activation, as root, before any
-  # user's home-manager identity exists) use the host's own SSH host key as
-  # the recipient instead of a personal key.
-  wonderland = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIYjbPn9PgJXtEpzkkBXiZV/TIShXl5Ny5Rb0oB7m6MP root@wonderland";
   #  homelab = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP9RzisL6wVQK3scDyEPEpFgrcdFYkW9LssnWlORGXof nixos";
   #
   #  vm-homelab = {
@@ -70,11 +66,4 @@ in {
   # --- work
   "dendritic/modules/profile/work/.ssh/config.d/work.age".publicKeys = [pumita];
   "dendritic/modules/profile/work/.ssh/keys/work.age".publicKeys = [pumita];
-
-  # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  # ┃                 Services                  ┃
-  # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-  # --- rdp (wonderland)
-  "dendritic/modules/service/rdp.age".publicKeys = [wonderland];
 }
