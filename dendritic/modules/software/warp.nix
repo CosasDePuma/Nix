@@ -41,6 +41,9 @@ in {
     homeManagerModules.software-warp = {
       pkgs,
       config,
+      # Shadows the outer file-level `lib` with home-manager's own extended
+      # one, which is what actually has `.hm` (needed for `lib.hm.dag.*`).
+      lib,
       ...
     }: let
       settingsPath =
@@ -55,6 +58,18 @@ in {
             text = lib.mkDefault warpSettings;
           };
         }
+        (lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
+          # Warp stages downloaded updates under this dir before offering to
+          # install them; making it immutable stops that write, which is
+          # also what suppresses the "a new version is available" nag (it
+          # never gets a staged update to point at). uchg is settable by a
+          # normal user on their own files, unlike Linux's chattr +i.
+          home.activation.disableWarpAutoupdate = lib.hm.dag.entryAfter ["writeBoundary"] ''
+            autoupdateDir="$HOME/Library/Application Support/dev.warp.Warp-Stable/autoupdate"
+            mkdir -p "$autoupdateDir"
+            /usr/bin/chflags -R uchg "$autoupdateDir" 2>/dev/null || true
+          '';
+        })
         (lib.mkIf (config.programs.opencode.enable or false) {
           programs.opencode.settings.plugin = ["@warp-dot-dev/opencode-warp"];
         })
@@ -66,6 +81,15 @@ in {
 
     nixosModules.software-warp = {pkgs, ...}: {
       environment.systemPackages = with pkgs; [warp-terminal];
+
+      # Unlike on Darwin, Warp on Linux never stages an update locally --
+      # it only polls releases.warp.dev and shows the "new version" nag
+      # straight off that response (confirmed via its own log: "Starting
+      # autoupdate polling loop" / "Checking for update on channel stable").
+      # There's no local write step to lock down, so block the check itself.
+      # networking.hosts."127.0.0.1" is multi-owner/additive (any module may
+      # want to blackhole a different host under it), so no mkDefault here.
+      networking.hosts."127.0.0.1" = ["releases.warp.dev"];
     };
   };
 }
