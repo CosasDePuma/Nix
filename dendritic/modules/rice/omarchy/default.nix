@@ -107,12 +107,82 @@
             };
           };
 
+          # bind is a list: this fully replaces software-hyprland's mkDefault
+          # one instead of merging with it (Hyprland fires every bind that
+          # matches a key, so a merge would double-fire duplicates like
+          # SUPER+RETURN). That means every generic binding a rice still
+          # wants has to be repeated here, not just the omarchy-specific
+          # ones.
           bind = [
+            # --- omarchy
             {_args = ["SUPER + RETURN" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${pkgs.warp-terminal}/bin/warp-terminal")'')];}
             {_args = ["SUPER + SPACE" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${omarchy-menu}/bin/omarchy-menu")'')];}
             {_args = ["SUPER + V" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${omarchy-menu-clipboard}/bin/omarchy-menu-clipboard")'')];}
             {_args = ["SUPER + COMMA" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${omarchy-theme-switcher}/bin/omarchy-theme-switcher")'')];}
             {_args = ["SUPER + ESCAPE" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${omarchy-system-lock}/bin/omarchy-system-lock")'')];}
+
+            # --- window management
+            {_args = ["SUPER + Q" (lib.generators.mkLuaInline "hl.dsp.window.close()")];}
+            {_args = ["SUPER + SHIFT + SPACE" (lib.generators.mkLuaInline ''hl.dsp.window.float({action = "toggle"})'')];}
+            {_args = ["SUPER + F" (lib.generators.mkLuaInline "hl.dsp.window.fullscreen()")];}
+
+            # --- focus, between windows
+            {_args = ["SUPER + LEFT" (lib.generators.mkLuaInline ''hl.dsp.focus({direction = "left"})'')];}
+            {_args = ["SUPER + RIGHT" (lib.generators.mkLuaInline ''hl.dsp.focus({direction = "right"})'')];}
+            {_args = ["SUPER + UP" (lib.generators.mkLuaInline ''hl.dsp.focus({direction = "up"})'')];}
+            {_args = ["SUPER + DOWN" (lib.generators.mkLuaInline ''hl.dsp.focus({direction = "down"})'')];}
+
+            # --- workspaces
+            {_args = ["SUPER + 1" (lib.generators.mkLuaInline ''hl.dsp.focus({workspace = "1"})'')];}
+            {_args = ["SUPER + SHIFT + 1" (lib.generators.mkLuaInline ''hl.dsp.window.move({workspace = "1", follow = true})'')];}
+            {_args = ["SUPER + 2" (lib.generators.mkLuaInline ''hl.dsp.focus({workspace = "2"})'')];}
+            {_args = ["SUPER + SHIFT + 2" (lib.generators.mkLuaInline ''hl.dsp.window.move({workspace = "2", follow = true})'')];}
+            {_args = ["SUPER + 3" (lib.generators.mkLuaInline ''hl.dsp.focus({workspace = "3"})'')];}
+            {_args = ["SUPER + SHIFT + 3" (lib.generators.mkLuaInline ''hl.dsp.window.move({workspace = "3", follow = true})'')];}
+            {_args = ["SUPER + 4" (lib.generators.mkLuaInline ''hl.dsp.focus({workspace = "4"})'')];}
+            {_args = ["SUPER + SHIFT + 4" (lib.generators.mkLuaInline ''hl.dsp.window.move({workspace = "4", follow = true})'')];}
+            {_args = ["SUPER + 5" (lib.generators.mkLuaInline ''hl.dsp.focus({workspace = "5"})'')];}
+            {_args = ["SUPER + SHIFT + 5" (lib.generators.mkLuaInline ''hl.dsp.window.move({workspace = "5", follow = true})'')];}
+            {_args = ["SUPER + 6" (lib.generators.mkLuaInline ''hl.dsp.focus({workspace = "6"})'')];}
+            {_args = ["SUPER + SHIFT + 6" (lib.generators.mkLuaInline ''hl.dsp.window.move({workspace = "6", follow = true})'')];}
+            {_args = ["SUPER + 7" (lib.generators.mkLuaInline ''hl.dsp.focus({workspace = "7"})'')];}
+            {_args = ["SUPER + SHIFT + 7" (lib.generators.mkLuaInline ''hl.dsp.window.move({workspace = "7", follow = true})'')];}
+            {_args = ["SUPER + 8" (lib.generators.mkLuaInline ''hl.dsp.focus({workspace = "8"})'')];}
+            {_args = ["SUPER + SHIFT + 8" (lib.generators.mkLuaInline ''hl.dsp.window.move({workspace = "8", follow = true})'')];}
+            {_args = ["SUPER + 9" (lib.generators.mkLuaInline ''hl.dsp.focus({workspace = "9"})'')];}
+            {_args = ["SUPER + SHIFT + 9" (lib.generators.mkLuaInline ''hl.dsp.window.move({workspace = "9", follow = true})'')];}
+            {_args = ["SUPER + 0" (lib.generators.mkLuaInline ''hl.dsp.focus({workspace = "10"})'')];}
+            {_args = ["SUPER + SHIFT + 0" (lib.generators.mkLuaInline ''hl.dsp.window.move({workspace = "10", follow = true})'')];}
+
+            # --- media keys
+            {_args = ["XF86AudioRaiseVolume" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${pkgs.wireplumber}/bin/wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+")'') {repeating = true;}];}
+            {_args = ["XF86AudioLowerVolume" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${pkgs.wireplumber}/bin/wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-")'') {repeating = true;}];}
+            {_args = ["XF86AudioMute" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${pkgs.wireplumber}/bin/wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle")'')];}
+            {_args = ["XF86AudioMicMute" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${pkgs.wireplumber}/bin/wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle")'')];}
+            {_args = ["XF86MonBrightnessUp" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${pkgs.brightnessctl}/bin/brightnessctl s 10%+")'') {repeating = true;}];}
+            {_args = ["XF86MonBrightnessDown" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${pkgs.brightnessctl}/bin/brightnessctl s 10%-")'') {repeating = true;}];}
+
+            # --- mouse
+            {
+              _args = [
+                "SUPER + mouse:272"
+                (lib.generators.mkLuaInline "hl.dsp.window.drag()")
+                {
+                  mouse = true;
+                  drag = true;
+                }
+              ];
+            }
+            {
+              _args = [
+                "SUPER + mouse:273"
+                (lib.generators.mkLuaInline "hl.dsp.window.resize()")
+                {
+                  mouse = true;
+                  drag = true;
+                }
+              ];
+            }
           ];
         };
       };

@@ -55,8 +55,14 @@
                 {_args = ["XDG_SESSION_DESKTOP" "Hyprland"];}
               ];
 
-              bind = [
-                {_args = ["SUPER + RETURN" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${pkgs.kitty}/bin/kitty")'')];}
+              # A full replacement, not an addition: bind is a list, so any
+              # rice that also sets it (normal priority, no mkDefault) fully
+              # overrides this one rather than merging with it -- Hyprland
+              # would otherwise fire every bind that matches a key, which is
+              # exactly what made SUPER+RETURN launch both kitty (this list)
+              # and a rice's own terminal at once. No default terminal here
+              # on purpose: picking one is a rice's job, not this module's.
+              bind = lib.mkDefault [
                 {_args = ["SUPER + Q" (lib.generators.mkLuaInline "hl.dsp.window.close()")];}
                 {_args = ["SUPER + SHIFT + SPACE" (lib.generators.mkLuaInline ''hl.dsp.window.float({action = "toggle"})'')];}
                 {_args = ["SUPER + F" (lib.generators.mkLuaInline "hl.dsp.window.fullscreen()")];}
