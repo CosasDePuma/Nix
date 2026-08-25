@@ -315,6 +315,7 @@
       ...
     }: {
       imports = [
+        inputs.self.nixosModules.hardware-bluetooth
         inputs.self.nixosModules.settings-gtk
         inputs.self.nixosModules.software-hyprland
         inputs.self.nixosModules.software-mako
@@ -340,7 +341,6 @@
         };
         upower.enable = lib.mkDefault true;
       };
-      hardware.bluetooth.enable = lib.mkDefault true;
 
       # System packages available globally
       environment.systemPackages = with pkgs; [
