@@ -56,6 +56,7 @@
     in {
       imports = [
         inputs.self.homeManagerModules.fonts-jetbrains
+        inputs.self.homeManagerModules.settings-gtk
         inputs.self.homeManagerModules.software-hyprland
         inputs.self.homeManagerModules.software-mako
         inputs.self.homeManagerModules.software-omarchy-shell
@@ -84,11 +85,9 @@
       # gtk-theme Adwaita-dark / icon-theme Yaru-blue / color-scheme
       # prefer-dark). colorScheme = "dark" is what actually makes Adwaita
       # render dark (the separate "Adwaita-dark" theme name upstream sets is
-      # a legacy GTK3 alias for the same thing); this also writes the
-      # equivalent dconf keys home-manager's gtk module derives from these
-      # options, needed for the desktop's D-Bus dark-mode setting.
+      # a legacy GTK3 alias for the same thing). settings-gtk owns turning
+      # the gtk module on in the first place; this just picks the theme.
       gtk = {
-        enable = lib.mkDefault true;
         theme.name = lib.mkDefault "Adwaita";
         colorScheme = lib.mkDefault "dark";
         iconTheme = {
@@ -316,6 +315,7 @@
       ...
     }: {
       imports = [
+        inputs.self.nixosModules.settings-gtk
         inputs.self.nixosModules.software-hyprland
         inputs.self.nixosModules.software-mako
         inputs.self.nixosModules.software-quickshell
@@ -341,10 +341,6 @@
         upower.enable = lib.mkDefault true;
       };
       hardware.bluetooth.enable = lib.mkDefault true;
-
-      # Backs home-manager's gtk.* -> dconf.settings writes above: without
-      # the system dconf D-Bus service, those writes are inert.
-      programs.dconf.enable = lib.mkDefault true;
 
       # System packages available globally
       environment.systemPackages = with pkgs; [
