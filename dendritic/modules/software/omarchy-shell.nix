@@ -14,20 +14,22 @@ in {
       name = "omarchy-shell";
       runtimeInputs = [pkgs.coreutils pkgs.quickshell];
       text = ''
-        QUIET=0
-        if [[ ''${1:-} == "-q" ]]; then
-          QUIET=1
-          shift
-        fi
+                QUIET=0
+                if [[ ''${1:-} == "-q" ]]; then
+                  QUIET=1
+                  shift
+                fi
 
-        fail() {
-          (( QUIET )) && exit 0
-          echo "$1" >&2
-          exit 1
-        }
+                fail() {
+                  (( QUIET )) && exit 0
+                  echo "$1" >&2
+                  exit 1
+                }
 
-        if (( $# == 0 )) || [[ $1 == "-h" || $1 == "--help" ]]; then
-          cat <<USAGE
+                if (( $# == 0 )) || [[ $1 == "-h" || $1 == "--help" ]]; then
+                  # The heredoc body and its terminator sit at column 0 on purpose:
+                  # bash requires an exact match, and nix keeps this indentation.
+                  cat <<USAGE
         Usage: omarchy-shell [-q] <target> <method> [args...]
 
         Forwards an IPC call to the running Omarchy shell. The shell is expected
@@ -37,58 +39,59 @@ in {
           -q  Quiet best-effort mode. Suppress output and return success even when
               the shell, target, method, or arguments are unavailable.
         USAGE
-          exit 0
-        fi
+                  exit 0
+                fi
 
-        (( $# >= 2 )) || fail "Usage: omarchy-shell <target> <method> [args...]"
-        # Default to the vendored app instead of requiring the variable:
-        # callers outside the session don't inherit home.sessionVariables,
-        # and an unset path would break every lookup below.
-        export OMARCHY_PATH="''${OMARCHY_PATH:-${vendor}}"
-        [[ -f $OMARCHY_PATH/shell/shell.qml ]] || fail "omarchy-shell config not found: $OMARCHY_PATH/shell/shell.qml"
+                (( $# >= 2 )) || fail "Usage: omarchy-shell <target> <method> [args...]"
+                # Default to the vendored app instead of requiring the variable:
+                # callers outside the session don't inherit home.sessionVariables,
+                # and an unset path would break every lookup below.
+                export OMARCHY_PATH="''${OMARCHY_PATH:-${vendor}}"
+                [[ -f $OMARCHY_PATH/shell/shell.qml ]] || fail "omarchy-shell config not found: $OMARCHY_PATH/shell/shell.qml"
 
-        # qs matches instances by display, and a caller from outside the
-        # session (ssh or TTY) has none, so recover it from the compositor
-        # socket.
-        if [[ -z ''${WAYLAND_DISPLAY:-} ]]; then
-          socket=$(ls -t "''${XDG_RUNTIME_DIR:-/run/user/$UID}"/wayland-[0-9]* 2>/dev/null | grep -v '\.lock$' | head -n1)
-          [[ -n $socket ]] && export WAYLAND_DISPLAY=''${socket##*/}
-        fi
+                # qs matches instances by display, and a caller from outside the
+                # session (ssh or TTY) has none, so recover it from the compositor
+                # socket.
+                if [[ -z ''${WAYLAND_DISPLAY:-} ]]; then
+                  # shellcheck disable=SC2010
+                  socket=$(ls -t "''${XDG_RUNTIME_DIR:-/run/user/$UID}"/wayland-[0-9]* 2>/dev/null | grep -v '\.lock$' | head -n1)
+                  [[ -n $socket ]] && export WAYLAND_DISPLAY=''${socket##*/}
+                fi
 
-        if [[ $1 == "shell" && ( $2 == "summon" || $2 == "toggle" ) ]] && (( $# == 3 )); then
-          set -- "$1" "$2" "$3" "{}"
-        fi
+                if [[ $1 == "shell" && ( $2 == "summon" || $2 == "toggle" ) ]] && (( $# == 3 )); then
+                  set -- "$1" "$2" "$3" "{}"
+                fi
 
-        # The -- keeps function names that shadow qs subcommands (e.g. show) as
-        # positionals. qs reports connection failures with a nonzero exit, but
-        # IPC-level failures (unknown target/function, bad arguments) go to
-        # stdout with exit 0.
-        ipc_timeout=''${OMARCHY_SHELL_IPC_TIMEOUT:-2s}
-        output=$(timeout --kill-after=1s "$ipc_timeout" qs ipc -n -p "$OMARCHY_PATH/shell" call -- "$@" 2>/dev/null)
-        ipc_status=$?
+                # The -- keeps function names that shadow qs subcommands (e.g. show) as
+                # positionals. qs reports connection failures with a nonzero exit, but
+                # IPC-level failures (unknown target/function, bad arguments) go to
+                # stdout with exit 0.
+                ipc_timeout=''${OMARCHY_SHELL_IPC_TIMEOUT:-2s}
+                output=$(timeout --kill-after=1s "$ipc_timeout" qs ipc -n -p "$OMARCHY_PATH/shell" call -- "$@" 2>/dev/null)
+                ipc_status=$?
 
-        if (( ipc_status == 124 || ipc_status == 137 )); then
-          fail "omarchy-shell is not responding"
-        elif (( ipc_status != 0 )); then
-          fail "omarchy-shell is not running"
-        fi
+                if (( ipc_status == 124 || ipc_status == 137 )); then
+                  fail "omarchy-shell is not responding"
+                elif (( ipc_status != 0 )); then
+                  fail "omarchy-shell is not running"
+                fi
 
-        case $output in
-          "Target not found." | "Function not found." | "Too few arguments provided"* | "Too many arguments provided"*)
-            fail "$output"
-            ;;
-          # A starting shell answers on stdout and exits 0, so a ping reads it
-          # as up and the next call's answer as a result. It is as unreachable
-          # as none.
-          "Not ready to accept queries yet"*)
-            fail "omarchy-shell is not ready"
-            ;;
-        esac
+                case $output in
+                  "Target not found." | "Function not found." | "Too few arguments provided"* | "Too many arguments provided"*)
+                    fail "$output"
+                    ;;
+                  # A starting shell answers on stdout and exits 0, so a ping reads it
+                  # as up and the next call's answer as a result. It is as unreachable
+                  # as none.
+                  "Not ready to accept queries yet"*)
+                    fail "omarchy-shell is not ready"
+                    ;;
+                esac
 
-        if (( !QUIET )) && [[ -n $output ]]; then
-          echo "$output"
-        fi
-        exit 0
+                if (( !QUIET )) && [[ -n $output ]]; then
+                  echo "$output"
+                fi
+                exit 0
       '';
     };
 
