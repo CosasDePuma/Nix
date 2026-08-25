@@ -9,20 +9,47 @@
       pkgs,
       ...
     }: let
+      # Thin wrappers over the vendored shell's plugin IPC surface, mirroring
+      # upstream bin/omarchy-menu and bin/omarchy-menu-clipboard. They call
+      # omarchy-shell by bare name because its wrapper derivation lives in
+      # software-omarchy-shell (imported below), which puts it on PATH; there
+      # is no pkgs attribute to interpolate a store path from.
       omarchy-menu = pkgs.writeShellApplication {
         name = "omarchy-menu";
-        runtimeInputs = [pkgs.fuzzel];
+        runtimeInputs = [pkgs.jq];
         text = ''
-          exec fuzzel --prompt "▶ "
+          verb="''${1:-toggle}"
+          route="''${2:-root}"
+
+          menu_payload() {
+            jq -nc --arg menu "$1" '{ menu: $menu }'
+          }
+
+          case "$verb" in
+            toggle)
+              exec omarchy-shell shell toggle omarchy.menu "$(menu_payload "$route")"
+              ;;
+            summon)
+              exec omarchy-shell shell summon omarchy.menu "$(menu_payload "$route")"
+              ;;
+            close)
+              exec omarchy-shell shell hide omarchy.menu
+              ;;
+            refresh | ping)
+              exec omarchy-shell shell call omarchy.menu "$verb" "{}"
+              ;;
+            *)
+              echo "Usage: omarchy-menu [toggle|summon|close|refresh|ping] [route]" >&2
+              exit 1
+              ;;
+          esac
         '';
       };
 
       omarchy-menu-clipboard = pkgs.writeShellApplication {
         name = "omarchy-menu-clipboard";
-        runtimeInputs = [pkgs.cliphist pkgs.fuzzel pkgs.wl-clipboard];
         text = ''
-          entry=$(cliphist list | fuzzel --dmenu --prompt "📋 ") || exit 0
-          printf '%s\n' "$entry" | cliphist decode | wl-copy
+          exec omarchy-shell shell toggle omarchy.clipboard
         '';
       };
 
@@ -76,9 +103,9 @@
         XDG_SESSION_DESKTOP = lib.mkDefault "Hyprland";
       };
 
-      # omarchy-menu et al. shell out to the bare fuzzel binary, but it still
-      # reads ~/.config/fuzzel/fuzzel.ini, so managing it here themes every
-      # launcher invocation for free.
+      # omarchy-theme-switcher shells out to the bare fuzzel binary, but it
+      # still reads ~/.config/fuzzel/fuzzel.ini, so managing it here themes
+      # every launcher invocation for free.
       programs.fuzzel.enable = lib.mkDefault true;
 
       # Mirrors omarchy's install/user/first-run/gnome-theme.sh (gsettings
@@ -293,27 +320,9 @@
         };
         Install.WantedBy = ["graphical-session.target"];
       };
-
-      # Clipboard history daemon feeding omarchy-menu-clipboard
-      systemd.user.services.omarchy-cliphist = {
-        Unit = {
-          Description = "Omarchy clipboard history";
-          PartOf = ["graphical-session.target"];
-          After = ["graphical-session.target"];
-        };
-        Service = {
-          ExecStart = "${pkgs.wl-clipboard}/bin/wl-paste --watch ${pkgs.cliphist}/bin/cliphist store";
-          Restart = "on-failure";
-        };
-        Install.WantedBy = ["graphical-session.target"];
-      };
     };
 
-    nixosModules.rice-omarchy = {
-      pkgs,
-      lib,
-      ...
-    }: {
+    nixosModules.rice-omarchy = {pkgs, ...}: {
       imports = [
         inputs.self.nixosModules.hardware-bluetooth
         inputs.self.nixosModules.service-greetd
