@@ -4,7 +4,7 @@
   ...
 }: {
   flake.homeManagerModules.profile-cosasdepuma = {config, ...}: {
-    imports = [inputs.agenix.homeManagerModules.default];
+    imports = [inputs.self.homeManagerModules.settings-agenix];
 
     programs.git.settings.user = {
       name = lib.mkDefault "Kike Fontán";
