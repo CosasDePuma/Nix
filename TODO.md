@@ -11,16 +11,18 @@ plugins oficiales (`menu`, `lock`, `notifications`, `osd`, `panels`,
 prioridad es **usar la shell en vez de re-implementarla** con
 fuzzel/hyprlock/swaybg.
 
-## 1. Menú real vía IPC Quickshell ── 🔄 En curso
+## 1. Menú real vía IPC Quickshell ── ✅ Completado
 
-- [ ] Reescribir `omarchy-menu` como thin-wrapper IPC al plugin
+- [x] Reescribir `omarchy-menu` como thin-wrapper IPC al plugin
   `omarchy.menu` (`omarchy-shell shell toggle omarchy.menu '<json>'`),
   espejo del `bin/omarchy-menu` upstream: verbos `toggle|summon|close|refresh`
   + rutas (`root`, `system`, `capture`, `theme`, `toggle`, `apps`...).
-- [ ] Reescribir `omarchy-menu-clipboard` como toggle del plugin
-  `omarchy.clipboard` (upstream: `SUPER+CTRL+V`).
-- [ ] Actualizar comentario sobre fuzzel (solo queda el theme-switcher
-  usándolo hasta resolver el punto 2).
+- [x] Reescribir `omarchy-menu-clipboard` como toggle del plugin
+  `omarchy.clipboard` (upstream: `SUPER+CTRL+V`; aquí sigue en `SUPER+V`).
+- [x] Eliminar el servicio `omarchy-cliphist`: el plugin clipboard trae sus
+  propios watchers `wl-paste --watch capture.sh`; actualizar comentario
+  sobre fuzzel (solo queda el theme-switcher usándolo hasta resolver el
+  punto 2).
 
 ## 2. Unificar el layout de estado de temas
 
