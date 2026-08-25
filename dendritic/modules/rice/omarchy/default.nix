@@ -317,6 +317,7 @@
       imports = [
         inputs.self.nixosModules.hardware-bluetooth
         inputs.self.nixosModules.service-greetd
+        inputs.self.nixosModules.service-hyprlock
         inputs.self.nixosModules.service-upower
         inputs.self.nixosModules.settings-gtk
         inputs.self.nixosModules.software-hyprland
@@ -330,9 +331,6 @@
         inputs.self.nixosModules.fonts-firacode
       ];
 
-      # System level services for Omarchy rice
-      security.pam.services.hyprlock = {};
-
       # System packages available globally
       environment.systemPackages = with pkgs; [
         brightnessctl
@@ -340,7 +338,6 @@
         grim
         gum
         hypridle
-        hyprlock
         hyprsunset
         jq
         libnotify
