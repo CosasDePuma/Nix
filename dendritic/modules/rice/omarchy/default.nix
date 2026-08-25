@@ -9,28 +9,106 @@
       pkgs,
       ...
     }: let
+      # Thin wrappers over the vendored shell's plugin IPC surface, mirroring
+      # upstream bin/omarchy-menu and bin/omarchy-menu-clipboard. They call
+      # omarchy-shell by bare name because its wrapper derivation lives in
+      # software-omarchy-shell (imported below), which puts it on PATH; there
+      # is no pkgs attribute to interpolate a store path from.
       omarchy-menu = pkgs.writeShellApplication {
         name = "omarchy-menu";
-        runtimeInputs = [pkgs.fuzzel];
+        runtimeInputs = [pkgs.jq];
         text = ''
-          exec fuzzel --prompt "▶ "
+          verb="''${1:-toggle}"
+          route="''${2:-root}"
+
+          menu_payload() {
+            jq -nc --arg menu "$1" '{ menu: $menu }'
+          }
+
+          case "$verb" in
+            toggle)
+              exec omarchy-shell shell toggle omarchy.menu "$(menu_payload "$route")"
+              ;;
+            summon)
+              exec omarchy-shell shell summon omarchy.menu "$(menu_payload "$route")"
+              ;;
+            close)
+              exec omarchy-shell shell hide omarchy.menu
+              ;;
+            refresh | ping)
+              exec omarchy-shell shell call omarchy.menu "$verb" "{}"
+              ;;
+            *)
+              echo "Usage: omarchy-menu [toggle|summon|close|refresh|ping] [route]" >&2
+              exit 1
+              ;;
+          esac
         '';
       };
 
       omarchy-menu-clipboard = pkgs.writeShellApplication {
         name = "omarchy-menu-clipboard";
-        runtimeInputs = [pkgs.cliphist pkgs.fuzzel pkgs.wl-clipboard];
         text = ''
-          entry=$(cliphist list | fuzzel --dmenu --prompt "📋 ") || exit 0
-          printf '%s\n' "$entry" | cliphist decode | wl-copy
+          exec omarchy-shell shell toggle omarchy.clipboard
         '';
       };
 
       omarchy-system-lock = pkgs.writeShellApplication {
         name = "omarchy-system-lock";
-        runtimeInputs = [pkgs.hyprlock];
+        # omarchy-shell resolves from PATH: its wrapper derivation lives in
+        # software-omarchy-shell (imported below), and hyprctl in the session
+        # environment provided by software-hyprland.
         text = ''
-          exec hyprlock
+          omarchy-shell lock lock >/dev/null
+          # Reset keyboard layout to the default one, best effort (upstream
+          # parity).
+          hyprctl switchxkblayout all 0 >/dev/null 2>&1 || true
+        '';
+      };
+
+      # Port of upstream bin/omarchy-audio-output-sink: the shell's audio
+      # panel polls it (every 15s) to resolve which physical sink really
+      # carries volume when a DSP sink fronts it. Needs pactl and awk.
+      omarchy-audio-output-sink = pkgs.writeShellApplication {
+        name = "omarchy-audio-output-sink";
+        runtimeInputs = [pkgs.pulseaudio pkgs.gawk];
+        text = ''
+          sink="''${1:-$(pactl get-default-sink 2>/dev/null)}"
+
+          if [[ -z $sink || $sink == alsa_output.* ]]; then
+            printf '%s\n' "$sink"
+            exit 0
+          fi
+
+          # A DSP sink feeds its physical output through a stream of its own;
+          # follow that stream down to the sink underneath.
+          downstream="$(pactl list sink-inputs 2>/dev/null |
+            awk -v virt="$sink" '
+              /^Sink Input #/ {target = ""}
+              /^[[:space:]]*Sink:/ {target = $2}
+              /node\.name = / {
+                name = $0
+                sub(/.*node\.name = "/, "", name)
+                sub(/"$/, "", name)
+                if (index(name, virt) == 1 && target != "") {print target; exit}
+              }
+              /application\.name = "EasyEffects"/ {
+                if (virt == "easyeffects_sink" && target != "") {print target; exit}
+              }')"
+
+          if [[ -n $downstream ]]; then
+            name="$(pactl list sinks short 2>/dev/null |
+              awk -v id="$downstream" '$1 == id {print $2; exit}')"
+            if [[ -n $name ]]; then
+              printf '%s\n' "$name"
+              exit 0
+            fi
+          fi
+
+          # Nothing resolvable downstream -- the DSP sink may simply be idle.
+          # Fall back to the sink itself so callers still have something to
+          # act on.
+          printf '%s\n' "$sink"
         '';
       };
 
@@ -76,9 +154,9 @@
         XDG_SESSION_DESKTOP = lib.mkDefault "Hyprland";
       };
 
-      # omarchy-menu et al. shell out to the bare fuzzel binary, but it still
-      # reads ~/.config/fuzzel/fuzzel.ini, so managing it here themes every
-      # launcher invocation for free.
+      # omarchy-theme-switcher shells out to the bare fuzzel binary, but it
+      # still reads ~/.config/fuzzel/fuzzel.ini, so managing it here themes
+      # every launcher invocation for free.
       programs.fuzzel.enable = lib.mkDefault true;
 
       # Mirrors omarchy's install/user/first-run/gnome-theme.sh (gsettings
@@ -248,6 +326,7 @@
       # Omarchy essential tools in user space
       home.packages =
         [
+          omarchy-audio-output-sink
           omarchy-menu
           omarchy-menu-clipboard
           omarchy-system-lock
@@ -258,8 +337,8 @@
           fzf
           grim
           gum
-          hypridle
-          hyprlock
+          # hyprsunset stays: the shell's nightlight plugin drives it via
+          # hyprctl hyprsunset temperature.
           hyprsunset
           imagemagick
           jq
@@ -293,31 +372,13 @@
         };
         Install.WantedBy = ["graphical-session.target"];
       };
-
-      # Clipboard history daemon feeding omarchy-menu-clipboard
-      systemd.user.services.omarchy-cliphist = {
-        Unit = {
-          Description = "Omarchy clipboard history";
-          PartOf = ["graphical-session.target"];
-          After = ["graphical-session.target"];
-        };
-        Service = {
-          ExecStart = "${pkgs.wl-clipboard}/bin/wl-paste --watch ${pkgs.cliphist}/bin/cliphist store";
-          Restart = "on-failure";
-        };
-        Install.WantedBy = ["graphical-session.target"];
-      };
     };
 
-    nixosModules.rice-omarchy = {
-      pkgs,
-      lib,
-      ...
-    }: {
+    nixosModules.rice-omarchy = {pkgs, ...}: {
       imports = [
         inputs.self.nixosModules.hardware-bluetooth
         inputs.self.nixosModules.service-greetd
-        inputs.self.nixosModules.service-hyprlock
+        inputs.self.nixosModules.service-omarchy-lock
         inputs.self.nixosModules.service-upower
         inputs.self.nixosModules.settings-gtk
         inputs.self.nixosModules.software-hyprland
@@ -337,7 +398,6 @@
         fzf
         grim
         gum
-        hypridle
         hyprsunset
         jq
         libnotify
