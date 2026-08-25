@@ -29,6 +29,7 @@
         # keep-sorted start
         meta-ai
         meta-terminal
+        profile-cosasdepuma
         rice-omarchy
         software-brave
         software-windowsvm
