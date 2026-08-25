@@ -80,6 +80,23 @@
       # launcher invocation for free.
       programs.fuzzel.enable = lib.mkDefault true;
 
+      # Mirrors omarchy's install/user/first-run/gnome-theme.sh (gsettings
+      # gtk-theme Adwaita-dark / icon-theme Yaru-blue / color-scheme
+      # prefer-dark). colorScheme = "dark" is what actually makes Adwaita
+      # render dark (the separate "Adwaita-dark" theme name upstream sets is
+      # a legacy GTK3 alias for the same thing); this also writes the
+      # equivalent dconf keys home-manager's gtk module derives from these
+      # options, needed for the desktop's D-Bus dark-mode setting.
+      gtk = {
+        enable = lib.mkDefault true;
+        theme.name = lib.mkDefault "Adwaita";
+        colorScheme = lib.mkDefault "dark";
+        iconTheme = {
+          name = lib.mkDefault "Yaru-blue";
+          package = lib.mkDefault pkgs.yaru-theme;
+        };
+      };
+
       # Hyprland custom configuration in Omarchy style
       wayland.windowManager.hyprland = {
         enable = lib.mkDefault true;
@@ -324,6 +341,10 @@
         upower.enable = lib.mkDefault true;
       };
       hardware.bluetooth.enable = lib.mkDefault true;
+
+      # Backs home-manager's gtk.* -> dconf.settings writes above: without
+      # the system dconf D-Bus service, those writes are inert.
+      programs.dconf.enable = lib.mkDefault true;
 
       # System packages available globally
       environment.systemPackages = with pkgs; [
