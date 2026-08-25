@@ -1,8 +1,4 @@
-{
-  inputs,
-  lib,
-  ...
-}: let
+{inputs, ...}: let
   warpSettings = ''
     [appearance.input]
     input_mode = "waterfall"
