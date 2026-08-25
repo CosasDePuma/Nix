@@ -54,8 +54,15 @@ fuzzel/hyprlock/swaybg.
 
 - [ ] `symlinkJoin "omarchy-cli"` con los scripts seleccionados de
   `/tmp/omarchy/bin` (~433), parcheando `$OMARCHY_PATH` → store.
+- [ ] Prioridad inmediata — los 8 que la shell invoca por
+  `$OMARCHY_PATH/bin/`: `omarchy-clipboard-open`,
+  `omarchy-clipboard-paste-file`, `omarchy-clipboard-paste-text`,
+  `omarchy-hyprland-focus-app`, `omarchy-menu-emoji-insert`,
+  `omarchy-notification-send`, `omarchy-reminder`,
+  `omarchy-remove-launcher-entry`. Sin ellos esas acciones del menú/barra
+  fallan.
 - [ ] Stub de los pacman/yay/AUR con aviso de flujo nixos-rebuild.
-- [ ] Orden de portado: `capture-*`, `audio-*`, `brightness-*`,
+- [ ] Orden de portado posterior: `capture-*`, `audio-*`, `brightness-*`,
   `theme-*`, `toggle*`, `system-*`. Cada tanda desbloquea sus binds.
 
 ## 5. Completar binds hacia `default/hypr/bindings/utilities.lua`
