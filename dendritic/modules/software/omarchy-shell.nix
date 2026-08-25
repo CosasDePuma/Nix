@@ -19,6 +19,11 @@ in {
         # usefully watch, and no in-place reload to warn about.
         export QS_DISABLE_FILE_WATCHER=1
         export QS_NO_RELOAD_POPUP=1
+        # Default to the vendored app instead of requiring the variable:
+        # callers outside the systemd unit (omarchy-menu, Hyprland exec_cmd,
+        # ssh) don't inherit home.sessionVariables, and with set -u an unset
+        # OMARCHY_PATH kills the wrapper before it can do anything.
+        export OMARCHY_PATH="''${OMARCHY_PATH:-${vendor}}"
         exec quickshell -n -p "$OMARCHY_PATH/shell"
       '';
     };
