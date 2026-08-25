@@ -32,15 +32,23 @@ fuzzel/hyprlock/swaybg.
 - [ ] Wallpaper gestionado por el estado de tema / plugin `background`
   en vez de `pkill swaybg`.
 
-## 3. Lock e idle nativos de la shell
+## 3. Lock e idle nativos de la shell ── ✅ Completado
 
-- [ ] Upstream ya no usa hypridle/hyprlock: quitar ambos de
-  `home.packages` y apuntar `omarchy-system-lock` a
-  `omarchy-shell lock lock`.
-- [ ] El idle de `shell.json` (150s screensaver / 300s lock) lo impone la
-  propia shell; verificar que ningún servicio huésped compita.
-- [ ] Conservar `service-hyprlock` (NixOS) solo como proveedor PAM para
-  la autenticación del lock screen.
+- [x] Quitar hypridle/hyprlock de `home.packages` (HM) y
+  `environment.systemPackages` (NixOS); `hyprsunset` se queda: el plugin
+  nightlight de la shell lo maneja vía `hyprctl hyprsunset temperature`.
+- [x] `omarchy-system-lock` → `omarchy-shell lock lock` + reset best-effort
+  de layout de teclado (`hyprctl switchxkblayout all 0`), espejo upstream.
+- [x] El idle lo impone la propia shell: `plugins/services/idle/Service.qml`
+  lee los tiempos de `shell.json` (150s screensaver / 300s lock).
+- [x] Nuevo `service-omarchy-lock`: registra los servicios PAM
+  `omarchy-lock-password` (siempre) y `omarchy-lock-fingerprint`
+  (condicionado a `services.fprintd.enable`) que exige
+  `plugins/lock/Service.qml`; sustituye a `service-hyprlock` como import
+  de `rice-omarchy`.
+- Nota: el salvapantallas upstream usa `omarchy-launch-screensaver` +
+  `ttfx`; sin él el idle sigue bloqueando a los 300s pero no dibuja el
+  efecto. Portarlo junto al punto 4 si interesa.
 
 ## 4. Suite CLI como derivación única (Fase 2 del PLAN.md)
 
@@ -80,3 +88,6 @@ fuzzel/hyprlock/swaybg.
   lista de `home.packages`; dejar en sistema solo lo útil en TTY.
 - [ ] Windows VM: ya existe (`software-windowsvm`); solo falta el
   lanzador/entrada de menú cuando el menú real esté (punto 1).
+- [ ] Investigar mako vs plugin `notifications` de la shell: si el plugin
+  reclama `org.freedesktop.Notifications`, mako sobra (y su unidad
+  systemd con él); hoy conviven y uno gana la carrera del nombre D-Bus.

@@ -55,9 +55,14 @@
 
       omarchy-system-lock = pkgs.writeShellApplication {
         name = "omarchy-system-lock";
-        runtimeInputs = [pkgs.hyprlock];
+        # omarchy-shell resolves from PATH: its wrapper derivation lives in
+        # software-omarchy-shell (imported below), and hyprctl in the session
+        # environment provided by software-hyprland.
         text = ''
-          exec hyprlock
+          omarchy-shell lock lock >/dev/null
+          # Reset keyboard layout to the default one, best effort (upstream
+          # parity).
+          hyprctl switchxkblayout all 0 >/dev/null 2>&1 || true
         '';
       };
 
@@ -285,8 +290,8 @@
           fzf
           grim
           gum
-          hypridle
-          hyprlock
+          # hyprsunset stays: the shell's nightlight plugin drives it via
+          # hyprctl hyprsunset temperature.
           hyprsunset
           imagemagick
           jq
@@ -326,7 +331,7 @@
       imports = [
         inputs.self.nixosModules.hardware-bluetooth
         inputs.self.nixosModules.service-greetd
-        inputs.self.nixosModules.service-hyprlock
+        inputs.self.nixosModules.service-omarchy-lock
         inputs.self.nixosModules.service-upower
         inputs.self.nixosModules.settings-gtk
         inputs.self.nixosModules.software-hyprland
@@ -346,7 +351,6 @@
         fzf
         grim
         gum
-        hypridle
         hyprsunset
         jq
         libnotify
