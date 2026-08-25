@@ -6,7 +6,7 @@
   }: let
     decode = value: lib.concatStrings (lib.reverseList (lib.stringToCharacters value));
   in {
-    imports = [inputs.self.homeManagerModules.settings-agenix];
+    imports = [inputs.agenix.homeManagerModules.default];
 
     age.secrets = {
       "ssh-keys-work" = {
