@@ -17,7 +17,6 @@ in {
   flake = {
     darwinModules.software-ssh = {pkgs, ...}: {
       environment.systemPackages = [pkgs.sshpass];
-      environment.etc."ssh/ssh_config.d/99-user-base.conf".text = sshClientConfig true;
     };
 
     homeManagerModules.software-ssh = {pkgs, ...}: {
@@ -27,7 +26,6 @@ in {
     };
 
     nixosModules.software-ssh = {pkgs, ...}: {
-      programs.ssh.extraConfig = sshClientConfig false;
       environment.systemPackages = [pkgs.sshpass];
     };
   };
