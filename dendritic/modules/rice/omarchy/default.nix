@@ -316,6 +316,7 @@
     }: {
       imports = [
         inputs.self.nixosModules.hardware-bluetooth
+        inputs.self.nixosModules.service-greetd
         inputs.self.nixosModules.settings-gtk
         inputs.self.nixosModules.software-hyprland
         inputs.self.nixosModules.software-mako
@@ -330,17 +331,7 @@
 
       # System level services for Omarchy rice
       security.pam.services.hyprlock = {};
-      services = {
-        # greetd + tuigreet: a terminal greeter holds no seat/DRM master, so
-        # Hyprland can take the GPU. GDM's Wayland greeter races the session
-        # for DRM ("Session never registered") and GNOME 50 no longer allows
-        # switching it to X11.
-        greetd = {
-          enable = lib.mkDefault true;
-          settings.default_session.command = "${pkgs.tuigreet}/bin/tuigreet --time --sessions /run/current-system/sw/share/wayland-sessions --remember";
-        };
-        upower.enable = lib.mkDefault true;
-      };
+      services.upower.enable = lib.mkDefault true;
 
       # System packages available globally
       environment.systemPackages = with pkgs; [
