@@ -317,6 +317,7 @@
       imports = [
         inputs.self.nixosModules.hardware-bluetooth
         inputs.self.nixosModules.service-greetd
+        inputs.self.nixosModules.service-upower
         inputs.self.nixosModules.settings-gtk
         inputs.self.nixosModules.software-hyprland
         inputs.self.nixosModules.software-mako
@@ -331,7 +332,6 @@
 
       # System level services for Omarchy rice
       security.pam.services.hyprlock = {};
-      services.upower.enable = lib.mkDefault true;
 
       # System packages available globally
       environment.systemPackages = with pkgs; [
