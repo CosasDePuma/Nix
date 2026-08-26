@@ -10,7 +10,10 @@
       pkgs,
       ...
     }: {
-      imports = [inputs.self.homeManagerModules.settings-wayland];
+      imports = [
+        inputs.self.homeManagerModules.settings-gtk
+        inputs.self.homeManagerModules.settings-wayland
+      ];
       config = lib.mkMerge [
         {
           wayland.windowManager.hyprland = {
@@ -130,7 +133,10 @@
     };
 
     nixosModules.software-hyprland = {pkgs, ...}: {
-      imports = [inputs.self.nixosModules.settings-wayland];
+      imports = [
+        inputs.self.nixosModules.settings-gtk
+        inputs.self.nixosModules.settings-wayland
+      ];
 
       # Hyprland always launches through uwsm, never bare. The hyprland
       # package ships both hyprland.desktop and hyprland-uwsm.desktop; drop

@@ -9,138 +9,20 @@
       pkgs,
       ...
     }: let
-      # Thin wrappers over the vendored shell's plugin IPC surface, mirroring
-      # upstream bin/omarchy-menu and bin/omarchy-menu-clipboard. They call
-      # omarchy-shell by bare name because its wrapper derivation lives in
-      # software-omarchy-shell (imported below), which puts it on PATH; there
-      # is no pkgs attribute to interpolate a store path from.
-      omarchy-menu = pkgs.writeShellApplication {
-        name = "omarchy-menu";
-        runtimeInputs = [pkgs.jq];
-        text = ''
-          verb="''${1:-toggle}"
-          route="''${2:-root}"
-
-          menu_payload() {
-            jq -nc --arg menu "$1" '{ menu: $menu }'
-          }
-
-          case "$verb" in
-            toggle)
-              exec omarchy-shell shell toggle omarchy.menu "$(menu_payload "$route")"
-              ;;
-            summon)
-              exec omarchy-shell shell summon omarchy.menu "$(menu_payload "$route")"
-              ;;
-            close)
-              exec omarchy-shell shell hide omarchy.menu
-              ;;
-            refresh | ping)
-              exec omarchy-shell shell call omarchy.menu "$verb" "{}"
-              ;;
-            *)
-              echo "Usage: omarchy-menu [toggle|summon|close|refresh|ping] [route]" >&2
-              exit 1
-              ;;
-          esac
-        '';
-      };
-
-      omarchy-menu-clipboard = pkgs.writeShellApplication {
-        name = "omarchy-menu-clipboard";
-        text = ''
-          exec omarchy-shell shell toggle omarchy.clipboard
-        '';
-      };
-
-      omarchy-system-lock = pkgs.writeShellApplication {
-        name = "omarchy-system-lock";
-        # omarchy-shell resolves from PATH: its wrapper derivation lives in
-        # software-omarchy-shell (imported below), and hyprctl in the session
-        # environment provided by software-hyprland.
-        text = ''
-          omarchy-shell lock lock >/dev/null
-          # Reset keyboard layout to the default one, best effort (upstream
-          # parity).
-          hyprctl switchxkblayout all 0 >/dev/null 2>&1 || true
-        '';
-      };
-
-      # Port of upstream bin/omarchy-audio-output-sink: the shell's audio
-      # panel polls it (every 15s) to resolve which physical sink really
-      # carries volume when a DSP sink fronts it. Needs pactl and awk.
-      omarchy-audio-output-sink = pkgs.writeShellApplication {
-        name = "omarchy-audio-output-sink";
-        runtimeInputs = [pkgs.pulseaudio pkgs.gawk];
-        text = ''
-          sink="''${1:-$(pactl get-default-sink 2>/dev/null)}"
-
-          if [[ -z $sink || $sink == alsa_output.* ]]; then
-            printf '%s\n' "$sink"
-            exit 0
-          fi
-
-          # A DSP sink feeds its physical output through a stream of its own;
-          # follow that stream down to the sink underneath.
-          downstream="$(pactl list sink-inputs 2>/dev/null |
-            awk -v virt="$sink" '
-              /^Sink Input #/ {target = ""}
-              /^[[:space:]]*Sink:/ {target = $2}
-              /node\.name = / {
-                name = $0
-                sub(/.*node\.name = "/, "", name)
-                sub(/"$/, "", name)
-                if (index(name, virt) == 1 && target != "") {print target; exit}
-              }
-              /application\.name = "EasyEffects"/ {
-                if (virt == "easyeffects_sink" && target != "") {print target; exit}
-              }')"
-
-          if [[ -n $downstream ]]; then
-            name="$(pactl list sinks short 2>/dev/null |
-              awk -v id="$downstream" '$1 == id {print $2; exit}')"
-            if [[ -n $name ]]; then
-              printf '%s\n' "$name"
-              exit 0
-            fi
-          fi
-
-          # Nothing resolvable downstream -- the DSP sink may simply be idle.
-          # Fall back to the sink itself so callers still have something to
-          # act on.
-          printf '%s\n' "$sink"
-        '';
-      };
-
-      omarchy-theme-switcher = pkgs.writeShellApplication {
-        name = "omarchy-theme-switcher";
-        runtimeInputs = [pkgs.coreutils pkgs.fuzzel pkgs.libnotify pkgs.procps pkgs.swaybg];
-        text = ''
-          theme_dir="$HOME/.config/omarchy/themes"
-          if [ ! -d "$theme_dir" ]; then
-            notify-send "Omarchy" "No themes installed yet"
-            exit 0
-          fi
-          theme=$(find "$theme_dir" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort | fuzzel --dmenu --prompt "🎨 ") || exit 0
-          wallpaper=$(find "$theme_dir/$theme" -type f \( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' \) | head -n 1)
-          if [ -n "$wallpaper" ]; then
-            pkill -x swaybg 2>/dev/null || true
-            nohup swaybg -i "$wallpaper" -m fill >/dev/null 2>&1 &
-          fi
-          printf '%s\n' "$theme" > "$HOME/.config/omarchy/current-theme"
-          notify-send "Omarchy" "Theme: $theme"
-        '';
-      };
+      omarchy-menu = import ./_scripts/omarchy-menu.nix {inherit pkgs;};
+      omarchy-menu-clipboard = import ./_scripts/omarchy-menu-clipboard.nix {inherit pkgs;};
+      omarchy-system-lock = import ./_scripts/omarchy-system-lock.nix {inherit pkgs;};
+      omarchy-audio-output-sink = import ./_scripts/omarchy-audio-output-sink.nix {inherit pkgs;};
+      theme-switcher = import ../../themes/_/theme-switcher.nix {inherit pkgs;};
     in {
       imports = [
         inputs.self.homeManagerModules.fonts-jetbrains
-        inputs.self.homeManagerModules.settings-gtk
+        inputs.self.homeManagerModules.settings-xdg
+        inputs.self.homeManagerModules.software-ghostty
         inputs.self.homeManagerModules.software-hyprland
         inputs.self.homeManagerModules.software-mako
         inputs.self.homeManagerModules.software-omarchy-shell
         inputs.self.homeManagerModules.software-quickshell
-        inputs.self.homeManagerModules.settings-wayland
-        inputs.self.homeManagerModules.software-warp
         inputs.self.homeManagerModules.software-starship
         inputs.self.homeManagerModules.software-swaybg
       ];
@@ -149,15 +31,15 @@
       # itself is owned by software-omarchy-shell (it points at the
       # vendored shell app, not this ~/.config/omarchy config dir).
       home.sessionVariables = {
-        TERMINAL = lib.mkDefault "warp-terminal";
+        TERMINAL = lib.mkDefault "${pkgs.ghostty}/bin/ghostty";
         XDG_CURRENT_DESKTOP = lib.mkDefault "Hyprland";
         XDG_SESSION_DESKTOP = lib.mkDefault "Hyprland";
       };
 
-      # omarchy-theme-switcher shells out to the bare fuzzel binary, but it
-      # still reads ~/.config/fuzzel/fuzzel.ini, so managing it here themes
-      # every launcher invocation for free.
-      programs.fuzzel.enable = lib.mkDefault true;
+      programs.fuzzel = {
+        enable = lib.mkDefault true;
+        settings.main.include = lib.mkDefault "${config.home.homeDirectory}/.local/state/theme/fuzzel.ini";
+      };
 
       # Mirrors omarchy's install/user/first-run/gnome-theme.sh (gsettings
       # gtk-theme Adwaita-dark / icon-theme Yaru-blue / color-scheme
@@ -174,9 +56,44 @@
         };
       };
 
+      programs.ghostty = {
+        enable = lib.mkDefault true;
+        settings = {
+          config-file = [
+            "?${config.home.homeDirectory}/.local/state/theme/ghostty.conf"
+          ];
+          font-family = "JetBrainsMono Nerd Font";
+          font-size = 9;
+          window-padding-x = 14;
+          window-padding-y = 14;
+          gtk-single-instance = false;
+          confirm-close-surface = lib.mkDefault false;
+          resize-overlay = lib.mkDefault "never";
+          gtk-toolbar-style = lib.mkDefault "flat";
+          cursor-style = lib.mkDefault "block";
+          cursor-style-blink = lib.mkDefault false;
+          shell-integration-features = lib.mkDefault "no-cursor,ssh-env";
+          mouse-scroll-multiplier = lib.mkDefault 0.95;
+          async-backend = lib.mkDefault "epoll";
+          keybind = [
+            "shift+insert=paste_from_clipboard"
+            "control+insert=copy_to_clipboard"
+            "shift+enter=csi:13;2u"
+            "alt+shift+enter=csi:13;4u"
+            "super+control+shift+alt+arrow_down=resize_split:down,100"
+            "super+control+shift+alt+arrow_up=resize_split:up,100"
+            "super+control+shift+alt+arrow_left=resize_split:left,100"
+            "super+control+shift+alt+arrow_right=resize_split:right,100"
+          ];
+        };
+      };
+
       # Hyprland custom configuration in Omarchy style
       wayland.windowManager.hyprland = {
         enable = lib.mkDefault true;
+        extraConfig = lib.mkDefault ''
+          pcall(dofile, os.getenv("HOME") .. "/.local/state/theme/hyprland.lua")
+        '';
         settings = {
           config = {
             general = {
@@ -209,11 +126,13 @@
           # ones.
           bind = [
             # --- omarchy
-            {_args = ["SUPER + RETURN" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${pkgs.warp-terminal}/bin/warp-terminal")'')];}
+            {_args = ["SUPER + RETURN" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${pkgs.ghostty}/bin/ghostty")'')];}
+            {_args = ["SUPER + SHIFT + RETURN" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${pkgs.ghostty}/bin/ghostty -e ${inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default}/bin/herdr")'')];}
             {_args = ["SUPER + SPACE" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${omarchy-menu}/bin/omarchy-menu")'')];}
             {_args = ["SUPER + V" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${omarchy-menu-clipboard}/bin/omarchy-menu-clipboard")'')];}
-            {_args = ["SUPER + COMMA" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${omarchy-theme-switcher}/bin/omarchy-theme-switcher")'')];}
+            {_args = ["SUPER + COMMA" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${theme-switcher}/bin/theme-switcher")'')];}
             {_args = ["SUPER + ESCAPE" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${omarchy-system-lock}/bin/omarchy-system-lock")'')];}
+            {_args = ["SUPER + B" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${lib.getExe pkgs.brave-origin}")'')];}
 
             # --- window management
             {_args = ["SUPER + Q" (lib.generators.mkLuaInline "hl.dsp.window.close()")];}
@@ -330,7 +249,7 @@
           omarchy-menu
           omarchy-menu-clipboard
           omarchy-system-lock
-          omarchy-theme-switcher
+          theme-switcher
         ]
         ++ (with pkgs; [
           brightnessctl
@@ -351,6 +270,9 @@
           wl-clipboard
         ]);
 
+      xdg.configFile."herdr/config.toml".source =
+        config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.local/state/theme/herdr.toml";
+
       # services.mako only installs the package and writes the config; it
       # starts nothing on its own, so notify-send has no D-Bus name to
       # reach without this unit.
@@ -366,7 +288,23 @@
           StartLimitBurst = 10;
         };
         Service = {
-          ExecStart = "${config.services.mako.package}/bin/mako";
+          ExecStart = "${config.services.mako.package}/bin/mako -c %h/.local/state/theme/mako.conf";
+          Restart = "on-failure";
+          RestartSec = "2s";
+        };
+        Install.WantedBy = ["graphical-session.target"];
+      };
+
+      systemd.user.services.wallpaper = {
+        Unit = {
+          Description = "Wallpaper";
+          PartOf = ["graphical-session.target"];
+          After = ["graphical-session.target"];
+          StartLimitIntervalSec = 60;
+          StartLimitBurst = 10;
+        };
+        Service = {
+          ExecStart = "${pkgs.swaybg}/bin/swaybg -i %h/.local/state/theme/wallpaper -m fill";
           Restart = "on-failure";
           RestartSec = "2s";
         };
@@ -376,20 +314,18 @@
 
     nixosModules.rice-omarchy = {pkgs, ...}: {
       imports = [
+        inputs.self.nixosModules.fonts-firacode
+        inputs.self.nixosModules.fonts-jetbrains
         inputs.self.nixosModules.hardware-bluetooth
         inputs.self.nixosModules.service-greetd
         inputs.self.nixosModules.service-omarchy-lock
         inputs.self.nixosModules.service-upower
-        inputs.self.nixosModules.settings-gtk
+        inputs.self.nixosModules.software-ghostty
         inputs.self.nixosModules.software-hyprland
         inputs.self.nixosModules.software-mako
         inputs.self.nixosModules.software-quickshell
-        inputs.self.nixosModules.settings-wayland
-        inputs.self.nixosModules.software-warp
         inputs.self.nixosModules.software-starship
         inputs.self.nixosModules.software-swaybg
-        inputs.self.nixosModules.fonts-jetbrains
-        inputs.self.nixosModules.fonts-firacode
       ];
 
       # System packages available globally

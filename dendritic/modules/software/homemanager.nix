@@ -11,7 +11,7 @@
           home-manager = {
             useGlobalPkgs = lib.mkDefault true;
             useUserPackages = lib.mkDefault true;
-            backupFileExtension = lib.mkDefault "bak";
+            backupFileExtension = lib.mkDefault "~";
           };
         }
         (lib.mkIf (config.system.primaryUser != null) {
@@ -25,7 +25,7 @@
       config.home-manager = {
         useGlobalPkgs = lib.mkDefault true;
         useUserPackages = lib.mkDefault true;
-        backupFileExtension = lib.mkDefault "bak";
+        backupFileExtension = lib.mkDefault "~";
       };
     };
   };

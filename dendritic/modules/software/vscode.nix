@@ -23,15 +23,6 @@
                 tamasfe.even-better-toml
               ]
               ++ lib.optional (config.programs.claude-code.enable or false) anthropic.claude-code;
-            userSettings = {
-              "terminal.integrated.fontFamily" = "'FiraCode Nerd Font Mono', monospace";
-              "explorer.fileNesting.enabled" = true;
-              "explorer.fileNesting.patterns" = {
-                "flake.nix" = "flake.lock";
-              };
-              "terminal.integrated.fontLigatures.enabled" = true;
-              "todo-tree.tree.hideTreeWhenEmpty" = true;
-            };
           }
           extras
         ];
@@ -42,11 +33,13 @@
           "default" = vsconfig {};
           "python" = vsconfig {
             extensions = with pkgs.vscode-extensions; [ms-python.python];
-            userSettings."explorer.fileNesting.patterns" = {
-              "pyproject.toml" = "poetry.lock,uv.lock";
-            };
           };
         };
+      };
+
+      config.home.file = lib.mkIf (config.programs.vscode.enable or false) {
+        ".config/Code/User/settings.json".source =
+          config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.local/state/theme/vscode.json";
       };
     };
 
