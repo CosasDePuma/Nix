@@ -110,18 +110,13 @@
     # tmux session -> herdr workspace, tmux window -> herdr tab, tmux pane -> herdr pane
 
     [theme]
+    # tmux ran on the terminal's own palette (bg=default, fg=default, ANSI blue accents)
     name = "terminal"
 
     [theme.custom]
-    sidebar_bg = "#111c18"
-    active_row_bg = "#23372B"
-    selection_bg = "#32473B"
+    # The active tab is drawn as panel_bg text on an accent background, so panel_bg
+    # has to be dark for it to read - same colors as status-left's "#[fg=black,bg=blue]"
     panel_bg = "black"
-    accent = "#509475"
-    green = "#549e6a"
-    blue = "#509475"
-    red = "#FF5345"
-    yellow = "#459451"
 
     [terminal]
     new_cwd = "follow"
@@ -180,7 +175,7 @@
     next_workspace = ["prefix+shift+n", "alt+down"]
 
     [ui]
-    accent = "#509475"
+    accent = "blue"
     pane_gaps = false
     pane_outer_borders = false
     pane_scrollbars = false
