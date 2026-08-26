@@ -58,9 +58,6 @@
         ".vscode"
         "Documents"
         "Downloads"
-        "Music"
-        "Pictures"
-        "Videos"
         # keep-sorted end
       ];
       files = [

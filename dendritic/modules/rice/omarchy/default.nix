@@ -17,13 +17,13 @@
     in {
       imports = [
         inputs.self.homeManagerModules.fonts-jetbrains
-        inputs.self.homeManagerModules.settings-gtk
+        inputs.self.homeManagerModules.settings-wayland
+        inputs.self.homeManagerModules.settings-xdg
+        inputs.self.homeManagerModules.software-ghostty
         inputs.self.homeManagerModules.software-hyprland
         inputs.self.homeManagerModules.software-mako
         inputs.self.homeManagerModules.software-omarchy-shell
         inputs.self.homeManagerModules.software-quickshell
-        inputs.self.homeManagerModules.settings-wayland
-        inputs.self.homeManagerModules.software-ghostty
         inputs.self.homeManagerModules.software-starship
         inputs.self.homeManagerModules.software-swaybg
       ];
@@ -319,7 +319,6 @@
         inputs.self.nixosModules.service-greetd
         inputs.self.nixosModules.service-omarchy-lock
         inputs.self.nixosModules.service-upower
-        inputs.self.nixosModules.settings-gtk
         inputs.self.nixosModules.software-hyprland
         inputs.self.nixosModules.software-mako
         inputs.self.nixosModules.software-quickshell
