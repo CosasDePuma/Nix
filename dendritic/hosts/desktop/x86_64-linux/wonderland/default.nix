@@ -45,16 +45,31 @@
 
     disko.devices.disk.main.device = "/dev/disk/by-id/nvme-eui.0025384b51424d22";
 
-    environment.persistence."/nix/persist".users.wizard.directories = [
-      "Downloads"
-      "Documents"
-      "Music"
-      "Pictures"
-      "Videos"
-      ".config"
-      ".local"
-      ".ssh"
-    ];
+    environment.persistence."/nix/persist".users.wizard = {
+      directories = [
+        # keep-sorted start
+        ".claude"
+        ".config"
+        ".copilot"
+        ".gemini"
+        ".local"
+        ".pi"
+        ".ssh"
+        ".vscode"
+        "Documents"
+        "Downloads"
+        "Music"
+        "Pictures"
+        "Videos"
+        # keep-sorted end
+      ];
+      files = [
+        # keep-sorted start
+        ".bash_history"
+        ".zsh_history"
+        # keep-sorted end
+      ];
+    };
 
     networking.hostName = "wonderland";
 
