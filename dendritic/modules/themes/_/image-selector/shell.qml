@@ -138,7 +138,7 @@ ShellRoot {
       id: card
       visible: root.opened && root.imagesLoaded && root.imageArray.length > 0
       width: Math.min(parent.width - 80, root.expandedWidth + 13 * (root.sliceWidth + root.sliceSpacing) + 40)
-      height: root.expandedHeight + 60
+      height: root.expandedHeight + 80
       anchors.centerIn: parent
 
       MouseArea { anchors.fill: parent; onClicked: {} }
@@ -146,8 +146,7 @@ ShellRoot {
       Item {
         id: carousel
         anchors.top: parent.top
-        anchors.topMargin: 30
-        anchors.bottom: parent.bottom
+        height: root.expandedHeight
         anchors.horizontalCenter: parent.horizontalCenter
         width: root.expandedWidth + 13 * (root.sliceWidth + root.sliceSpacing)
         clip: false
@@ -281,14 +280,14 @@ ShellRoot {
 
       Text {
         visible: root.imageArray.length > 0
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 10
+        anchors.top: carousel.bottom
+        anchors.topMargin: 28
         anchors.horizontalCenter: carousel.horizontalCenter
         text: root.imageArray[root.selectedIndex].themeName
         color: root.text
         style: Text.Outline
         styleColor: "#88000000"
-        font.pixelSize: 16
+        font.pixelSize: 18
         font.weight: Font.DemiBold
         horizontalAlignment: Text.AlignHCenter
         elide: Text.ElideRight
