@@ -96,7 +96,7 @@ _: {
 
           # Wait for the guest RDP server to complete boot/install and respond to handshake
           ready=""
-          for _ in $(seq 1 600); do
+          for _ in $(seq 1 1800); do
             if ! systemctl is-active --quiet docker-windows.service; then
               notify-send "Windows VM" "Windows service stopped unexpectedly"
               exit 1
