@@ -47,11 +47,19 @@ _: {
           "/dev/kvm:/dev/kvm"
           "/dev/net/tun:/dev/net/tun"
         ];
+        extraOptions = [
+          "--cap-add=NET_ADMIN"
+          "--stop-timeout=120"
+        ];
         ports = [
-          "127.0.0.1:3389:3389"
+          "127.0.0.1:3389:3389/tcp"
+          "127.0.0.1:3389:3389/udp"
           "127.0.0.1:8006:8006"
         ];
-        volumes = ["${sharedDir}:/data"];
+        volumes = [
+          "${sharedDir}:/storage"
+          "${sharedDir}/shared:/data"
+        ];
         environment = {
           RAM_SIZE = lib.mkDefault "8G";
           CPU_CORES = lib.mkDefault "4";
@@ -66,28 +74,49 @@ _: {
         name = "windows-vm";
         runtimeInputs = [pkgs.coreutils pkgs.freerdp pkgs.libnotify pkgs.systemd];
         text = ''
+          mkdir -p "$HOME/Windows/shared"
+
+          check_rdp() {
+            exec 3<>/dev/tcp/127.0.0.1/3389 2>/dev/null || return 1
+            printf '\x03\x00\x00\x13\x0e\xe0\x00\x00\x00\x00\x00\x01\x00\x08\x00\x03\x00\x00\x00' >&3 2>/dev/null || { exec 3>&-; return 1; }
+            local reply=""
+            if read -r -n 2 -t 2 reply <&3 2>/dev/null; then
+              exec 3>&-
+              return 0
+            fi
+            exec 3>&-
+            return 1
+          }
+
           if ! systemctl start docker-windows.service; then
             notify-send "Windows VM" "Failed to start Windows container"
             exit 1
           fi
 
-          # Wait for the RDP port; the first boot installs Windows itself and
-          # can be followed on http://localhost:8006
+          notify-send "Windows VM" "Starting Windows VM... (First boot may take a few minutes; view progress at http://localhost:8006)"
+
+          # Wait for the guest RDP server to complete boot/install and respond to handshake
           ready=""
           for _ in $(seq 1 600); do
-            if (exec 3<> /dev/tcp/127.0.0.1/3389) 2> /dev/null; then
-              exec 3>&-
+            if ! systemctl is-active --quiet docker-windows.service; then
+              notify-send "Windows VM" "Windows service stopped unexpectedly"
+              exit 1
+            fi
+
+            if check_rdp; then
               ready=1
               break
             fi
-            sleep 1
+            sleep 2
           done
+
           if [ -z "$ready" ]; then
             notify-send "Windows VM" "Windows did not expose RDP in time"
+            systemctl stop docker-windows.service
             exit 1
           fi
 
-          client=$(command -v sdl-freerdp || command -v wl-freerdp || command -v xfreerdp)
+          client=$(command -v sdl-freerdp || command -v wlfreerdp || command -v wl-freerdp || command -v xfreerdp)
           "$client" /v:127.0.0.1:3389 /cert:ignore /dynamic-resolution "$@"
           status=$?
 

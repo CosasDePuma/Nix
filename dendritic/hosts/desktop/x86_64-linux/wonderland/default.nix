@@ -57,6 +57,7 @@
         ".vscode"
         "Documents"
         "Downloads"
+        "Windows"
         # keep-sorted end
       ];
       files = [
