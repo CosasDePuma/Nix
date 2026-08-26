@@ -17,7 +17,6 @@
     in {
       imports = [
         inputs.self.homeManagerModules.fonts-jetbrains
-        inputs.self.homeManagerModules.settings-wayland
         inputs.self.homeManagerModules.settings-xdg
         inputs.self.homeManagerModules.software-ghostty
         inputs.self.homeManagerModules.software-hyprland
@@ -315,19 +314,18 @@
 
     nixosModules.rice-omarchy = {pkgs, ...}: {
       imports = [
+        inputs.self.nixosModules.fonts-firacode
+        inputs.self.nixosModules.fonts-jetbrains
         inputs.self.nixosModules.hardware-bluetooth
         inputs.self.nixosModules.service-greetd
         inputs.self.nixosModules.service-omarchy-lock
         inputs.self.nixosModules.service-upower
+        inputs.self.nixosModules.software-ghostty
         inputs.self.nixosModules.software-hyprland
         inputs.self.nixosModules.software-mako
         inputs.self.nixosModules.software-quickshell
-        inputs.self.nixosModules.settings-wayland
-        inputs.self.nixosModules.software-ghostty
         inputs.self.nixosModules.software-starship
         inputs.self.nixosModules.software-swaybg
-        inputs.self.nixosModules.fonts-jetbrains
-        inputs.self.nixosModules.fonts-firacode
       ];
 
       # System packages available globally

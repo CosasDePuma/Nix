@@ -19,7 +19,6 @@
       software-homemanager
       software-networkmanager
       software-spotify
-      software-ssh
       software-vscode
       software-windowsvm
       system-impermanence
