@@ -33,68 +33,170 @@
     then lib.strings.trim (builtins.readFile (builtins.dirOf (builtins.toString backgroundsDir) + "/ghostty-theme"))
     else "";
 
+  cleanHex = c: lib.strings.removePrefix "#" c;
+
   ghosttyConf =
-    if ghosttyThemeName != ""
-    then "theme = ${ghosttyThemeName}\n"
-    else "";
+    (
+      if ghosttyThemeName != ""
+      then "theme = ${ghosttyThemeName}\n"
+      else ""
+    )
+    + ''
+      background = #${cleanHex colors.background}
+      foreground = #${cleanHex colors.foreground}
+      cursor-color = #${cleanHex (colors.bright_foreground or colors.foreground)}
+      selection-background = #${cleanHex (colors.selection or colors.muted)}
+      selection-foreground = #${cleanHex (colors.bright_foreground or colors.foreground)}
+
+      palette = 0=#${cleanHex colors.background}
+      palette = 1=#${cleanHex (colors.red or colors.accent)}
+      palette = 2=#${cleanHex (colors.green or colors.accent)}
+      palette = 3=#${cleanHex (colors.yellow or colors.accent)}
+      palette = 4=#${cleanHex (colors.blue or colors.accent)}
+      palette = 5=#${cleanHex (colors.magenta or colors.accent)}
+      palette = 6=#${cleanHex (colors.cyan or colors.accent)}
+      palette = 7=#${cleanHex colors.foreground}
+      palette = 8=#${cleanHex (colors.muted or colors.foreground)}
+      palette = 9=#${cleanHex (colors.bright_red or colors.red or colors.accent)}
+      palette = 10=#${cleanHex (colors.bright_green or colors.green or colors.accent)}
+      palette = 11=#${cleanHex (colors.bright_yellow or colors.yellow or colors.accent)}
+      palette = 12=#${cleanHex (colors.bright_blue or colors.blue or colors.accent)}
+      palette = 13=#${cleanHex (colors.bright_magenta or colors.magenta or colors.accent)}
+      palette = 14=#${cleanHex (colors.bright_cyan or colors.cyan or colors.accent)}
+      palette = 15=#${cleanHex (colors.bright_foreground or colors.foreground)}
+    '';
 
   hyprlandConf = ''
     general {
-      col.active_border = rgba(${colors.accent}ee) rgba(${colors.dark_foreground or colors.foreground}ee) 45deg
-      col.inactive_border = rgba(${colors.selection or colors.muted}aa)
+      col.active_border = rgba(${cleanHex colors.accent}ee) rgba(${cleanHex (colors.dark_foreground or colors.foreground)}ee) 45deg
+      col.inactive_border = rgba(${cleanHex (colors.selection or colors.muted)}aa)
     }
   '';
 
   hyprlandLua = ''
     hl.config({
       general = {
-        ["col.active_border"] = { colors = { "#${colors.accent}ee", "#${colors.dark_foreground or colors.foreground}ee" }, angle = 45 },
-        ["col.inactive_border"] = "#${colors.selection or colors.muted}aa",
+        ["col.active_border"] = { colors = { "#${cleanHex colors.accent}ee", "#${cleanHex (colors.dark_foreground or colors.foreground)}ee" }, angle = 45 },
+        ["col.inactive_border"] = "#${cleanHex (colors.selection or colors.muted)}aa",
       }
     })
   '';
 
   fuzzelIni = ''
     [colors]
-    background=${colors.background}f2
-    text=${colors.foreground}ff
-    prompt=${colors.accent}ff
-    placeholder=${colors.muted}ff
-    input=${colors.foreground}ff
-    match=${colors.accent}ff
-    selection=${colors.foreground}14
-    selection-text=${colors.accent}ff
-    selection-match=${colors.bright_foreground or colors.foreground}ff
-    border=${colors.foreground}ff
+    background=${cleanHex colors.background}f2
+    text=${cleanHex colors.foreground}ff
+    prompt=${cleanHex colors.accent}ff
+    placeholder=${cleanHex colors.muted}ff
+    input=${cleanHex colors.foreground}ff
+    match=${cleanHex colors.accent}ff
+    selection=${cleanHex colors.foreground}14
+    selection-text=${cleanHex colors.accent}ff
+    selection-match=${cleanHex (colors.bright_foreground or colors.foreground)}ff
+    border=${cleanHex colors.foreground}ff
   '';
 
   makoConf = ''
-    background-color=#${colors.background}ff
-    text-color=#${colors.foreground}ff
-    border-color=#${colors.accent}ff
+    background-color=#${cleanHex colors.background}ff
+    text-color=#${cleanHex colors.foreground}ff
+    border-color=#${cleanHex colors.accent}ff
     border-size=2
     border-radius=10
-    progress-color=over #${colors.accent}ff
+    progress-color=over #${cleanHex colors.accent}ff
   '';
 
   herdrToml = ''
+    # Mirrors the Omarchy tmux config in config/tmux/tmux.conf
+    # tmux session -> herdr workspace, tmux window -> herdr tab, tmux pane -> herdr pane
+
+    [theme]
+    name = "terminal"
+
     [theme.custom]
-    sidebar_bg = "#${colors.background}"
-    active_row_bg = "#${colors.lighter_background or colors.background}"
-    selection_bg = "#${colors.selection or colors.muted}"
-    accent = "#${colors.accent}"
-    green = "#${colors.green or colors.accent}"
-    blue = "#${colors.blue or colors.accent}"
-    red = "#${colors.red or colors.accent}"
-    yellow = "#${colors.yellow or colors.accent}"
+    sidebar_bg = "#${cleanHex colors.background}"
+    active_row_bg = "#${cleanHex (colors.lighter_background or colors.background)}"
+    selection_bg = "#${cleanHex (colors.selection or colors.muted)}"
+    panel_bg = "black"
+    accent = "#${cleanHex colors.accent}"
+    green = "#${cleanHex (colors.green or colors.accent)}"
+    blue = "#${cleanHex (colors.blue or colors.accent)}"
+    red = "#${cleanHex (colors.red or colors.accent)}"
+    yellow = "#${cleanHex (colors.yellow or colors.accent)}"
+
+    [terminal]
+    new_cwd = "follow"
+
+    [keys]
+    prefix = "ctrl+space"
+
+    # Config and help
+    reload_config = "prefix+q"
+    help = "prefix+?"
+    detach = "prefix+d"
+
+    # Copy mode
+    copy_mode = "prefix+["
+
+    # Panes
+    split_horizontal = ["prefix+h", "alt+enter"]
+    split_vertical = ["prefix+v", "alt+shift+enter"]
+    close_pane = ["prefix+x", "alt+esc"]
+    zoom = "prefix+z"
+    last_pane = "prefix+;"
+
+    focus_pane_left = "ctrl+alt+left"
+    focus_pane_down = "ctrl+alt+down"
+    focus_pane_up = "ctrl+alt+up"
+    focus_pane_right = "ctrl+alt+right"
+
+    resize_mode = ["prefix+ctrl+left", "prefix+ctrl+down", "prefix+ctrl+up", "prefix+ctrl+right"]
+
+    # Like resize-pane on C-M-S-arrows
+    resize_pane_left = "ctrl+alt+shift+left"
+    resize_pane_down = "ctrl+alt+shift+down"
+    resize_pane_up = "ctrl+alt+shift+up"
+    resize_pane_right = "ctrl+alt+shift+right"
+
+    # No tmux equivalent; herdr's default prefix+shift+p is taken by previous session
+    rename_pane = "prefix+shift+o"
+
+    # Windows -> tabs
+    new_tab = "prefix+c"
+    rename_tab = "prefix+r"
+    close_tab = "prefix+k"
+    switch_tab = ["prefix+1..9", "alt+1..9"]
+    previous_tab = ["prefix+p", "alt+left"]
+    next_tab = ["prefix+n", "alt+right"]
+
+    # Like swap-window -t -1/+1 on M-S-Left/Right
+    move_tab_previous = "alt+shift+left"
+    move_tab_next = "alt+shift+right"
+
+    # Sessions -> workspaces
+    new_workspace = "prefix+shift+c"
+    rename_workspace = "prefix+shift+r"
+    close_workspace = "prefix+shift+k"
+    previous_workspace = ["prefix+shift+p", "alt+up"]
+    next_workspace = ["prefix+shift+n", "alt+down"]
+
+    [ui]
+    accent = "#${cleanHex colors.accent}"
+    pane_gaps = false
+    pane_outer_borders = false
+    pane_scrollbars = false
+    confirm_close = false
+    prompt_new_tab_name = false
+    mouse_capture = true
+    tab_bar_right = [{ type = "zoom" }, { type = "hostname" }]
+    window_title = "{hostname}: {workspace}"
   '';
 
   shellToml = ''
     [bar]
-    background       = "#${colors.background}"
+    background       = "#${cleanHex colors.background}"
     background-alpha = 1.0
-    text             = "#${colors.foreground}"
-    active           = "#${colors.red or colors.accent}"
+    text             = "#${cleanHex colors.foreground}"
+    active           = "#${cleanHex (colors.red or colors.accent)}"
     scale-with-font  = true
     size-horizontal  = 26
     size-vertical    = 28
@@ -202,7 +304,7 @@ in {
     }
     // extraFiles;
 
-  home.activation.initTheme = lib.hm.dag.entryAfter ["writeBoundary"] ''
+  home.activation."initTheme_${themeName}" = lib.hm.dag.entryAfter ["writeBoundary"] ''
     state_theme="$HOME/.local/state/theme"
     default_theme="$HOME/.local/share/themes/${themeName}"
     if [ ! -e "$state_theme/name" ] && [ -d "$default_theme" ]; then

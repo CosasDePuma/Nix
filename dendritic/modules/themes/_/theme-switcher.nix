@@ -120,6 +120,7 @@ pkgs.writeShellApplication {
         "${pkgs.hyprland}/bin/hyprctl" reload >/dev/null 2>&1 || true
         "${pkgs.mako}/bin/makoctl" reload >/dev/null 2>&1 || true
         "${pkgs.procps}/bin/pkill" -USR2 -f ghostty 2>/dev/null || true
+        herdr server reload-config >/dev/null 2>&1 || true
 
         wallpaper_file="$state_theme/wallpaper"
         if [ -f "$wallpaper_file" ]; then

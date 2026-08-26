@@ -39,6 +39,7 @@
         software-vscode
         software-windowsvm
         themes-everforest
+        themes-osakajade
         # keep-sorted end
       ];
     };

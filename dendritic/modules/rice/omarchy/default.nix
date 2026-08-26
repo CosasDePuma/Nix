@@ -271,6 +271,9 @@
           wl-clipboard
         ]);
 
+      xdg.configFile."herdr/config.toml".source =
+        config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.local/state/theme/herdr.toml";
+
       # services.mako only installs the package and writes the config; it
       # starts nothing on its own, so notify-send has no D-Bus name to
       # reach without this unit.
