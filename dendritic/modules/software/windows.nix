@@ -77,7 +77,7 @@ _: {
           mkdir -p "$HOME/Windows/shared"
 
           check_rdp() {
-            exec 3<>/dev/tcp/127.0.0.1/3389 2>/dev/null || return 1
+            { exec 3<>/dev/tcp/127.0.0.1/3389; } 2>/dev/null || return 1
             printf '\x03\x00\x00\x13\x0e\xe0\x00\x00\x00\x00\x00\x01\x00\x08\x00\x03\x00\x00\x00' >&3 2>/dev/null || { exec 3>&-; return 1; }
             if read -r -n 2 -t 2 <&3 2>/dev/null; then
               exec 3>&-
