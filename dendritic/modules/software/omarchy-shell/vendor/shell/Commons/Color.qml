@@ -14,7 +14,7 @@ QtObject {
 
   readonly property string home: Quickshell.env("HOME")
   readonly property string stateHome: home + "/.local/state"
-  readonly property string currentThemePath: stateHome + "/omarchy/current/theme"
+  readonly property string currentThemePath: stateHome + "/theme"
 
   property color foreground: "#cacccc"
   property color background: "#101315"

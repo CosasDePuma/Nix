@@ -10,6 +10,7 @@
       hardware-defaults
       hardware-nvme
       meta-ai
+      meta-terminal
       rice-omarchy
       service-ssh
       settings-locale
@@ -33,7 +34,7 @@
         rice-omarchy
         software-brave
         software-windowsvm
-        themes-osakajade
+        themes-everforest
         # keep-sorted end
       ];
     };
