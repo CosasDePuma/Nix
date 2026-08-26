@@ -18,7 +18,7 @@
       };
     };
 
-    nixosModules.software-zsh = {
+    nixosModules.software-zsh = {pkgs, ...}: {
       programs.zsh = {
         enable = lib.mkDefault true;
         enableCompletion = lib.mkDefault true;
@@ -30,6 +30,7 @@
           "--yolo" = lib.mkDefault "--dangerously-skip-permissions";
         };
       };
+      users.defaultUserShell = lib.mkForce pkgs.zsh;
     };
   };
 }
