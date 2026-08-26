@@ -97,7 +97,7 @@ pkgs.writeShellApplication {
       if [ -d "$target_theme" ]; then
         state_theme="$HOME/.local/state/theme"
         "${pkgs.coreutils}/bin/mkdir" -p "$state_theme"
-        "${pkgs.coreutils}/bin/ln" -sfn "$target_theme" "$state_theme/current"
+        "${pkgs.coreutils}/bin/rm" -f "$state_theme/current" 2>/dev/null || true
         "${pkgs.coreutils}/bin/ln" -sfn "$target_theme/colors.toml" "$state_theme/colors.toml"
         "${pkgs.coreutils}/bin/ln" -sfn "$target_theme/shell.toml" "$state_theme/shell.toml"
         "${pkgs.coreutils}/bin/ln" -sfn "$target_theme/ghostty.conf" "$state_theme/ghostty.conf"

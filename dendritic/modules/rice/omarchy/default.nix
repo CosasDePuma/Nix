@@ -63,10 +63,11 @@
           config-file = [
             "?${config.home.homeDirectory}/.local/state/theme/ghostty.conf"
           ];
-          font-family = lib.mkDefault "JetBrainsMono Nerd Font";
-          font-size = lib.mkDefault 9;
-          window-padding-x = lib.mkDefault 14;
-          window-padding-y = lib.mkDefault 14;
+          font-family = "JetBrainsMono Nerd Font";
+          font-size = 9;
+          window-padding-x = 14;
+          window-padding-y = 14;
+          gtk-single-instance = false;
           confirm-close-surface = lib.mkDefault false;
           resize-overlay = lib.mkDefault "never";
           gtk-toolbar-style = lib.mkDefault "flat";

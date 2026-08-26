@@ -205,9 +205,9 @@ in {
   home.activation.initTheme = lib.hm.dag.entryAfter ["writeBoundary"] ''
     state_theme="$HOME/.local/state/theme"
     default_theme="$HOME/.local/share/themes/${themeName}"
-    if [ ! -e "$state_theme/current" ] && [ -d "$default_theme" ]; then
+    if [ ! -e "$state_theme/name" ] && [ -d "$default_theme" ]; then
       mkdir -p "$state_theme"
-      ln -sfn "$default_theme" "$state_theme/current"
+      rm -f "$state_theme/current" 2>/dev/null || true
       ln -sfn "$default_theme/colors.toml" "$state_theme/colors.toml"
       ln -sfn "$default_theme/shell.toml" "$state_theme/shell.toml"
       ln -sfn "$default_theme/ghostty.conf" "$state_theme/ghostty.conf"
