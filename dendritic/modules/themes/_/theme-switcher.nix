@@ -109,17 +109,12 @@ pkgs.writeShellApplication {
         "${pkgs.coreutils}/bin/ln" -sfn "$target_theme/wallpaper" "$state_theme/wallpaper"
         "${pkgs.coreutils}/bin/printf" '%s\n' "$theme_name" > "$state_theme/name"
 
-        if "${pkgs.procps}/bin/pgrep" -x hyprland >/dev/null 2>&1; then
-          "${pkgs.hyprland}/bin/hyprctl" reload >/dev/null 2>&1 || true
-        fi
-
-        if "${pkgs.procps}/bin/pgrep" -x mako >/dev/null 2>&1; then
-          "${pkgs.mako}/bin/makoctl" reload >/dev/null 2>&1 || true
-        fi
+        "${pkgs.hyprland}/bin/hyprctl" reload >/dev/null 2>&1 || true
+        "${pkgs.mako}/bin/makoctl" reload >/dev/null 2>&1 || true
 
         wallpaper_file="$state_theme/wallpaper"
         if [ -f "$wallpaper_file" ]; then
-          "${pkgs.procps}/bin/pkill" -x swaybg 2>/dev/null || true
+          "${pkgs.procps}/bin/pkill" -i -f swaybg 2>/dev/null || true
           "${pkgs.swaybg}/bin/swaybg" -i "$wallpaper_file" -m fill >/dev/null 2>&1 &
         fi
 
