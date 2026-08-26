@@ -42,16 +42,24 @@ pkgs.writeShellApplication {
     for theme in "''${themes[@]}"; do
       theme_path="$themes_dir/$theme"
       wallpapers_dir="$theme_path/wallpapers"
-      image=$("${pkgs.findutils}/bin/find" -L "$wallpapers_dir" -maxdepth 1 -type f \( -iname "*.webp" -o -iname "*.png" -o -iname "*.jpg" -o -iname "*.jpeg" \) | "${pkgs.coreutils}/bin/sort" | "${pkgs.coreutils}/bin/head" -n1)
+
+      if [ -e "$theme_path/wallpaper" ]; then
+        image="$theme_path/wallpaper"
+      else
+        image=$("${pkgs.findutils}/bin/find" -L "$wallpapers_dir" -maxdepth 1 -type f \( -iname "*.webp" -o -iname "*.png" -o -iname "*.jpg" -o -iname "*.jpeg" \) | "${pkgs.coreutils}/bin/sort" | "${pkgs.coreutils}/bin/head" -n1)
+      fi
 
       [ -n "$image" ] || continue
 
-      thumbnail="$cache_dir/$theme.thumb.jpg"
-      if [ ! -f "$thumbnail" ]; then
-        "${pkgs.vips}/bin/vipsthumbnail" "$image" --size 1536x864 --smartcrop=centre --path "$thumbnail" 2>/dev/null || thumbnail="$image"
+      image_real=$("${pkgs.coreutils}/bin/readlink" -f "$image")
+      thumb_hash=$(printf '%s' "$image_real" | "${pkgs.coreutils}/bin/md5sum" | "${pkgs.coreutils}/bin/cut" -d' ' -f1)
+      thumbnail="$cache_dir/$theme-$thumb_hash.thumb.jpg"
+
+      if [ ! -f "$thumbnail" ] || [ "$image_real" -nt "$thumbnail" ]; then
+        "${pkgs.vips}/bin/vipsthumbnail" "$image_real" --size 1536x864 --smartcrop=centre --path "$thumbnail" 2>/dev/null || thumbnail="$image_real"
       fi
 
-      "${pkgs.coreutils}/bin/printf" '%s\t%s\t%s\n' "$image" "$thumbnail" "$theme" >> "$rows_file"
+      "${pkgs.coreutils}/bin/printf" '%s\t%s\t%s\n' "$image_real" "$thumbnail" "$theme" >> "$rows_file"
     done
 
     if [ ! -s "$rows_file" ]; then
