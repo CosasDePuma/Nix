@@ -1,4 +1,8 @@
-{inputs, ...}: {
+{
+  inputs,
+  lib,
+  ...
+}: {
   flake = {
     darwinModules.software-herdr = {
       homebrew.brews = ["herdr"];
@@ -8,6 +12,10 @@
       home.packages = [
         inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default
       ];
+
+      xdg.configFile."herdr/config.toml".text = lib.mkDefault ''
+        onboarding = false
+      '';
     };
 
     nixosModules.software-herdr = {pkgs, ...}: {

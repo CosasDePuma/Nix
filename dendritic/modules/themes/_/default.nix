@@ -126,6 +126,8 @@
   '';
 
   herdrToml = ''
+    onboarding = false
+
     # Mirrors the Omarchy tmux config in config/tmux/tmux.conf
     # tmux session -> herdr workspace, tmux window -> herdr tab, tmux pane -> herdr pane
 
