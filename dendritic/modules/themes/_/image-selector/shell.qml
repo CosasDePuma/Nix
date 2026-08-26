@@ -128,12 +128,6 @@ ShellRoot {
     WlrLayershell.keyboardFocus: root.opened ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
     exclusionMode: ExclusionMode.Ignore
 
-    Rectangle {
-      anchors.fill: parent
-      visible: root.opened
-      color: root.bg
-    }
-
     MouseArea {
       anchors.fill: parent
       enabled: root.opened
