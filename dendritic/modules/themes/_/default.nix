@@ -5,6 +5,8 @@
   ghosttyTheme ? null,
   vscodeExtension ? null,
   vscodeTheme ? null,
+  gtkTheme ? null,
+  cursorTheme ? null,
   extraFiles ? {},
 }: {
   config ? {},
@@ -40,6 +42,16 @@
     if builtins.isFunction vscodeExtension
     then vscodeExtension pkgs
     else vscodeExtension;
+
+  resolvedGtkTheme =
+    if builtins.isFunction gtkTheme
+    then gtkTheme pkgs
+    else gtkTheme;
+
+  resolvedCursorTheme =
+    if builtins.isFunction cursorTheme
+    then cursorTheme pkgs
+    else cursorTheme;
 
   cleanHex = c: lib.strings.removePrefix "#" c;
 
@@ -334,6 +346,23 @@ in {
         extensions = [resolvedVscodeExtension];
       };
     };
+  };
+
+  gtk = lib.mkIf ((config.gtk.enable or false) && resolvedGtkTheme != null) {
+    theme = {
+      inherit (resolvedGtkTheme) package;
+      inherit (resolvedGtkTheme) name;
+    };
+  };
+
+  home.pointerCursor = lib.mkIf (resolvedCursorTheme != null) {
+    enable = true;
+    inherit (resolvedCursorTheme) package;
+    inherit (resolvedCursorTheme) name;
+    size = resolvedCursorTheme.size or 24;
+    gtk.enable = true;
+    hyprcursor.enable = true;
+    x11.enable = true;
   };
 
   home.activation."initTheme_${themeName}" = lib.hm.dag.entryAfter ["writeBoundary"] ''

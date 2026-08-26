@@ -13,5 +13,14 @@ in {
         version = "2.0.0";
         sha256 = "0s6vy9ryfwnpi88rvgxmrwsynhw3zwwks8h404bhn55xwz610378";
       };
+    gtkTheme = pkgs: {
+      package = pkgs.everforest-gtk-theme;
+      name = "Everforest-Dark";
+    };
+    cursorTheme = pkgs: {
+      package = pkgs.everforest-cursors;
+      name = "everforest-cursors";
+      size = 24;
+    };
   };
 }
