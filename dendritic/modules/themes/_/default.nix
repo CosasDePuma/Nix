@@ -113,15 +113,15 @@
     name = "terminal"
 
     [theme.custom]
-    sidebar_bg = "#${cleanHex colors.background}"
-    active_row_bg = "#${cleanHex (colors.lighter_background or colors.background)}"
-    selection_bg = "#${cleanHex (colors.selection or colors.muted)}"
+    sidebar_bg = "#111c18"
+    active_row_bg = "#23372B"
+    selection_bg = "#32473B"
     panel_bg = "black"
-    accent = "#${cleanHex colors.accent}"
-    green = "#${cleanHex (colors.green or colors.accent)}"
-    blue = "#${cleanHex (colors.blue or colors.accent)}"
-    red = "#${cleanHex (colors.red or colors.accent)}"
-    yellow = "#${cleanHex (colors.yellow or colors.accent)}"
+    accent = "#509475"
+    green = "#549e6a"
+    blue = "#509475"
+    red = "#FF5345"
+    yellow = "#459451"
 
     [terminal]
     new_cwd = "follow"
@@ -180,7 +180,7 @@
     next_workspace = ["prefix+shift+n", "alt+down"]
 
     [ui]
-    accent = "#${cleanHex colors.accent}"
+    accent = "#509475"
     pane_gaps = false
     pane_outer_borders = false
     pane_scrollbars = false
