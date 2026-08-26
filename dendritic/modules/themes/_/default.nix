@@ -289,6 +289,23 @@
     selected-border           = "hyprland.active-border-foreground"
     selected-border-alpha     = 0.25
   '';
+
+  vscodeSettings =
+    {
+      "terminal.integrated.fontFamily" = "'FiraCode Nerd Font Mono', monospace";
+      "explorer.fileNesting.enabled" = true;
+      "explorer.fileNesting.patterns" = {
+        "flake.nix" = "flake.lock";
+        "pyproject.toml" = "poetry.lock,uv.lock";
+      };
+      "terminal.integrated.fontLigatures.enabled" = true;
+      "todo-tree.tree.hideTreeWhenEmpty" = true;
+    }
+    // lib.optionalAttrs (vscodeTheme != null) {
+      "workbench.colorTheme" = vscodeTheme;
+    };
+
+  vscodeJson = builtins.toJSON vscodeSettings;
 in {
   home.packages = [theme-switcher];
 
@@ -304,22 +321,17 @@ in {
       "${themeShareDir}/mako.conf".text = makoConf;
       "${themeShareDir}/herdr.toml".text = herdrToml;
       "${themeShareDir}/shell.toml".text = shellToml;
+      "${themeShareDir}/vscode.json".text = vscodeJson;
     }
     // extraFiles;
 
-  programs.vscode = lib.mkIf ((config.programs.vscode.enable or false) && (vscodeTheme != null || resolvedVscodeExtension != null)) {
+  programs.vscode = lib.mkIf ((config.programs.vscode.enable or false) && resolvedVscodeExtension != null) {
     profiles = {
       default = {
-        extensions = lib.optional (resolvedVscodeExtension != null) resolvedVscodeExtension;
-        userSettings = lib.optionalAttrs (vscodeTheme != null) {
-          "workbench.colorTheme" = vscodeTheme;
-        };
+        extensions = [resolvedVscodeExtension];
       };
       python = {
-        extensions = lib.optional (resolvedVscodeExtension != null) resolvedVscodeExtension;
-        userSettings = lib.optionalAttrs (vscodeTheme != null) {
-          "workbench.colorTheme" = vscodeTheme;
-        };
+        extensions = [resolvedVscodeExtension];
       };
     };
   };
@@ -339,6 +351,7 @@ in {
       ln -sfn "$default_theme/mako.conf" "$state_theme/mako.conf"
       ln -sfn "$default_theme/herdr.toml" "$state_theme/herdr.toml"
       ln -sfn "$default_theme/wallpaper" "$state_theme/wallpaper"
+      ln -sfn "$default_theme/vscode.json" "$state_theme/vscode.json"
       printf '%s\n' "${themeName}" > "$state_theme/name"
     fi
   '';

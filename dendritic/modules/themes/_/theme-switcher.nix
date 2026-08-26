@@ -115,6 +115,7 @@ pkgs.writeShellApplication {
         "${pkgs.coreutils}/bin/ln" -sfn "$target_theme/mako.conf" "$state_theme/mako.conf"
         "${pkgs.coreutils}/bin/ln" -sfn "$target_theme/herdr.toml" "$state_theme/herdr.toml"
         "${pkgs.coreutils}/bin/ln" -sfn "$target_theme/wallpaper" "$state_theme/wallpaper"
+        "${pkgs.coreutils}/bin/ln" -sfn "$target_theme/vscode.json" "$state_theme/vscode.json"
         "${pkgs.coreutils}/bin/printf" '%s\n' "$theme_name" > "$state_theme/name"
 
         "${pkgs.hyprland}/bin/hyprctl" reload >/dev/null 2>&1 || true
