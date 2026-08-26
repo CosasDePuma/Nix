@@ -127,7 +127,7 @@
           bind = [
             # --- omarchy
             {_args = ["SUPER + RETURN" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${pkgs.ghostty}/bin/ghostty")'')];}
-            {_args = ["SUPER + SHIFT + RETURN" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("$TERMINAL -e ${inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default}/bin/herdr")'')];}
+            {_args = ["SUPER + SHIFT + RETURN" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${pkgs.ghostty}/bin/ghostty -e ${inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default}/bin/herdr")'')];}
             {_args = ["SUPER + SPACE" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${omarchy-menu}/bin/omarchy-menu")'')];}
             {_args = ["SUPER + V" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${omarchy-menu-clipboard}/bin/omarchy-menu-clipboard")'')];}
             {_args = ["SUPER + COMMA" (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("${theme-switcher}/bin/theme-switcher")'')];}
