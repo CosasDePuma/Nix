@@ -45,6 +45,15 @@
     }
   '';
 
+  hyprlandLua = ''
+    hl.config({
+      general = {
+        ["col.active_border"] = { colors = { "#${colors.accent}ee", "#${colors.dark_foreground or colors.foreground}ee" }, angle = 45 },
+        ["col.inactive_border"] = "#${colors.selection or colors.muted}aa",
+      }
+    })
+  '';
+
   fuzzelIni = ''
     [colors]
     background=${colors.background}f2
@@ -185,6 +194,7 @@ in {
       "${themeShareDir}/wallpaper".source = defaultWallpaper;
       "${themeShareDir}/ghostty.conf".text = ghosttyConf;
       "${themeShareDir}/hyprland.conf".text = hyprlandConf;
+      "${themeShareDir}/hyprland.lua".text = hyprlandLua;
       "${themeShareDir}/fuzzel.ini".text = fuzzelIni;
       "${themeShareDir}/mako.conf".text = makoConf;
       "${themeShareDir}/herdr.toml".text = herdrToml;
@@ -202,6 +212,7 @@ in {
       ln -sfn "$default_theme/shell.toml" "$state_theme/shell.toml"
       ln -sfn "$default_theme/ghostty.conf" "$state_theme/ghostty.conf"
       ln -sfn "$default_theme/hyprland.conf" "$state_theme/hyprland.conf"
+      ln -sfn "$default_theme/hyprland.lua" "$state_theme/hyprland.lua"
       ln -sfn "$default_theme/fuzzel.ini" "$state_theme/fuzzel.ini"
       ln -sfn "$default_theme/mako.conf" "$state_theme/mako.conf"
       ln -sfn "$default_theme/herdr.toml" "$state_theme/herdr.toml"

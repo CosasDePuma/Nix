@@ -18,7 +18,9 @@
       software-brave
       software-homemanager
       software-networkmanager
+      software-spotify
       software-ssh
+      software-vscode
       software-windowsvm
       system-impermanence
       # keep-sorted end
@@ -33,6 +35,8 @@
         profile-cosasdepuma
         rice-omarchy
         software-brave
+        software-spotify
+        software-vscode
         software-windowsvm
         themes-everforest
         # keep-sorted end

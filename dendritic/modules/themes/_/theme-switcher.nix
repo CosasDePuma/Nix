@@ -102,6 +102,7 @@ pkgs.writeShellApplication {
         "${pkgs.coreutils}/bin/ln" -sfn "$target_theme/shell.toml" "$state_theme/shell.toml"
         "${pkgs.coreutils}/bin/ln" -sfn "$target_theme/ghostty.conf" "$state_theme/ghostty.conf"
         "${pkgs.coreutils}/bin/ln" -sfn "$target_theme/hyprland.conf" "$state_theme/hyprland.conf"
+        "${pkgs.coreutils}/bin/ln" -sfn "$target_theme/hyprland.lua" "$state_theme/hyprland.lua"
         "${pkgs.coreutils}/bin/ln" -sfn "$target_theme/fuzzel.ini" "$state_theme/fuzzel.ini"
         "${pkgs.coreutils}/bin/ln" -sfn "$target_theme/mako.conf" "$state_theme/mako.conf"
         "${pkgs.coreutils}/bin/ln" -sfn "$target_theme/herdr.toml" "$state_theme/herdr.toml"

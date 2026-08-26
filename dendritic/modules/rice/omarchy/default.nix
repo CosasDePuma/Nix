@@ -91,10 +91,10 @@
       # Hyprland custom configuration in Omarchy style
       wayland.windowManager.hyprland = {
         enable = lib.mkDefault true;
+        extraConfig = lib.mkDefault ''
+          pcall(dofile, os.getenv("HOME") .. "/.local/state/theme/hyprland.lua")
+        '';
         settings = {
-          source = [
-            "${config.home.homeDirectory}/.local/state/theme/hyprland.conf"
-          ];
           config = {
             general = {
               gaps_in = lib.mkDefault 6;
