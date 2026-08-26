@@ -18,6 +18,9 @@
         programs.opencode = {
           enable = lib.mkDefault true;
           enableMcpIntegration = lib.mkDefault true;
+          tui = {
+            theme = lib.mkDefault "everforest";
+          };
           settings = {
             autoshare = lib.mkDefault false;
             autoupdate = lib.mkDefault true;
