@@ -3,8 +3,11 @@
   colorsFile,
   backgroundsDir,
   ghosttyTheme ? null,
+  vscodeExtension ? null,
+  vscodeTheme ? null,
   extraFiles ? {},
 }: {
+  config ? {},
   lib,
   pkgs,
   ...
@@ -32,6 +35,11 @@
     else if builtins.pathExists (builtins.dirOf (builtins.toString backgroundsDir) + "/ghostty-theme")
     then lib.strings.trim (builtins.readFile (builtins.dirOf (builtins.toString backgroundsDir) + "/ghostty-theme"))
     else "";
+
+  resolvedVscodeExtension =
+    if builtins.isFunction vscodeExtension
+    then vscodeExtension pkgs
+    else vscodeExtension;
 
   cleanHex = c: lib.strings.removePrefix "#" c;
 
@@ -298,6 +306,23 @@ in {
       "${themeShareDir}/shell.toml".text = shellToml;
     }
     // extraFiles;
+
+  programs.vscode = lib.mkIf ((config.programs.vscode.enable or false) && (vscodeTheme != null || resolvedVscodeExtension != null)) {
+    profiles = {
+      default = {
+        extensions = lib.optional (resolvedVscodeExtension != null) resolvedVscodeExtension;
+        userSettings = lib.optionalAttrs (vscodeTheme != null) {
+          "workbench.colorTheme" = vscodeTheme;
+        };
+      };
+      python = {
+        extensions = lib.optional (resolvedVscodeExtension != null) resolvedVscodeExtension;
+        userSettings = lib.optionalAttrs (vscodeTheme != null) {
+          "workbench.colorTheme" = vscodeTheme;
+        };
+      };
+    };
+  };
 
   home.activation."initTheme_${themeName}" = lib.hm.dag.entryAfter ["writeBoundary"] ''
     state_theme="$HOME/.local/state/theme"
