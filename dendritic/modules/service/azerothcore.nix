@@ -150,6 +150,17 @@
           # warns using a playerbot character may crash the server), which
           # only exists after someone creates one in-game.
           AC_AUCTION_HOUSE_BOT_ENABLE_SELLER = "1";
+
+          # mod-spelldraft's level-up popup never fires and the DB it
+          # should seed (prestige_stats) stays empty, with zero Eluna/ALE
+          # log output either way -- AzerothCore silently drops LOG_INFO
+          # calls for a logger category that has no Logger.*/Appender.*
+          # entries configured, so this isn't proof Eluna is failing, it's
+          # proof its output has nowhere to go. Wire up its own log file so
+          # the *next* investigation has real evidence instead of silence.
+          AC_LOGGER_ALE = "4,ALELog ALEConsole";
+          AC_APPENDER_ALELOG = "2,5,0,ALE.log,w";
+          AC_APPENDER_ALECONSOLE = "1,4,0,\"0 9 0 3 5 0\"";
         };
         volumes = [etcVolume logsVolume "ac-client-data:/azerothcore/env/dist/data/:ro"];
         ports = [
