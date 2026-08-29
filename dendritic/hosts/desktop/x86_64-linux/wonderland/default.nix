@@ -16,6 +16,7 @@
       settings-locale
       settings-nix
       software-brave
+      software-discord
       software-homemanager
       software-networkmanager
       software-spotify
@@ -55,6 +56,7 @@
         profile-cosasdepuma
         rice-omarchy
         software-brave
+        software-discord
         software-spotify
         software-vscode
         software-windowsvm
