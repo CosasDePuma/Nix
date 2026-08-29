@@ -161,6 +161,17 @@
           AC_LOGGER_ALE = "4,ALELog ALEConsole";
           AC_APPENDER_ALELOG = "2,5,0,ALE.log,w";
           AC_APPENDER_ALECONSOLE = "1,4,0,\"0 9 0 3 5 0\"";
+
+          # The actual bug, found via /proc/1/cwd on the running container:
+          # ALE.ScriptPath defaults to the bare relative string "lua_scripts",
+          # which Eluna resolves against worldserver's real CWD -- which is
+          # /azerothcore, NOT /azerothcore/env/dist (unlike AC_DATA_DIR/
+          # AC_LOGS_DIR above, which are absolute paths we set ourselves).
+          # The lua_scripts/ we bundle into the image at env/dist/lua_scripts
+          # was one directory level too deep for Eluna to ever find it --
+          # nothing was wrong with Eluna or the scripts themselves. Point at
+          # it with an absolute path instead of relying on CWD.
+          AC_ALE_SCRIPT_PATH = "/azerothcore/env/dist/lua_scripts";
         };
         volumes = [etcVolume logsVolume "ac-client-data:/azerothcore/env/dist/data/:ro"];
         ports = [
