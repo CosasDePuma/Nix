@@ -10,9 +10,10 @@ table inet filter {
         ct state { established, related } counter accept comment "Allow established connections";
 
         iifname {
+            "tailscale0",
             "vl10.homelab",
             "vl20.hacking"
-        } counter accept comment "Allow VLANs to access the router";
+        } counter accept comment "Allow Tailscale and VLANs to access the router";
 
         # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
         # ┃              Port Forwarding              ┃
