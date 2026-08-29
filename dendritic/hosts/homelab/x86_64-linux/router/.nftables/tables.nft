@@ -11,16 +11,14 @@ table inet filter {
 
         iifname {
             "vl10.homelab",
-            "vl20.hacking",
-            "wireguard"
-        } counter accept comment "Allow VLANs and VPN to access the router";
+            "vl20.hacking"
+        } counter accept comment "Allow VLANs to access the router";
 
         # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
         # ┃              Port Forwarding              ┃
         # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
         iifname "eth0" tcp dport 64022 counter accept comment "Allow SSH connections (custom port)";
-        iifname "eth0" udp dport 51820 counter accept comment "Allow WireGuard connections";
         iifname "eth0" tcp dport 443 counter accept comment "Allow Headscale (Tailscale coordination server)";
         iifname "eth0" tcp dport 61640 counter accept comment "Allow TCP qBitTorrent Seeder";
         iifname "eth0" udp dport 61640 counter accept comment "Allow UDP qBitTorrent Seeder";
@@ -37,9 +35,8 @@ table inet filter {
 
         iifname {
             "vl10.homelab",
-            "vl20.hacking",
-            "wireguard"
-        } oifname "eth0" counter accept comment "Allow VLANs and VPN access to the Internet";
+            "vl20.hacking"
+        } oifname "eth0" counter accept comment "Allow VLANs access to the Internet";
 
         # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
         # ┃               VLAN: HomeLab               ┃
@@ -59,25 +56,13 @@ table inet filter {
         # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
         iifname "vl20.hacking" oifname "vl20.hacking" counter accept comment "Allow Hacking traffic to other Hacking machines";
-        iifname "vl20.hacking" oifname "wireguard" counter accept comment "Allow Hacking VLAN to access WireGuard clients";
-
-        # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-        # ┃                 WireGuard                 ┃
-        # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-        iifname "wireguard" oifname "wireguard" ip daddr 10.10.10.254 counter accept comment "Allow WireGuard traffic to WireGuard router";
-        iifname "wireguard" oifname "wireguard" counter drop comment "Block WireGuard traffic to other WireGuard clients";
-
-        iifname "wireguard" oifname "vl10.homelab" tcp dport { 22, 64022 } counter accept comment "Allow WireGuard SSH access to Homelab servers";
-        iifname "wireguard" oifname "vl10.homelab" ip daddr 10.0.10.1 tcp dport 443 counter accept comment "Allow WireGuard HTTPS access to Homelab reverse proxy";
-        iifname "wireguard" oifname "vl10.homelab" ip daddr 10.0.10.10 tcp dport { 3724, 8085 } counter accept comment "Allow WireGuard access to AzerothCore (gaming) auth/world ports";
-        iifname "wireguard" oifname "vl20.hacking" counter accept comment "Allow WireGuard access to Hacking VLAN";
 
         # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
         # ┃                 Tailscale                 ┃
         # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-        iifname "tailscale0" oifname "vl10.homelab" counter accept comment "Allow Tailscale clients to reach the Homelab VLAN (subnet route); Headscale's ACL is the actual access-control layer here";
+        iifname "tailscale0" oifname "vl10.homelab" counter accept comment "Allow Tailscale clients to reach Homelab VLAN";
+        iifname "tailscale0" oifname "eth0" ip daddr { 192.168.1.3, 192.168.1.4 } counter accept comment "Allow Tailscale clients to reach NAS and Proxmox";
     }
 }
 table ip nat {
