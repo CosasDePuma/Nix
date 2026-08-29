@@ -1,11 +1,11 @@
-{lib, ...}: {
+_: {
   flake = {
     darwinModules.software-discord = {
       homebrew.casks = ["discord"];
     };
 
-    homeManagerModules.software-discord = {
-      programs.discord.enable = lib.mkDefault true;
+    homeManagerModules.software-discord = {pkgs, ...}: {
+      home.packages = with pkgs; [discord];
     };
 
     nixosModules.software-discord = {pkgs, ...}: {
