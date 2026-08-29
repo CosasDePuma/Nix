@@ -18,6 +18,17 @@ _: {
       # actual client (and thus realmlist.wtf) has to live.
       gameDir = "${clientDir}/ChromieCraft_3.3.5a";
       wine = pkgs.wineWow64Packages.stable;
+      # mod-spelldraft needs client-side files (a patch MPQ + a Lua addon) to
+      # match what the server expects -- unlike mod-playerbots and mod-ale,
+      # which are purely server-side and need nothing here. Pinned to a rev
+      # so a client rebuild can't silently drift from what the server built
+      # in .github/workflows/azerothcore-kikewtf.yml (bump both together).
+      spelldraftSrc = pkgs.fetchFromGitHub {
+        owner = "bdodroid";
+        repo = "mod-spelldraft";
+        rev = "ca54a656710718af8e7d8c6e54749d72b0cc9df3";
+        sha256 = "0gjwqcdhmzqvf03w1ag4i5w80q1p5vdcl5652gb7y8r9h4igwmrc";
+      };
       launcher = pkgs.writeShellApplication {
         name = "wow-335a";
         runtimeInputs = [wine];
@@ -44,6 +55,9 @@ _: {
       home.file = {
         "${gameDir}/realmlist.wtf".text = "set realmlist 10.0.10.10";
         "${gameDir}/Data/enUS/realmlist.wtf".text = "set realmlist 10.0.10.10";
+
+        "${gameDir}/Data/patch-P.mpq".source = "${spelldraftSrc}/wow-client/Data/patch-P.mpq";
+        "${gameDir}/Interface/AddOns/SpellDraft".source = "${spelldraftSrc}/wow-client/Interface/AddOns/SpellDraft";
       };
 
       xdg.desktopEntries.wow-335a = {
