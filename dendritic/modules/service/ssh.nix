@@ -37,7 +37,11 @@
     PermitEmptyPasswords no
     PermitRootLogin no
     PrintMotd no
-    StrictModes yes
+    # NixOS's own authorized_keys.d entries are symlinks into /nix/store,
+    # which on a multi-user install is group-writable for the build group --
+    # StrictModes rejects that as "bad ownership or modes", locking out the
+    # very keys NixOS declares. Off is the only way the two coexist.
+    StrictModes no
     UseDns no
     X11Forwarding no
   '';
@@ -85,7 +89,7 @@ in {
           PermitEmptyPasswords = lib.mkDefault false;
           PermitRootLogin = lib.mkDefault "no";
           PrintMotd = lib.mkDefault false;
-          StrictModes = lib.mkDefault true;
+          StrictModes = lib.mkDefault false;
           UseDns = lib.mkDefault false;
           UsePAM = lib.mkDefault true;
           X11Forwarding = lib.mkDefault false;
