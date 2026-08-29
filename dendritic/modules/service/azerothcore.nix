@@ -136,6 +136,20 @@
           AC_RATE_DROP_ITEM_LEGENDARY = "2";
           AC_RATE_DROP_ITEM_ARTIFACT = "2";
           AC_RATE_DROP_ITEM_REFERENCED = "2";
+
+          # mod-hardcore: permadeath from level 1 to 79 (not 80/max) -- the
+          # mod's own default leaves 1-9 exempt (MinLevel.Enable = 10), so
+          # this has to be set explicitly to actually cover 1-79.
+          AC_MOD_HARDCORE_ENABLE = "1";
+          AC_MOD_HARDCORE_MIN_LEVEL_ENABLE = "1";
+          AC_MOD_HARDCORE_MAX_LEVEL_ENABLE = "79";
+
+          # mod-ah-bot-plus: enables the seller side, but AuctionHouseBot.GUIDs
+          # (which character drives it) is deliberately left unset here -- it
+          # has to be a real, non-bot character's GUID (the mod's own README
+          # warns using a playerbot character may crash the server), which
+          # only exists after someone creates one in-game.
+          AC_AUCTION_HOUSE_BOT_ENABLE_SELLER = "1";
         };
         volumes = [etcVolume logsVolume "ac-client-data:/azerothcore/env/dist/data/:ro"];
         ports = [
