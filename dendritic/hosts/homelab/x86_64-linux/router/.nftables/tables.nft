@@ -72,6 +72,12 @@ table inet filter {
         iifname "wireguard" oifname "vl10.homelab" ip daddr 10.0.10.1 tcp dport 443 counter accept comment "Allow WireGuard HTTPS access to Homelab reverse proxy";
         iifname "wireguard" oifname "vl10.homelab" ip daddr 10.0.10.10 tcp dport { 3724, 8085 } counter accept comment "Allow WireGuard access to AzerothCore (gaming) auth/world ports";
         iifname "wireguard" oifname "vl20.hacking" counter accept comment "Allow WireGuard access to Hacking VLAN";
+
+        # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+        # ┃                 Tailscale                 ┃
+        # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+        iifname "tailscale0" oifname "vl10.homelab" counter accept comment "Allow Tailscale clients to reach the Homelab VLAN (subnet route); Headscale's ACL is the actual access-control layer here";
     }
 }
 table ip nat {
