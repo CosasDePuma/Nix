@@ -7,7 +7,11 @@ _: {
       hardware.graphics.enable32Bit = lib.mkDefault true;
     };
 
-    homeManagerModules.software-wow = {pkgs, ...}: let
+    homeManagerModules.software-wow = {
+      lib,
+      pkgs,
+      ...
+    }: let
       # Where the client goes: nothing here fetches it (a multi-GB
       # Blizzard-copyrighted download isn't something Nix should package),
       # so the client itself has to be extracted here by hand -- see
@@ -46,15 +50,13 @@ _: {
     in {
       home.packages = [launcher wine pkgs.winetricks];
 
-      # Overwrites whatever realmlist the downloaded client ships with --
-      # points it at the homelab AzerothCore server
-      # (dendritic/hosts/homelab/x86_64-linux/gaming) instead of wherever
-      # the client's original source pointed it. Two copies: this client
-      # ships one in the client root and another, separate one under
-      # Data/enUS, and it isn't obvious which one it actually reads.
+      # Overwrites whatever realmlist the downloaded client ships with.
+      # Defaults to localhost (127.0.0.1); hosts override this with their
+      # specific realm address. Two copies: this client ships one in the
+      # client root and another, separate one under Data/enUS.
       home.file = {
-        "${gameDir}/realmlist.wtf".text = "set realmlist 10.0.10.10";
-        "${gameDir}/Data/enUS/realmlist.wtf".text = "set realmlist 10.0.10.10";
+        "${gameDir}/realmlist.wtf".text = lib.mkDefault "set realmlist 127.0.0.1";
+        "${gameDir}/Data/enUS/realmlist.wtf".text = lib.mkDefault "set realmlist 127.0.0.1";
 
         "${gameDir}/Data/patch-P.mpq".source = "${spelldraftSrc}/wow-client/Data/patch-P.mpq";
         "${gameDir}/Interface/AddOns/SpellDraft".source = "${spelldraftSrc}/wow-client/Interface/AddOns/SpellDraft";

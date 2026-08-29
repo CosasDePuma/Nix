@@ -8,6 +8,7 @@
   flake.nixosModules.service-azerothcore = {
     config,
     lib,
+    pkgs,
     ...
   }: let
     # Fully qualified: podman refuses to guess a registry for a short name
@@ -202,6 +203,32 @@
       # unit depends on this one.
       "podman-ac-db-import".serviceConfig.Restart = lib.mkForce "no";
       "podman-ac-worldserver".after = ["podman-ac-client-data-init.service"];
+
+      "ac-realmlist-config" = {
+        description = "Configure AzerothCore realmlist address in database";
+        after = ["podman-ac-db-import.service" "podman-ac-database.service"];
+        requires = ["podman-ac-database.service"];
+        wantedBy = ["multi-user.target"];
+        environment = {
+          REALM_ADDRESS = lib.mkDefault "127.0.0.1";
+          REALM_NAME = lib.mkDefault "AzerothCore";
+        };
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+        };
+        path = [pkgs.podman pkgs.coreutils];
+        script = ''
+          for _ in $(seq 1 30); do
+            if podman exec ac-database mysqladmin ping -uroot -p${dbPassword} --silent 2>/dev/null; then
+              break
+            fi
+            sleep 2
+          done
+          podman exec ac-database mysql -uroot -p${dbPassword} -e \
+            "UPDATE acore_auth.realmlist SET name = '$REALM_NAME', address = '$REALM_ADDRESS', localAddress = '$REALM_ADDRESS' WHERE id = 1;"
+        '';
+      };
     };
   };
 }
