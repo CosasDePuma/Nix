@@ -195,6 +195,42 @@
           mode = "file";
           path = ./.headscale/acl.hujson;
         };
+        dns = {
+          magic_dns = true;
+          base_domain = "me.${domain}";
+          search_domains = [
+            "me.${domain}"
+            "home.${domain}"
+          ];
+          extra_records = [
+            # Homelab (.home.kike.wtf)
+            {
+              name = "router.home.${domain}";
+              type = "A";
+              value = "100.64.0.1";
+            }
+            {
+              name = "router.home.${domain}";
+              type = "AAAA";
+              value = "fd7a:115c:a1e0::1";
+            }
+            {
+              name = "gaming.home.${domain}";
+              type = "A";
+              value = "10.0.10.10";
+            }
+            {
+              name = "nas.home.${domain}";
+              type = "A";
+              value = "192.168.1.3";
+            }
+            {
+              name = "proxmox.home.${domain}";
+              type = "A";
+              value = "192.168.1.4";
+            }
+          ];
+        };
       };
 
       # Subnet router only: gaming/services/etc. don't run tailscale
