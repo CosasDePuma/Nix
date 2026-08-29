@@ -65,3 +65,25 @@ jobs:
               --push \
               core
           done
+
+      # mod-playerbots (and, per its own install notes, mod-spelldraft) auto-
+      # populate their dedicated tables by reading SQL straight out of
+      # modules/<name>/data/sql/ at worldserver startup -- but the upstream
+      # Dockerfile's worldserver stage only copies the compiled binary, not
+      # the modules/ tree it was built from, so that lookup fails at runtime
+      # ("Directory .../mod-playerbots/data/sql/playerbots/base/ not exist").
+      # Layer modules/ back on top of the image we just pushed to fix that.
+      - name: Bundle modules/ into the worldserver image
+        run: |
+          set -euo pipefail
+          cat > /tmp/with-modules.Dockerfile <<'DOCKERFILE'
+          ARG BASE
+          FROM ${BASE}
+          COPY modules /azerothcore/modules
+          DOCKERFILE
+          docker buildx build \
+            --file /tmp/with-modules.Dockerfile \
+            --build-arg BASE="${IMAGE}:azerothcore-worldserver" \
+            --tag "${IMAGE}:azerothcore-worldserver" \
+            --push \
+            core
