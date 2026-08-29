@@ -20,7 +20,9 @@
         ++ lib.optionals (config.virtualisation.libvirtd.enable or false) ["/var/lib/libvirt"]
         ++ lib.optionals (config.virtualisation.docker.enable or false) ["/var/lib/docker"]
         ++ lib.optionals (config.virtualisation.podman.enable or false) ["/var/lib/containers"]
-        ++ lib.optionals (config.services.ollama.enable or false) ["/var/lib/ollama"];
+        ++ lib.optionals (config.services.ollama.enable or false) ["/var/lib/ollama"]
+        ++ lib.optionals (config.services.headscale.enable or false) ["/var/lib/headscale"]
+        ++ lib.optionals (config.services.tailscale.enable or false) ["/var/lib/tailscale"];
       # Host keys only, not the whole "/etc/ssh" directory: NixOS populates
       # /etc/ssh with symlinks into the store (sshd_config, ssh_config,
       # authorized_keys.d, ...), and persisting the directory wholesale
