@@ -43,6 +43,8 @@
       };
     };
 
+    systemd.services."ac-realmlist-config".environment.REALM_ADDRESS = "wow.game.kike.wtf";
+
     system.stateVersion = "26.11";
 
     users.users.gamer = {

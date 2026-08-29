@@ -42,6 +42,12 @@
 
     home-manager.users.wizard = {
       home.stateVersion = "26.11";
+      home.file = let
+        gameDir = "Games/WoW/ChromieCraft_3.3.5a";
+      in {
+        "${gameDir}/realmlist.wtf".text = "set realmlist wow.game.kike.wtf";
+        "${gameDir}/Data/enUS/realmlist.wtf".text = "set realmlist wow.game.kike.wtf";
+      };
       imports = with inputs.self.homeManagerModules; [
         # keep-sorted start
         meta-ai

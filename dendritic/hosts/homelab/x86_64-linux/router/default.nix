@@ -157,6 +157,7 @@
           search_domains = [
             "me.${domain}"
             "home.${domain}"
+            "game.${domain}"
           ];
           extra_records = [
             # Homelab (.home.kike.wtf)
@@ -171,11 +172,6 @@
               value = "fd7a:115c:a1e0::1";
             }
             {
-              name = "gaming.home.${domain}";
-              type = "A";
-              value = "10.0.10.10";
-            }
-            {
               name = "nas.home.${domain}";
               type = "A";
               value = "192.168.1.3";
@@ -184,6 +180,13 @@
               name = "proxmox.home.${domain}";
               type = "A";
               value = "192.168.1.4";
+            }
+
+            # Gaming (.game.kike.wtf)
+            {
+              name = "wow.game.${domain}";
+              type = "A";
+              value = "10.0.10.10";
             }
           ];
         };
