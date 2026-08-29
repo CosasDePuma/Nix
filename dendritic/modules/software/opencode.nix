@@ -19,7 +19,7 @@
           enable = lib.mkDefault true;
           enableMcpIntegration = lib.mkDefault true;
           tui = {
-            theme = lib.mkDefault "everforest";
+            theme = lib.mkDefault "opencode";
           };
           settings = {
             autoshare = lib.mkDefault false;
