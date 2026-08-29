@@ -1,0 +1,230 @@
+{
+  pkgs,
+  omarchy-menu-select,
+}:
+pkgs.writeShellApplication {
+  name = "omarchy-menu-herdr-keybindings";
+  runtimeInputs = [
+    omarchy-menu-select
+    pkgs.coreutils
+    pkgs.gawk
+    pkgs.hyprland
+    pkgs.jq
+  ];
+  text = ''
+    # omarchy:summary=Display annotated Herdr keybindings using an interactive search menu.
+    # omarchy:args=[--print|-p] [--config <path>]
+
+    print_only=false
+    config_file="''${HERDR_CONFIG_PATH:-''${XDG_CONFIG_HOME:-$HOME/.config}/herdr/config.toml}"
+
+    while (($#)); do
+      case "$1" in
+        --print|-p)
+          print_only=true
+          ;;
+        --config)
+          shift
+          config_file="$1"
+          ;;
+        *)
+          config_file="$1"
+          ;;
+      esac
+
+      shift
+    done
+
+    # With no config file, Herdr runs on its own built-in defaults.
+    [[ -f $config_file ]] || config_file="/dev/null"
+
+    output_keybindings() (
+      set -o pipefail
+      if ! command -v herdr >/dev/null 2>&1; then
+        echo "herdr command not found" >&2
+        return 1
+      fi
+
+      herdr --default-config | awk -v sq="\x27" -v config_file="$config_file" '
+    function strip_comment(value,   i, ch, quote, out) {
+      quote = ""
+      out = ""
+
+      for (i = 1; i <= length(value); i++) {
+        ch = substr(value, i, 1)
+
+        if (quote == "" && (ch == "\"" || ch == sq)) quote = ch
+        else if (ch == quote) quote = ""
+        if (ch == "#" && quote == "") break
+
+        out = out ch
+      }
+
+      return out
+    }
+
+    function without_quoted(value,   i, ch, quote, out) {
+      quote = ""
+      out = ""
+
+      for (i = 1; i <= length(value); i++) {
+        ch = substr(value, i, 1)
+
+        if (quote == "") {
+          if (ch == "\"" || ch == sq) quote = ch
+          else out = out ch
+        } else if (ch == quote) {
+          quote = ""
+        }
+      }
+
+      return quote == "" ? out : "\001"
+    }
+
+    function is_binding_value(value,   rest) {
+      value = strip_comment(value)
+      sub(/^[[:space:]]+/, "", value)
+      sub(/[[:space:]]+$/, "", value)
+      if (value == "") return 0
+
+      rest = without_quoted(value)
+
+      return rest == "" || rest ~ /^\[[[:space:],]*\]$/
+    }
+
+    function key_text(key,   count, parts, i, text) {
+      count = split(key, parts, "+")
+      text = ""
+
+      for (i = 1; i <= count; i++) {
+        text = text (text == "" ? "" : " + ") toupper(parts[i])
+      }
+
+      return text
+    }
+
+    function combo_text(value,   i, ch, quote, part, text) {
+      value = strip_comment(value)
+      quote = ""
+      part = ""
+      text = ""
+
+      for (i = 1; i <= length(value); i++) {
+        ch = substr(value, i, 1)
+
+        if (quote == "") {
+          if (ch == "\"" || ch == sq) { quote = ch; part = "" }
+          continue
+        }
+
+        if (ch == quote) {
+          quote = ""
+          if (part != "") text = text (text == "" ? "" : " / ") key_text(part)
+          continue
+        }
+
+        part = part ch
+      }
+
+      return text
+    }
+
+    function describe(action,   text) {
+      sub(/^navigate_/, "", action)
+      gsub(/_/, " ", action)
+      text = toupper(substr(action, 1, 1)) substr(action, 2)
+
+      return text
+    }
+
+    function remember(action) {
+      if (action in seen) return
+      seen[action] = 1
+      order[++count] = action
+    }
+
+    function bind(action, value,   combo) {
+      combo = combo_text(value)
+      if (combo == "") return
+
+      if (action ~ /^navigate_/) combo = "NAVIGATE + " combo
+      remember(action)
+      combos[action] = combo
+    }
+
+    FNR == NR {
+      line = $0
+      sub(/^[[:space:]]*#[[:space:]]*/, "", line)
+
+      if (line ~ /^\[\[keys\.command\]\]/) { in_keys = 0; next }
+      if (line ~ /^\[/) { in_keys = (line ~ /^\[keys\]/); next }
+      if (!in_keys) next
+      if (line !~ /^[a-z_]+[[:space:]]*=/) next
+
+      action = line
+      sub(/[[:space:]]*=.*$/, "", action)
+      value = line
+      sub(/^[^=]*=[[:space:]]*/, "", value)
+      if (!is_binding_value(value)) next
+
+      remember(action)
+      bind(action, value)
+      next
+    }
+
+    {
+      if ($0 ~ /^\[\[keys\.command\]\]/) { in_user_keys = 0; next }
+      if ($0 ~ /^\[/) { in_user_keys = ($0 ~ /^\[keys\]/); next }
+      if (!in_user_keys) next
+      if ($0 ~ /^[[:space:]]*#/) next
+      if ($0 !~ /^[[:space:]]*[a-z_]+[[:space:]]*=/) next
+
+      line = $0
+      sub(/^[[:space:]]*/, "", line)
+      action = line
+      sub(/[[:space:]]*=.*$/, "", action)
+      value = line
+      sub(/^[^=]*=[[:space:]]*/, "", value)
+      if (!is_binding_value(value)) next
+
+      if (combo_text(value) == "") {
+        delete combos[action]
+        next
+      }
+
+      bind(action, value)
+    }
+
+    END {
+      if ("prefix" in combos) {
+        printf "%-32s → %s\n", "PREFIX", combos["prefix"]
+      }
+
+      for (i = 1; i <= count; i++) {
+        action = order[i]
+        if (action == "prefix") continue
+        if (!(action in combos)) continue
+
+        printf "%-32s → %s\n", combos[action], describe(action)
+      }
+    }
+    ' - "$config_file"
+    )
+
+    if [[ $print_only == "true" ]]; then
+      output_keybindings
+      exit 0
+    fi
+
+    records=$(output_keybindings)
+
+    monitor_height=$(hyprctl monitors -j 2>/dev/null | jq -r '.[] | select(.focused == true) | .height' 2>/dev/null || echo "900")
+
+    if [[ ! $monitor_height =~ ^[0-9]+$ ]] || ((monitor_height <= 0)); then
+      monitor_height=900
+    fi
+
+    menu_height=$((monitor_height * 40 / 100))
+    printf '%s\n' "$records" | omarchy-menu-select 'Herdr keybindings' -- --width 800 --height "$menu_height" >/dev/null || true
+  '';
+}
