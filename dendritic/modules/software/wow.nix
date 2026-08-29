@@ -12,7 +12,7 @@ _: {
       # Blizzard-copyrighted download isn't something Nix should package),
       # so the client itself has to be extracted here by hand -- see
       # https://chromiecraft.com/en/downloads/ for a clean 3.3.5a client.
-      clientDir = "Games/wow-335a";
+      clientDir = "Games/WoW";
       wine = pkgs.wineWow64Packages.stable;
       launcher = pkgs.writeShellApplication {
         name = "wow-335a";
@@ -20,7 +20,7 @@ _: {
         text = ''
           export WINEPREFIX="$HOME/${clientDir}/.wine"
           cd "$HOME/${clientDir}"
-          exec wine Wow.exe "$@"
+          exec wine WoW.exe "$@"
         '';
       };
     in {
