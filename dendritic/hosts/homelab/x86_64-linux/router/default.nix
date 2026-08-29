@@ -1,9 +1,5 @@
 {inputs, ...}: {
-  flake.nixosModules.router = {
-    config,
-    lib,
-    ...
-  }: let
+  flake.nixosModules.router = {config, ...}: let
     domain = "kike.wtf";
   in {
     imports =
@@ -35,7 +31,6 @@
     # needed for the router to decrypt these itself at activation.
     age.secrets = {
       "cloudflare-key".file = ./.ddclient/cloudflare-key.age;
-      "wireguard-key".file = ./.wireguard/wireguard-key.age;
       "tailscale-preauth-key".file = ./.tailscale/preauth-key.age;
     };
 
@@ -136,45 +131,6 @@
           interface = "eth1";
         };
       };
-      wireguard.interfaces."wireguard" = {
-        ips = ["10.10.10.254/24"];
-        listenPort = 51820;
-        privateKeyFile = config.age.secrets."wireguard-key".path;
-        peers = let
-          users = [
-            {
-              name = "pumita-macbook";
-              publicKey = "09SUz/zGOFkZKnV8e8k+MJ4ul97EAvFEm8MN2rjztkQ=";
-            }
-            {
-              name = "pumita-iphone";
-              publicKey = "fLlRUveH+pYk6efVANQh+g3MJXMvG3rAsY4Z1aAff20=";
-            }
-            {
-              name = "pumita-tv";
-              publicKey = "gL2M1YR+FjO9Wq5DjIBcBOtcxw/eyvo6HGv17Q43o2g=";
-            }
-            {
-              name = "family-tv";
-              publicKey = "ByqsQxP2YMKzYob5S0Uq9m8+jORNxcaZAApcSc5oQy0=";
-            }
-            {
-              name = "family-david";
-              publicKey = "ojqm9Pk4bWfAkoIwvEXRKf+bmxrra1C81HHxltsUhEU=";
-            }
-            {
-              name = "friends-dmaestro";
-              publicKey = "7+/GGKXRfKcYGSu/Faj+c5PoEGIdck2VLFUk8IuFE0E=";
-            }
-          ];
-        in
-          lib.lists.imap1 (i: user: {
-            inherit (user) name publicKey;
-            allowedIPs = ["10.10.10.${builtins.toString i}/32"];
-            persistentKeepalive = 25;
-          })
-          users;
-      };
       nftables.ruleset = builtins.readFile ./.nftables/tables.nft;
     };
 
@@ -242,7 +198,7 @@
         useRoutingFeatures = "server";
         extraUpFlags = [
           "--login-server=https://vpn.${domain}"
-          "--advertise-routes=10.0.10.0/24"
+          "--advertise-routes=10.0.10.0/24,192.168.1.3/32,192.168.1.4/32"
         ];
       };
 
@@ -272,7 +228,6 @@
           interface = [
             "vl10.homelab"
             "vl20.hacking"
-            "wireguard"
           ];
           dhcp-range = [
             "vl10.homelab,10.0.10.100,10.0.10.200,255.255.255.0,24h"

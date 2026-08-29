@@ -1,27 +1,34 @@
 {
-  // Which headscale users are allowed to register a node with each tag --
-  // create the user first with `headscale users create pumita`. Local
-  // (non-OIDC) headscale usernames are referenced with a trailing "@" and
-  // no domain -- "pumita@", not "pumita" or "pumita@example.com".
+  "hosts": {
+    "homelab": "10.0.10.0/24",
+    "wow-server": "10.0.10.10/32",
+    "nas": "192.168.1.3/32",
+    "proxmox": "192.168.1.4/32"
+  },
+
   "tagOwners": {
-    "tag:admin": ["pumita@"],
-    "tag:gaming": ["pumita@"]
+    "tag:homelab": ["pumita@"],
+    "tag:gaming": ["pumita@"],
+    "tag:media": ["pumita@"]
   },
 
   "acls": [
-    // Admin devices (your own): full access to the homelab LAN the router
-    // advertises as a subnet route.
+    // 1. pumita (personal user) and tag:homelab devices: full unrestricted access
     {
       "action": "accept",
-      "src": ["tag:admin"],
-      "dst": ["10.0.10.0/24:*"]
+      "src": ["pumita@", "tag:homelab"],
+      "dst": ["*:*"]
     },
-    // Gaming devices (handed out to friends): only the AzerothCore ports on
-    // the WoW server, nothing else on the LAN.
+
+    // 2. Gaming (WoW / AzerothCore server auth and world ports)
     {
       "action": "accept",
       "src": ["tag:gaming"],
-      "dst": ["10.0.10.10:3724,8085"]
+      "dst": [
+        "wow-server:3724,8085"
+      ]
     }
+
+    // 3. Media: placeholder without access rules for now (default deny)
   ]
 }
