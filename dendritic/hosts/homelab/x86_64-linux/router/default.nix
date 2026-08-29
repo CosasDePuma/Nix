@@ -17,11 +17,13 @@
         network-forwarding
         network-interfaces
         network-nftables
+        service-headscale
         service-ssh
         settings-locale
         settings-nix
         software-network-tools
         software-sudo
+        software-tailscale
         system-impermanence
         # keep-sorted end
       ]);
@@ -34,6 +36,7 @@
     age.secrets = {
       "cloudflare-key".file = ./.ddclient/cloudflare-key.age;
       "wireguard-key".file = ./.wireguard/wireguard-key.age;
+      "tailscale-preauth-key".file = ./.tailscale/preauth-key.age;
     };
 
     # WAN-facing sysctls only: don't act on router-advertised IPv6 config
@@ -182,6 +185,31 @@
       # read, so it exits immediately every boot instead of doing anything.
       thermald.enable = false;
 
+      # Trying this alongside the existing WireGuard setup, not replacing it
+      # yet -- reuses the same domain ddclient already keeps pointed at this
+      # box, just on a different port.
+      headscale.settings = {
+        server_url = "https://vpn.${domain}";
+        tls_letsencrypt_hostname = "vpn.${domain}";
+        policy = {
+          mode = "file";
+          path = ./.headscale/acl.hujson;
+        };
+      };
+
+      # Subnet router only: gaming/services/etc. don't run tailscale
+      # themselves, they're just reachable through the LAN route this
+      # advertises. `headscale routes enable` still has to approve it once
+      # the node registers, same as approving a new node.
+      tailscale = {
+        authKeyFile = config.age.secrets."tailscale-preauth-key".path;
+        useRoutingFeatures = "server";
+        extraUpFlags = [
+          "--login-server=https://vpn.${domain}"
+          "--advertise-routes=10.0.10.0/24"
+        ];
+      };
+
       ddclient = {
         enable = true;
         domains = ["vpn.${domain}"];
@@ -196,7 +224,14 @@
         enable = true;
         resolveLocalQueries = false;
         settings = {
-          address = ["/${domain}/10.0.10.1"];
+          # More specific entries win over the wildcard: LAN/tailnet clients
+          # get sent straight to the router over the LAN instead of round-
+          # tripping out to the internet and back for its own public IP
+          # (which may not even hairpin back in on every ISP router anyway).
+          address = [
+            "/${domain}/10.0.10.1"
+            "/vpn.${domain}/10.0.10.254"
+          ];
           bind-dynamic = true;
           interface = [
             "vl10.homelab"

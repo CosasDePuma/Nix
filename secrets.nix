@@ -1,6 +1,7 @@
 let
   pumita = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKh1YtKaItcNzC3RGez38zaJ0geelyrb6AFV73OqLchv pumita";
   vmHomelabRouter = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICSv8kVRKNzpltMOS4/aI6Tv2pqG7++zFpXFJygQkAT3 root@router";
+  wonderland = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIYjbPn9PgJXtEpzkkBXiZV/TIShXl5Ny5Rb0oB7m6MP root@wonderland";
   #
   #  vm-homelab = {
   #    automation = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF5MEUY8ks+UAOo3u2EeLEsoJX1yK6nki5hZ7jhuj7NZ @homelab.automation";
@@ -64,6 +65,13 @@ in {
   # Client-side WireGuard profiles (not consumed by the router itself, kept
   # here as a decrypt-with-pumita-only backup for re-provisioning devices).
   "dendritic/hosts/homelab/x86_64-linux/router/.wireguard/wireguard-profiles.conf.age".publicKeys = [pumita];
+  "dendritic/hosts/homelab/x86_64-linux/router/.tailscale/preauth-key.age".publicKeys = [pumita vmHomelabRouter];
+
+  # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  # ┃                Wonderland                 ┃
+  # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  "dendritic/hosts/desktop/x86_64-linux/wonderland/.tailscale/preauth-key.age".publicKeys = [pumita wonderland];
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                 Profiles                  ┃
