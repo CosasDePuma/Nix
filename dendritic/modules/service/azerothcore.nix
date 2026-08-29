@@ -123,6 +123,19 @@
           # Values match what the warning itself suggests.
           AC_SPELL_DRAFT_ENABLE = "1";
           AC_SPELL_DRAFT_ALLOW_SPELLS_IN_DRUID_FORMS = "0";
+
+          # 5x leveling speed, 2x item drops.
+          AC_RATE_XP_KILL = "5";
+          AC_RATE_XP_QUEST = "5";
+          AC_RATE_XP_EXPLORE = "5";
+          AC_RATE_DROP_ITEM_POOR = "2";
+          AC_RATE_DROP_ITEM_NORMAL = "2";
+          AC_RATE_DROP_ITEM_UNCOMMON = "2";
+          AC_RATE_DROP_ITEM_RARE = "2";
+          AC_RATE_DROP_ITEM_EPIC = "2";
+          AC_RATE_DROP_ITEM_LEGENDARY = "2";
+          AC_RATE_DROP_ITEM_ARTIFACT = "2";
+          AC_RATE_DROP_ITEM_REFERENCED = "2";
         };
         volumes = [etcVolume logsVolume "ac-client-data:/azerothcore/env/dist/data/:ro"];
         ports = [
