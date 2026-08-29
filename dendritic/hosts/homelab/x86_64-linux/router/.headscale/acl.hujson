@@ -1,0 +1,27 @@
+{
+  // Which headscale users are allowed to register a node with each tag --
+  // create the user first with `headscale users create pumita`. Local
+  // (non-OIDC) headscale usernames are referenced with a trailing "@" and
+  // no domain -- "pumita@", not "pumita" or "pumita@example.com".
+  "tagOwners": {
+    "tag:admin": ["pumita@"],
+    "tag:gaming": ["pumita@"]
+  },
+
+  "acls": [
+    // Admin devices (your own): full access to the homelab LAN the router
+    // advertises as a subnet route.
+    {
+      "action": "accept",
+      "src": ["tag:admin"],
+      "dst": ["10.0.10.0/24:*"]
+    },
+    // Gaming devices (handed out to friends): only the AzerothCore ports on
+    // the WoW server, nothing else on the LAN.
+    {
+      "action": "accept",
+      "src": ["tag:gaming"],
+      "dst": ["10.0.10.10:3724,8085"]
+    }
+  ]
+}

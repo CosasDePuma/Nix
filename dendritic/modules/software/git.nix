@@ -1,13 +1,31 @@
 {lib, ...}: let
   gitconfig = {
-    alias.graph = lib.mkDefault "log --abbrev-commit --all --color --decorate --graph --oneline";
-    color.ui = lib.mkDefault true;
-    help.autocorrect = lib.mkDefault 1;
-    init.defaultBranch = lib.mkDefault "main";
-    log.date = lib.mkDefault "human";
-    pull.ff = lib.mkDefault "only";
-    push.autoSetupRemote = lib.mkDefault true;
-    url."git@github.com:".insteadOf = lib.mkDefault "github:";
+    alias = {
+      aliases = "config --global --get-regexp 'alias\\.'";
+      fullgraph = "log --graph --all --color --abbrev-commit --date=relative --pretty=format:'%C(red)%h%C(green)%d%C(reset)%x20%cd%C(bold blue)%x20%cn%C(reset)%C(yellow)%x20(%ce)%x20%C(cyan)%C(reset)%x20%s'";
+      graph = "log --abbrev-commit --all --color --decorate --graph --oneline";
+      last = "log -1 HEAD";
+    };
+    color = {
+      ui = true;
+      branch = {
+        current = "green";
+        local = "black dim";
+        remote = "yellow";
+      };
+      status = {
+        added = "green";
+        changed = "yellow";
+        untracked = "black dim";
+      };
+    };
+    help.autocorrect = 1;
+    init.defaultBranch = "main";
+    log.date = "human";
+    pull.ff = "only";
+    push.autoSetupRemote = true;
+    url."git@github.com:".insteadOf = "github:";
+    url."https://github.com/".insteadOf = "github.com:";
   };
   gitignore = [
     # keep-sorted start
@@ -50,15 +68,25 @@ in {
       programs.git = {
         enable = lib.mkDefault true;
         ignores = lib.mkDefault gitignore;
-        settings = lib.mkDefault gitconfig;
+        lfs.enable = lib.mkDefault true;
+        settings = gitconfig;
+        signing = {
+          format = lib.mkDefault "ssh";
+          signByDefault = lib.mkDefault true;
+        };
       };
     };
 
     nixosModules.software-git = {
-      environment.etc."gitignore".text = lib.mkDefault (builtins.concatStringsSep "\n" gitignore);
+      environment.etc."gitignore-global".text = lib.concatStringsSep "\n" gitignore + "\n";
       programs.git = {
         enable = lib.mkDefault true;
-        config = lib.mkDefault (gitconfig // {core.excludesfile = "/etc/gitignore";});
+        config =
+          gitconfig
+          // {
+            core.excludesFile = "/etc/gitignore-global";
+          };
+        lfs.enable = lib.mkDefault true;
       };
     };
   };

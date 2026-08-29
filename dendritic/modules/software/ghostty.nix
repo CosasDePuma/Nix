@@ -1,10 +1,15 @@
-{lib, ...}: {
+{
+  inputs,
+  lib,
+  ...
+}: {
   flake = {
     darwinModules.software-ghostty = {
       homebrew.casks = ["ghostty"];
     };
 
     homeManagerModules.software-ghostty = {osConfig, ...}: {
+      imports = [inputs.self.homeManagerModules.fonts-firacode];
       programs.ghostty = {
         enable = lib.mkDefault true;
         enableBashIntegration = lib.mkDefault osConfig.programs.bash.enable;

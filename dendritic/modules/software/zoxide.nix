@@ -10,7 +10,7 @@
         enableBashIntegration = lib.mkDefault osConfig.programs.bash.enable;
         enableFishIntegration = lib.mkDefault osConfig.programs.fish.enable;
         enableZshIntegration = lib.mkDefault osConfig.programs.zsh.enable;
-        options = lib.mkDefault ["--cmd cd"];
+        options = ["--cmd cd"];
       };
     };
 
@@ -20,7 +20,7 @@
         enableBashIntegration = lib.mkDefault config.programs.bash.enable;
         enableFishIntegration = lib.mkDefault config.programs.fish.enable;
         enableZshIntegration = lib.mkDefault config.programs.zsh.enable;
-        flags = lib.mkDefault ["--cmd cd"];
+        flags = ["--cmd cd"];
       };
     };
   };

@@ -17,6 +17,7 @@
 **/.env.*.local
 **/.env.local
 **/.idea/
+**/.playwright-mcp/
 **/__pycache__/
 **/build/
 **/bun.lockb

@@ -1,7 +1,59 @@
-{lib, ...}: {
+{lib, ...}: let
+  ciphers = [
+    "chacha20-poly1305@openssh.com"
+    "aes256-gcm@openssh.com"
+    "aes128-gcm@openssh.com"
+    "aes256-ctr"
+    "aes192-ctr"
+    "aes128-ctr"
+  ];
+  kex = [
+    "mlkem768x25519-sha256"
+    "sntrup761x25519-sha512"
+    "sntrup761x25519-sha512@openssh.com"
+  ];
+  macs = [
+    "hmac-sha2-512-etm@openssh.com"
+    "hmac-sha2-256-etm@openssh.com"
+    "umac-128-etm@openssh.com"
+  ];
+  sshHardening = ''
+    Ciphers ${lib.concatStringsSep "," ciphers}
+    KexAlgorithms ${lib.concatStringsSep "," kex}
+    MACs ${lib.concatStringsSep "," macs}
+    AuthorizedPrincipalsFile none
+    ChallengeResponseAuthentication no
+    ClientAliveInterval 300
+    GatewayPorts no
+    IgnoreRhosts yes
+    KbdInteractiveAuthentication no
+    LogLevel VERBOSE
+    LoginGraceTime 30
+    MaxAuthTries 3
+    MaxSessions 5
+    MaxStartups 10:30:100
+    PerSourceMaxStartups 1
+    PasswordAuthentication no
+    PermitEmptyPasswords no
+    PermitRootLogin no
+    PrintMotd no
+    # NixOS's own authorized_keys.d entries are symlinks into /nix/store,
+    # which on a multi-user install is group-writable for the build group --
+    # StrictModes rejects that as "bad ownership or modes", locking out the
+    # very keys NixOS declares. Off is the only way the two coexist.
+    StrictModes no
+    UseDns no
+    X11Forwarding no
+  '';
+in {
   flake = {
-    darwinModules.service-ssh = {
-      services.openssh.enable = lib.mkDefault true;
+    darwinModules.service-ssh = {config, ...}: {
+      services.openssh = {
+        enable = lib.mkDefault true;
+        extraConfig =
+          sshHardening
+          + lib.optionalString (config.system.primaryUser != null) "\nAllowUsers ${config.system.primaryUser}";
+      };
     };
 
     nixosModules.service-ssh = {
@@ -11,66 +63,45 @@
     }: {
       services.openssh.openFirewall = lib.mkDefault true;
       security.pam.sshAgentAuth.enable = lib.mkDefault true;
-      security.pam.services.sudo.sshAgentAuth = lib.mkDefault true;
       services.openssh = {
         enable = lib.mkDefault true;
         allowSFTP = lib.mkDefault true;
-        hostKeys = [
-          {
-            path = "/nix/persist/etc/ssh/ssh_host_ed25519_key";
-            type = "ed25519";
-          }
-          {
-            path = "/nix/persist/etc/ssh/ssh_host_rsa_key";
-            type = "rsa";
-            bits = 4096;
-          }
-        ];
         authorizedKeysInHomedir = lib.mkDefault false;
         ports = lib.mkDefault [64022];
         startWhenNeeded = lib.mkDefault true;
         settings = {
           AuthorizedPrincipalsFile = lib.mkDefault "none";
           ChallengeResponseAuthentication = lib.mkDefault false;
-          Ciphers = lib.mkDefault [
-            "chacha20-poly1305@openssh.com"
-            "aes256-gcm@openssh.com"
-            "aes128-gcm@openssh.com"
-            "aes256-ctr"
-            "aes192-ctr"
-            "aes128-ctr"
-          ];
+          Ciphers = lib.mkDefault ciphers;
           ClientAliveInterval = lib.mkDefault 300;
           GatewayPorts = lib.mkDefault "no";
           IgnoreRhosts = lib.mkDefault true;
           KbdInteractiveAuthentication = lib.mkDefault false;
-          KexAlgorithms = lib.mkDefault [
-            "curve25519-sha256@libssh.org"
-            "diffie-hellman-group16-sha512"
-            "diffie-hellman-group18-sha512"
-          ];
+          KexAlgorithms = lib.mkDefault kex;
           LogLevel = lib.mkDefault "VERBOSE";
           LoginGraceTime = lib.mkDefault "30";
-          Macs = lib.mkDefault [
-            "hmac-sha2-512-etm@openssh.com"
-            "hmac-sha2-256-etm@openssh.com"
-            "umac-128-etm@openssh.com"
-          ];
+          Macs = lib.mkDefault macs;
           MaxAuthTries = lib.mkDefault 3;
           MaxSessions = lib.mkDefault 5;
           MaxStartups = lib.mkDefault "10:30:100";
+          PerSourceMaxStartups = lib.mkDefault "1";
           PasswordAuthentication = lib.mkDefault false;
           PermitEmptyPasswords = lib.mkDefault false;
           PermitRootLogin = lib.mkDefault "no";
           PrintMotd = lib.mkDefault false;
-          StrictModes = lib.mkDefault true;
+          StrictModes = lib.mkDefault false;
           UseDns = lib.mkDefault false;
           UsePAM = lib.mkDefault true;
           X11Forwarding = lib.mkDefault false;
           AllowUsers = lib.mkDefault (
-            lib.attrsets.mapAttrsToList (name: _: name) (
-              lib.attrsets.filterAttrs (_: v: builtins.elem "sshusers" v.extraGroups) config.users.users
-            )
+            let
+              allowed = lib.attrsets.mapAttrsToList (name: _: name) (
+                lib.attrsets.filterAttrs (_: v: builtins.elem "sshusers" (v.extraGroups or [])) config.users.users
+              );
+            in
+              if allowed == []
+              then null
+              else allowed
           );
           Banner = lib.mkDefault (builtins.toString (
             pkgs.writeText "ssh-banner" ''

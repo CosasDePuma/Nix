@@ -12,11 +12,9 @@
           enable = lib.mkDefault true;
           strategy = lib.mkDefault ["history"];
         };
-        loginExtra = lib.mkDefault ''
-          if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" = 1 ]; then
-            exec start-hyprland
-          fi
-        '';
+        shellGlobalAliases = {
+          "--yolo" = lib.mkDefault "--dangerously-skip-permissions";
+        };
       };
     };
 
@@ -27,6 +25,9 @@
         autosuggestions = {
           enable = lib.mkDefault true;
           strategy = lib.mkDefault ["history"];
+        };
+        shellAliases = {
+          "--yolo" = lib.mkDefault "--dangerously-skip-permissions";
         };
       };
     };

@@ -22,40 +22,24 @@
                 seatonjiang.gitmoji-vscode
                 tamasfe.even-better-toml
               ]
-              ++ config.my.vscode-extraExtensions;
-            userSettings = {
-              "terminal.integrated.fontFamily" = "'FiraCode Nerd Font Mono', monospace";
-              "explorer.fileNesting.enabled" = true;
-              "explorer.fileNesting.patterns" = {
-                "flake.nix" = "flake.lock";
-              };
-              "terminal.integrated.fontLigatures.enabled" = true;
-              "todo-tree.tree.hideTreeWhenEmpty" = true;
-            };
+              ++ lib.optional (config.programs.claude-code.enable or false) anthropic.claude-code;
           }
           extras
         ];
     in {
-      options.my.vscode-extraExtensions = lib.mkOption {
-        type = lib.types.listOf lib.types.package;
-        default = [];
-        description = "Additional VSCode extensions to install.";
-        example = with pkgs.vscode-extensions; [
-          "ms-python.python"
-          "esbenp.prettier-vscode"
-        ];
-      };
       config.programs.vscode = {
         enable = lib.mkDefault true;
         profiles = {
           "default" = vsconfig {};
           "python" = vsconfig {
             extensions = with pkgs.vscode-extensions; [ms-python.python];
-            userSettings."explorer.fileNesting.patterns" = {
-              "pyproject.toml" = "poetry.lock,uv.lock";
-            };
           };
         };
+      };
+
+      config.home.file = lib.mkIf (config.programs.vscode.enable or false) {
+        ".config/Code/User/settings.json".source =
+          config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.local/state/theme/vscode.json";
       };
     };
 

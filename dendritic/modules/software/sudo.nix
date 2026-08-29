@@ -13,6 +13,7 @@
         sudo-rs = {
           enable = lib.mkDefault true;
           execWheelOnly = lib.mkDefault true;
+          wheelNeedsPassword = lib.mkDefault true;
         };
       };
     };

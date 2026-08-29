@@ -1,16 +1,12 @@
-{
-  inputs,
-  lib,
-  ...
-}: {
+{lib, ...}: {
   flake.nixosModules.software-qemu = {pkgs, ...}: {
-    imports = [inputs.self.nixosModules.software-dnsmasq];
     boot.initrd.kernelModules = [
       "virtio_blk"
       "virtio_pci"
       "virtio_scsi"
     ];
     environment.systemPackages = with pkgs; [
+      dnsmasq # TODO: Import as module
       spice
       spice-gtk
       spice-protocol
@@ -20,6 +16,11 @@
     networking.firewall.trustedInterfaces = lib.mkDefault ["virbr0"];
     virtualisation.libvirtd = {
       enable = lib.mkDefault true;
+      onBoot = lib.mkDefault "start";
+      onShutdown = lib.mkDefault "shutdown";
+      parallelShutdown = lib.mkDefault 0;
+      shutdownTimeout = lib.mkDefault 300;
+      firewallBackend = lib.mkDefault "nftables";
       qemu = {
         package = lib.mkDefault pkgs.qemu_kvm;
         runAsRoot = lib.mkDefault true;
