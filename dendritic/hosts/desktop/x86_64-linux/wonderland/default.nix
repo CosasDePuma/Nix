@@ -21,6 +21,7 @@
       software-spotify
       software-vscode
       software-windowsvm
+      software-wow
       system-impermanence
       # keep-sorted end
     ];
@@ -37,6 +38,7 @@
         software-spotify
         software-vscode
         software-windowsvm
+        software-wow
         themes-everforest
         # keep-sorted end
       ];
@@ -57,6 +59,7 @@
         ".vscode"
         "Documents"
         "Downloads"
+        "Games"
         "Windows"
         # keep-sorted end
       ];
