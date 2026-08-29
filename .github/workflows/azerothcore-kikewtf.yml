@@ -14,6 +14,9 @@ env:
   MOD_PLAYERBOTS_REF: master
   MOD_ALE_REF: master
   MOD_SPELLDRAFT_REF: main
+  MOD_HARDCORE_REF: main
+  MOD_AH_BOT_PLUS_REF: master
+  MOD_DUNGEON_CLEAR_REF: master
 
 jobs:
   build:
@@ -38,6 +41,9 @@ jobs:
           git clone --depth 1 --branch "$MOD_PLAYERBOTS_REF" https://github.com/mod-playerbots/mod-playerbots.git
           git clone --depth 1 --branch "$MOD_ALE_REF" https://github.com/azerothcore/mod-ale.git
           git clone --depth 1 --branch "$MOD_SPELLDRAFT_REF" https://github.com/bdodroid/mod-spelldraft.git
+          git clone --depth 1 --branch "$MOD_HARDCORE_REF" https://github.com/Zindokar/mod-hardcore.git
+          git clone --depth 1 --branch "$MOD_AH_BOT_PLUS_REF" https://github.com/NathanHandley/mod-ah-bot-plus.git
+          git clone --depth 1 --branch "$MOD_DUNGEON_CLEAR_REF" https://github.com/jrad7/mod-dungeon-clear.git
 
       - name: Apply mod-spelldraft core patches
         run: |
