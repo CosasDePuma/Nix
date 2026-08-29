@@ -19,6 +19,7 @@
       software-podman
       software-steam
       software-sudo
+      software-tailscale
       software-unar
       software-warp
       software-whatsapp
