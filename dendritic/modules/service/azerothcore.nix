@@ -116,6 +116,13 @@
           # above -- without this, worldserver refuses to start at all
           # ("Database Playerbots not specified in configuration file!").
           AC_PLAYERBOTS_DATABASE_INFO = dbInfo "playerbots";
+          # Without these two, mod-spelldraft doesn't just fall back to a
+          # default and move on like every other missing-property warning --
+          # it spins in a tight retry loop (21k+ identical log lines and
+          # climbing CPU/network use within 2 minutes, never finishing boot).
+          # Values match what the warning itself suggests.
+          AC_SPELL_DRAFT_ENABLE = "1";
+          AC_SPELL_DRAFT_ALLOW_SPELLS_IN_DRUID_FORMS = "0";
         };
         volumes = [etcVolume logsVolume "ac-client-data:/azerothcore/env/dist/data/:ro"];
         ports = [
