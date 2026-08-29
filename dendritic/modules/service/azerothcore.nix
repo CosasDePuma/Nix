@@ -139,6 +139,12 @@
 
     systemd.services = {
       "podman-ac-client-data-init".serviceConfig.Restart = lib.mkForce "no";
+      # One-shot like ac-client-data-init above: without this it defaults to
+      # Restart=always, so it keeps re-running (successfully) after its job
+      # is done until it trips systemd's start-limit-burst -- which then
+      # cascades into ac-worldserver refusing to start at all, since that
+      # unit depends on this one.
+      "podman-ac-db-import".serviceConfig.Restart = lib.mkForce "no";
       "podman-ac-worldserver".after = ["podman-ac-client-data-init.service"];
     };
   };
