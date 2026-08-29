@@ -1,0 +1,67 @@
+name: azerothcore-kikewtf
+
+on:
+  workflow_dispatch: {}
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+env:
+  IMAGE: ghcr.io/cosasdepuma/nix
+  # Pin each module to a ref. Bump these manually to pull in upstream
+  # changes -- nothing here tracks them automatically.
+  MOD_PLAYERBOTS_REF: master
+  MOD_ALE_REF: master
+  MOD_SPELLDRAFT_REF: main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Free disk space
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+
+      - name: Checkout azerothcore-wotlk (Playerbot branch)
+        uses: actions/checkout@v4
+        with:
+          repository: mod-playerbots/azerothcore-wotlk
+          ref: Playerbot
+          path: core
+
+      - name: Clone extra modules
+        run: |
+          cd core/modules
+          git clone --depth 1 --branch "$MOD_PLAYERBOTS_REF" https://github.com/mod-playerbots/mod-playerbots.git
+          git clone --depth 1 --branch "$MOD_ALE_REF" https://github.com/azerothcore/mod-ale.git
+          git clone --depth 1 --branch "$MOD_SPELLDRAFT_REF" https://github.com/bdodroid/mod-spelldraft.git
+
+      - name: Apply mod-spelldraft core patches
+        run: |
+          cd core/modules/mod-spelldraft
+          ./install.sh
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push service images
+        run: |
+          set -euo pipefail
+          for target in worldserver authserver db-import client-data; do
+            docker buildx build \
+              --file core/apps/docker/Dockerfile \
+              --target "$target" \
+              --tag "${IMAGE}:azerothcore-${target}" \
+              --push \
+              core
+          done
