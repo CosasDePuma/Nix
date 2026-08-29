@@ -38,11 +38,13 @@ merged automatically, speculatively, or "just to keep things tidy".
 - The only person who authorises a merge is the project lead.
 
 When a merge is authorised, always use `--no-ff` so the branch topology is
-preserved in the graph:
+preserved in the graph, and write the merge commit message following the
+[Merge commits](#merge-commits) convention below — never the Git-generated
+default:
 
 ```bash
 git checkout main
-git merge --no-ff feat/my-feature -m "Merge branch 'feat/my-feature' into main"
+git merge --no-ff feat/my-feature -m "merge(main): merge from feat/my-feature"
 ```
 
 ### 3. Every commit and every branch must follow the naming convention
@@ -170,11 +172,19 @@ feat(browser): fix SSL and update deps and refactor cli   ← one commit, three 
 
 ### Merge commits
 
-Merge commits also follow the convention. The message is auto-generated when
-you use the `--no-ff` flag with `-m`:
+Merge commits follow their own fixed format — do **not** use Git's default
+`Merge branch 'x' into y` message. Always pass an explicit `-m` with:
+
+```
+merge(dest): merge from source
+```
+
+Where `dest` is the branch being merged into and `source` is the branch being
+merged, both written exactly as their branch name (no `type/` prefix stripped,
+no rewording):
 
 ```bash
-git merge --no-ff feat/ssl-detection -m "Merge branch 'feat/ssl-detection' into main"
+git merge --no-ff feat/ssl-detection -m "merge(main): merge from feat/ssl-detection"
 ```
 
 ---
