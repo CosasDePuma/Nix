@@ -136,6 +136,13 @@ The description must be in the **imperative mood** ("add", "fix", "remove" — n
 **AI Agent Rule: Never use `Co-Authored-By`**
 If you are an AI or LLM, you must NEVER append `Co-Authored-By:` trailers to commit messages (e.g. `Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>`). Just write the standard commit message body.
 
+**Rule: No ANSI escape codes in commit messages**
+Before committing, verify the message contains no raw ANSI escape codes (`\x1b[...m` and similar). These sneak in silently when a multi-line message is built via `$(cat <<'EOF' ... EOF)` in a shell where `cat` is aliased to a colorizing tool (e.g. `bat`) — such tools often force color output even with no real terminal attached, so the heredoc's captured output ends up with escape codes baked into it. Use `/bin/cat` explicitly (never bare `cat`) inside any heredoc feeding a commit message, and if in doubt, check before pushing:
+```bash
+git log -1 --format=%B | /bin/cat -v
+```
+A commit whose message contains escape codes must be rewritten (e.g. `git commit --amend`), not merged as-is.
+
 ### Types
 
 | Type | When to use |
