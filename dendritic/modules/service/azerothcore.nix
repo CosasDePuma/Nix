@@ -1,18 +1,19 @@
 {inputs, ...}: {
   # AzerothCore (WoW 3.3.5a emulator) as a Podman container stack, mirroring
-  # https://www.azerothcore.org/wiki/installation's Docker setup but pulling
-  # the upstream prebuilt images instead of cloning/building the repo.
+  # https://www.azerothcore.org/wiki/installation's Docker setup. The
+  # mod-playerbots fork never publishes prebuilt images upstream (its
+  # docker_build.yml only pushes when running on azerothcore/azerothcore-wotlk
+  # itself), so these are built by .github/workflows/azerothcore-kikewtf.yml
+  # with mod-playerbots, mod-ale and mod-spelldraft baked in.
   flake.nixosModules.service-azerothcore = {
     config,
     lib,
     ...
   }: let
-    version = "master";
     # Fully qualified: podman refuses to guess a registry for a short name
-    # like "mysql:8.4" unless unqualified-search-registries is set globally,
-    # so every image here names its registry explicitly instead of relying
-    # on that.
-    acImage = name: lib.mkDefault "docker.io/acore/ac-wotlk-${name}:${version}";
+    # unless unqualified-search-registries is set globally, so this names
+    # the registry explicitly instead of relying on that.
+    acImage = name: lib.mkDefault "ghcr.io/cosasdepuma/nix:azerothcore-${name}";
 
     # Single source of truth for the DB root credential: every server reads
     # it back from ac-database (set once, below, with mkDefault) instead of
