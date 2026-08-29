@@ -69,6 +69,10 @@
           AC_LOGIN_DATABASE_INFO = dbInfo "auth";
           AC_WORLD_DATABASE_INFO = dbInfo "world";
           AC_CHARACTER_DATABASE_INFO = dbInfo "characters";
+          # mod-playerbots keeps its own database, separate from the three
+          # above -- without this, worldserver refuses to start at all
+          # ("Database Playerbots not specified in configuration file!").
+          AC_PLAYERBOTS_DATABASE_INFO = dbInfo "playerbots";
         };
         volumes = [etcVolume logsVolume];
         # Waits for ac-database's healthcheck (podman.sdnotify = "healthy"
@@ -108,6 +112,10 @@
           AC_LOGIN_DATABASE_INFO = dbInfo "auth";
           AC_WORLD_DATABASE_INFO = dbInfo "world";
           AC_CHARACTER_DATABASE_INFO = dbInfo "characters";
+          # mod-playerbots keeps its own database, separate from the three
+          # above -- without this, worldserver refuses to start at all
+          # ("Database Playerbots not specified in configuration file!").
+          AC_PLAYERBOTS_DATABASE_INFO = dbInfo "playerbots";
         };
         volumes = [etcVolume logsVolume "ac-client-data:/azerothcore/env/dist/data/:ro"];
         ports = [
