@@ -1,5 +1,6 @@
 {
   "hosts": {
+    "router": "100.64.0.1/32",
     "homelab": "10.0.10.0/24",
     "wow-server": "10.0.10.10/32",
     "nas": "192.168.1.3/32",
@@ -13,14 +14,19 @@
   },
 
   "acls": [
-    // 1. pumita (personal user) and tag:homelab devices: full unrestricted access
+    // 1. Homelab: acceso exclusivo a toda la infraestructura .home. (router, VLAN 10, NAS, Proxmox)
     {
       "action": "accept",
-      "src": ["pumita@", "tag:homelab"],
-      "dst": ["*:*"]
+      "src": ["tag:homelab"],
+      "dst": [
+        "router:*",
+        "homelab:*",
+        "nas:*",
+        "proxmox:*"
+      ]
     },
 
-    // 2. Gaming (WoW / AzerothCore server auth and world ports)
+    // 2. Gaming: acceso exclusivamente al servidor WoW (AzerothCore: auth 3724, world 8085)
     {
       "action": "accept",
       "src": ["tag:gaming"],
@@ -29,6 +35,6 @@
       ]
     }
 
-    // 3. Media: placeholder without access rules for now (default deny)
+    // 3. Media: de momento sin reglas de acceso (drop por defecto)
   ]
 }
