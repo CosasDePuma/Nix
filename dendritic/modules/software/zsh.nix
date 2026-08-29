@@ -30,7 +30,7 @@
           "--yolo" = lib.mkDefault "--dangerously-skip-permissions";
         };
       };
-      users.defaultUserShell = lib.mkForce pkgs.zsh;
+      users.defaultUserShell = lib.mkOverride 900 pkgs.zsh;
     };
   };
 }
