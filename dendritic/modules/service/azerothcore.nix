@@ -20,8 +20,13 @@
 
     # Fully qualified: podman refuses to guess a registry for a short name
     # unless unqualified-search-registries is set globally, so this names
-    # the registry explicitly instead of relying on that.
-    acImage = name: lib.mkDefault "ghcr.io/cosasdepuma/nix:azerothcore-${name}";
+    # the registry explicitly instead of relying on that. Tag suffix drops
+    # hyphens (db-import -> dbimport, client-data -> clientdata) to match
+    # what .github/workflows/azerothcore-kikewtf.yml actually publishes --
+    # the Docker build --target itself stays hyphenated there, since that
+    # has to match the upstream Dockerfile's real stage names; only the
+    # pushed tag is renamed.
+    acImage = name: lib.mkDefault "ghcr.io/cosasdepuma/nix:${prefix}-${lib.replaceStrings ["-"] [""] name}";
 
     # Single source of truth for the DB root credential: every server reads
     # it back from the database container (set once, below, with mkDefault)

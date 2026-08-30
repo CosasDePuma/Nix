@@ -9,6 +9,7 @@ concurrency:
 
 env:
   IMAGE: ghcr.io/cosasdepuma/nix
+  PREFIX: isekaiofwarcraft
   # Pin each module to a ref. Bump these manually to pull in upstream
   # changes -- nothing here tracks them automatically.
   MOD_PLAYERBOTS_REF: master
@@ -67,11 +68,16 @@ jobs:
       - name: Build and push service images
         run: |
           set -euo pipefail
+          # --target must match the Dockerfile's actual stage names
+          # (hyphenated: db-import, client-data) -- only the pushed tag
+          # drops the hyphen, to match the isekaiofwarcraft-* container
+          # names in azerothcore.nix (e.g. isekaiofwarcraft-dbimport).
           for target in worldserver authserver db-import client-data; do
+            tag="${target//-/}"
             docker buildx build \
               --file core/apps/docker/Dockerfile \
               --target "$target" \
-              --tag "${IMAGE}:azerothcore-${target}" \
+              --tag "${IMAGE}:${PREFIX}-${tag}" \
               --push \
               core
           done
@@ -104,7 +110,7 @@ jobs:
           DOCKERFILE
           docker buildx build \
             --file /tmp/with-modules.Dockerfile \
-            --build-arg BASE="${IMAGE}:azerothcore-worldserver" \
-            --tag "${IMAGE}:azerothcore-worldserver" \
+            --build-arg BASE="${IMAGE}:${PREFIX}-worldserver" \
+            --tag "${IMAGE}:${PREFIX}-worldserver" \
             --push \
             core
