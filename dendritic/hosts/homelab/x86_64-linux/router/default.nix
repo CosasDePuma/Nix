@@ -14,6 +14,8 @@
       network-forwarding
       network-interfaces
       network-nftables
+      service-ddclient
+      service-dnsmasq
       service-headscale
       service-ssh
       settings-locale
@@ -158,53 +160,34 @@
       };
 
       ddclient = {
-        enable = true;
         domains = ["vpn.${domain}"];
-        interval = "1h";
-        protocol = "cloudflare";
         passwordFile = config.age.secrets."cloudflare-key".path;
-        verbose = true;
         zone = domain;
       };
 
-      dnsmasq = {
-        enable = true;
-        resolveLocalQueries = false;
-        settings = {
-          # More specific entries win over the wildcard: LAN/tailnet clients
-          # get sent straight to the router over the LAN instead of round-
-          # tripping out to the internet and back for its own public IP
-          # (which may not even hairpin back in on every ISP router anyway).
-          address = [
-            "/${domain}/10.0.10.1"
-            "/vpn.${domain}/10.0.10.254"
-          ];
-          bind-dynamic = true;
-          interface = [
-            "vl10.homelab"
-            "vl20.hacking"
-          ];
-          dhcp-range = [
-            "vl10.homelab,10.0.10.100,10.0.10.200,255.255.255.0,24h"
-            "vl20.hacking,10.0.20.100,10.0.20.200,255.255.255.0,24h"
-          ];
-          dhcp-option = [
-            "vl10.homelab,option:router,${(builtins.head config.networking.interfaces."vl10.homelab".ipv4.addresses).address}"
-            "vl10.homelab,option:dns-server,${(builtins.head config.networking.interfaces."vl10.homelab".ipv4.addresses).address}"
-            "vl20.hacking,option:router,${(builtins.head config.networking.interfaces."vl20.hacking".ipv4.addresses).address}"
-            "vl20.hacking,option:dns-server,${(builtins.head config.networking.interfaces."vl20.hacking".ipv4.addresses).address}"
-          ];
-          cache-size = 1000;
-          domain-needed = true;
-          bogus-priv = true;
-          no-hosts = true;
-          no-resolv = true;
-          no-poll = true;
-          server = [
-            "1.1.1.1"
-            "8.8.8.8"
-          ];
-        };
+      dnsmasq.settings = {
+        # More specific entries win over the wildcard: LAN/tailnet clients
+        # get sent straight to the router over the LAN instead of round-
+        # tripping out to the internet and back for its own public IP
+        # (which may not even hairpin back in on every ISP router anyway).
+        address = [
+          "/${domain}/10.0.10.1"
+          "/vpn.${domain}/10.0.10.254"
+        ];
+        interface = [
+          "vl10.homelab"
+          "vl20.hacking"
+        ];
+        dhcp-range = [
+          "vl10.homelab,10.0.10.100,10.0.10.200,255.255.255.0,24h"
+          "vl20.hacking,10.0.20.100,10.0.20.200,255.255.255.0,24h"
+        ];
+        dhcp-option = [
+          "vl10.homelab,option:router,${(builtins.head config.networking.interfaces."vl10.homelab".ipv4.addresses).address}"
+          "vl10.homelab,option:dns-server,${(builtins.head config.networking.interfaces."vl10.homelab".ipv4.addresses).address}"
+          "vl20.hacking,option:router,${(builtins.head config.networking.interfaces."vl20.hacking".ipv4.addresses).address}"
+          "vl20.hacking,option:dns-server,${(builtins.head config.networking.interfaces."vl20.hacking".ipv4.addresses).address}"
+        ];
       };
     };
     users.users.router = {
