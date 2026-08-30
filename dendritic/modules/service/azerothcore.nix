@@ -86,6 +86,10 @@
           # log lines, never boots).
           AC_SPELL_DRAFT_ENABLE = "1";
           AC_SPELL_DRAFT_ALLOW_SPELLS_IN_DRUID_FORMS = "0";
+          # Same as spelldraft above: mod-aoe-loot rechecks these on every
+          # loot event instead of defaulting once (1000+ log lines/boot).
+          AC_AOELOOT_ENABLE = "1";
+          AC_AOELOOT_MESSAGE = "1";
 
           # 5x leveling speed, 2x item drops.
           AC_RATE_XP_KILL = "5";
