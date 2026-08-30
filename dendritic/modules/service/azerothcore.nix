@@ -173,6 +173,8 @@
           # nothing was wrong with Eluna or the scripts themselves. Point at
           # it with an absolute path instead of relying on CWD.
           AC_ALE_SCRIPT_PATH = "/azerothcore/env/dist/lua_scripts";
+
+          AC_MOTD = lib.mkDefault "Welcome to AzerothCore!";
         };
         volumes = [etcVolume logsVolume "ac-client-data:/azerothcore/env/dist/data/:ro"];
         ports = [
