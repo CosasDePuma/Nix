@@ -12,20 +12,8 @@
     ...
   }: let
     # Container name prefix -- matches the realm name (REALM_NAME below).
-    # Only the container/systemd-unit identity changes when this is
-    # bumped; the underlying data volumes (ac-database, ac-client-data,
-    # ac-config, ac-logs) are named separately and untouched, so renaming
-    # this never loses accounts/characters/etc.
+    # Only the container/systemd-unit identity changes when this is bumped.
     prefix = "isekaiofwarcraft";
-
-    # Fully qualified: podman refuses to guess a registry for a short name
-    # unless unqualified-search-registries is set globally, so this names
-    # the registry explicitly instead of relying on that. Tag suffix drops
-    # hyphens (db-import -> dbimport, client-data -> clientdata) to match
-    # what .github/workflows/azerothcore-kikewtf.yml actually publishes --
-    # the Docker build --target itself stays hyphenated there, since that
-    # has to match the upstream Dockerfile's real stage names; only the
-    # pushed tag is renamed.
     acImage = name: lib.mkDefault "ghcr.io/cosasdepuma/nix:${prefix}-${lib.replaceStrings ["-"] [""] name}";
 
     # Single source of truth for the DB root credential: every server reads
