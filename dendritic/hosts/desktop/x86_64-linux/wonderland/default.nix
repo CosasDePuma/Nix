@@ -1,5 +1,9 @@
 {inputs, ...}: {
   flake.nixosModules.wonderland = {
+    lib,
+    pkgs,
+    ...
+  }: {
     imports = with inputs.self.nixosModules; [
       # keep-sorted start
       boot-efi
@@ -79,6 +83,18 @@
     # unprivileged nix store binary and tailscale-systray's up/down fail
     # with "pkexec must be setuid root".
     security.polkit.enablePkexecWrapper = true;
+
+    # `tailscale` in PATH is a symlink to the same multicall binary as
+    # `tailscaled` (argv[0]-dispatched); pkexec canonicalizes the path
+    # before exec'ing it for TOCTOU safety, so `pkexec tailscale up`
+    # collapses to the daemon binary and fails with "Tailscaled does not
+    # take non-flag arguments". A real (non-symlink) wrapper that pins
+    # argv[0] survives that canonicalization.
+    environment.systemPackages = [
+      (lib.hiPrio (pkgs.writeShellScriptBin "tailscale" ''
+        exec -a tailscale ${pkgs.tailscale}/bin/tailscaled "$@"
+      ''))
+    ];
     # Root tmpfs's shared 2G default filled up: the WoW client alone is ~2GB
     # and briefly sat on it (not yet persisted the first time it was
     # extracted), leaving no room for anything else, including nix's own
