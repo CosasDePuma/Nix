@@ -2,6 +2,7 @@ let
   pumita = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKh1YtKaItcNzC3RGez38zaJ0geelyrb6AFV73OqLchv pumita";
   vmHomelabRouter = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJKUXuzhBlJMwGCXAanz7KnTz8HOWccVgU4tJsilIPjY root@router";
   vmHomelabMedia = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICBekVv5frPrfFD9JtEJGZp7YXmq3HqjGdZiznseUXgv root@media";
+  wonderland = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIYjbPn9PgJXtEpzkkBXiZV/TIShXl5Ny5Rb0oB7m6MP root@wonderland";
   #
   #  vm-homelab = {
   #    automation = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF5MEUY8ks+UAOo3u2EeLEsoJX1yK6nki5hZ7jhuj7NZ @homelab.automation";
@@ -72,6 +73,12 @@ in {
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
   "dendritic/hosts/homelab/x86_64-linux/media/.smb/smb.creds.age".publicKeys = [pumita vmHomelabMedia];
+
+  # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  # ┃                Wonderland                 ┃
+  # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  "dendritic/hosts/desktop/x86_64-linux/wonderland/.tailscale/preauth-key.age".publicKeys = [pumita wonderland];
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                 Profiles                  ┃
