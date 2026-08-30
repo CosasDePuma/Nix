@@ -1,5 +1,5 @@
 {inputs, ...}: {
-  flake.nixosModules.wonderland = {config, ...}: {
+  flake.nixosModules.wonderland = {
     imports = with inputs.self.nixosModules; [
       # keep-sorted start
       boot-efi
@@ -28,26 +28,33 @@
       # keep-sorted end
     ];
 
-    age.secrets."tailscale-preauth-key".file = ./.tailscale/preauth-key.age;
-
-    # Admin's own device: pulls in the router's advertised LAN route via
-    # tag:admin on the preauth key (see the router's ACL) rather than
-    # advertising anything itself.
-    services.tailscale = {
-      authKeyFile = config.age.secrets."tailscale-preauth-key".path;
-      extraUpFlags = [
-        "--login-server=https://vpn.kike.wtf"
-        "--accept-routes"
-      ];
-    };
-
-    home-manager.users.wizard = {
+    home-manager.users.wizard = {pkgs, ...}: {
       home.stateVersion = "26.11";
+      home.packages = [pkgs.tailscale-systray];
       home.file = let
         gameDir = "Games/WoW/ChromieCraft_3.3.5a";
       in {
         "${gameDir}/realmlist.wtf".text = "set realmlist wow.game.kike.wtf";
         "${gameDir}/Data/enUS/realmlist.wtf".text = "set realmlist wow.game.kike.wtf";
+      };
+      # tailscale's Linux CLI has no GUI of its own -- this gives the
+      # tray icon + pkexec-driven up/down that omarchy-shell's tailscale
+      # panel alone doesn't provide (login now happens interactively
+      # here instead of the old auto-connecting authKeyFile).
+      systemd.user.services.tailscale-systray = {
+        Unit = {
+          Description = "Tailscale systray";
+          PartOf = ["graphical-session.target"];
+          After = ["graphical-session.target"];
+          StartLimitIntervalSec = 60;
+          StartLimitBurst = 10;
+        };
+        Service = {
+          ExecStart = "${pkgs.tailscale-systray}/bin/tailscale-systray";
+          Restart = "on-failure";
+          RestartSec = "2s";
+        };
+        Install.WantedBy = ["graphical-session.target"];
       };
       imports = with inputs.self.homeManagerModules; [
         # keep-sorted start
@@ -102,8 +109,6 @@
     };
 
     networking.hostName = "wonderland";
-
-    system.stateVersion = "26.11";
 
     users.users.wizard = {
       initialPassword = "wizard";
