@@ -2,38 +2,32 @@
   flake.nixosModules.router = {config, ...}: let
     domain = "kike.wtf";
   in {
-    imports =
-      [inputs.disko.nixosModules.default]
-      ++ (with inputs.self.nixosModules; [
-        # keep-sorted start
-        hardware-serial
-        cpu-intel
-        hardware-defaults
-        network-dns
-        network-forwarding
-        network-interfaces
-        network-nftables
-        service-headscale
-        service-ssh
-        settings-locale
-        settings-nix
-        software-network-tools
-        software-sudo
-        software-tailscale
-        system-impermanence
-        # keep-sorted end
-      ]);
-
-    # Encrypted for this host's own SSH host key (plus pumita, so secrets can
-    # still be edited from the admin machine) -- agenix's default
-    # age.identityPaths already resolves to services.openssh.hostKeys, and
-    # /etc/ssh is persisted by system-impermanence, so no extra wiring is
-    # needed for the router to decrypt these itself at activation.
+    imports = with inputs.self.nixosModules; [
+      # keep-sorted start
+      boot-efi
+      boot-loader-grub
+      cpu-intel
+      disko-impermanence
+      hardware-defaults
+      hardware-serial
+      network-dns
+      network-forwarding
+      network-interfaces
+      network-nftables
+      service-headscale
+      service-ssh
+      settings-locale
+      settings-nix
+      software-network-tools
+      software-sudo
+      software-tailscale
+      system-impermanence
+      # keep-sorted end
+    ];
     age.secrets = {
       "cloudflare-key".file = ./.ddclient/cloudflare-key.age;
       "tailscale-preauth-key".file = ./.tailscale/preauth-key.age;
     };
-
     # WAN-facing sysctls only: don't act on router-advertised IPv6 config
     # from upstream, and don't run SLAAC/temp-address autoconf on eth0.
     boot.kernel.sysctl = {
@@ -43,54 +37,7 @@
       "net.ipv6.conf.eth0.accept_ra" = 2;
       "net.ipv6.conf.eth0.autoconf" = 1;
     };
-
-    # Matches this VM's actual, already-formatted disk exactly (verified via
-    # `lsblk -o PARTLABEL,MOUNTPOINT` on the live box) -- this is legacy
-    # BIOS/GPT from before disko-impermanence's ESP+nix layout existed, and
-    # nixos-rebuild switch never reformats, so the partition names/sizes
-    # below have to describe reality, not the newer convention.
-    #
-    # No boot-loader-grub import: disko itself already sets
-    # boot.loader.grub.devices once it sees the EF02 (BIOS-boot) partition
-    # below, and adding boot-loader-grub's own `device` on top of that
-    # duplicates the entry, which grub's own assertions reject.
-    disko.devices = {
-      disk.main = {
-        type = "disk";
-        device = "/dev/sda";
-        content = {
-          type = "gpt";
-          partitions = {
-            BOOT = {
-              size = "1M";
-              type = "EF02";
-            };
-            BOOT_FS = {
-              size = "1G";
-              content = {
-                type = "filesystem";
-                format = "ext4";
-                mountpoint = "/boot";
-              };
-            };
-            NIXOS = {
-              size = "100%";
-              content = {
-                type = "filesystem";
-                format = "ext4";
-                mountpoint = "/nix";
-                extraArgs = ["-L" "NIXOS"];
-              };
-            };
-          };
-        };
-      };
-      nodev."/" = {
-        fsType = "tmpfs";
-        mountOptions = ["x-initrd.mount" "defaults" "size=2G" "mode=755"];
-      };
-    };
-
+    disko.devices.disk.main.device = "/dev/sda";
     networking = {
       hostName = "router";
       interfaces = {
@@ -133,17 +80,8 @@
       };
       nftables.ruleset = builtins.readFile ./.nftables/tables.nft;
     };
-
     nixpkgs.config.allowUnfree = false;
-
     services = {
-      # Proxmox VM, not real Intel hardware -- no RAPL sysfs for thermald to
-      # read, so it exits immediately every boot instead of doing anything.
-      thermald.enable = false;
-
-      # Trying this alongside the existing WireGuard setup, not replacing it
-      # yet -- reuses the same domain ddclient already keeps pointed at this
-      # box, just on a different port.
       headscale.settings = {
         server_url = "https://vpn.${domain}";
         tls_letsencrypt_hostname = "vpn.${domain}";
@@ -204,6 +142,7 @@
           ];
         };
       };
+      thermald.enable = false;
 
       # Subnet router only: gaming/services/etc. don't run tailscale
       # themselves, they're just reachable through the LAN route this
@@ -268,9 +207,6 @@
         };
       };
     };
-
-    system.stateVersion = "26.11";
-
     users.users.router = {
       initialPassword = "router";
       isNormalUser = true;
