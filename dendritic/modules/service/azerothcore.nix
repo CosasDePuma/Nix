@@ -11,17 +11,24 @@
     pkgs,
     ...
   }: let
+    # Container name prefix -- matches the realm name (REALM_NAME below).
+    # Only the container/systemd-unit identity changes when this is
+    # bumped; the underlying data volumes (ac-database, ac-client-data,
+    # ac-config, ac-logs) are named separately and untouched, so renaming
+    # this never loses accounts/characters/etc.
+    prefix = "isekaiofwarcraft";
+
     # Fully qualified: podman refuses to guess a registry for a short name
     # unless unqualified-search-registries is set globally, so this names
     # the registry explicitly instead of relying on that.
     acImage = name: lib.mkDefault "ghcr.io/cosasdepuma/nix:azerothcore-${name}";
 
     # Single source of truth for the DB root credential: every server reads
-    # it back from ac-database (set once, below, with mkDefault) instead of
-    # duplicating the literal, so overriding it in one place keeps them
-    # all in sync.
-    dbPassword = config.virtualisation.oci-containers.containers.ac-database.environment.MYSQL_ROOT_PASSWORD;
-    dbInfo = db: "ac-database;3306;root;${dbPassword};acore_${db}";
+    # it back from the database container (set once, below, with mkDefault)
+    # instead of duplicating the literal, so overriding it in one place
+    # keeps them all in sync.
+    dbPassword = config.virtualisation.oci-containers.containers."${prefix}-database".environment.MYSQL_ROOT_PASSWORD;
+    dbInfo = db: "${prefix}-database;3306;root;${dbPassword};acore_${db}";
 
     etcVolume = "ac-config:/azerothcore/env/dist/etc";
     logsVolume = "ac-logs:/azerothcore/env/dist/logs";
@@ -31,13 +38,13 @@
     virtualisation.oci-containers.backend = lib.mkDefault "podman";
 
     # netavark's built-in DNS resolves containers by name on this network,
-    # so ac-db-import/ac-authserver/ac-worldserver can reach "ac-database"
-    # without hand-rolling a dedicated podman network to get the same thing
-    # docker-compose gives for free.
+    # so the db-import/authserver/worldserver containers can reach the
+    # database container without hand-rolling a dedicated podman network to
+    # get the same thing docker-compose gives for free.
     virtualisation.podman.defaultNetwork.settings.dns_enabled = lib.mkDefault true;
 
     virtualisation.oci-containers.containers = {
-      ac-database = {
+      "${prefix}-database" = {
         image = lib.mkDefault "docker.io/library/mysql:8.4";
         environment.MYSQL_ROOT_PASSWORD = lib.mkDefault "password";
         volumes = ["ac-database:/var/lib/mysql"];
@@ -57,12 +64,12 @@
       # One-shot: downloads the WoW client data (maps/dbc/vmaps/mmaps) the
       # servers need, then exits. Re-runs on every boot but the upstream
       # entrypoint skips the download once the volume is already populated.
-      ac-client-data-init = {
+      "${prefix}-client-data-init" = {
         image = acImage "client-data";
         volumes = ["ac-client-data:/azerothcore/env/dist/data"];
       };
 
-      ac-db-import = {
+      "${prefix}-db-import" = {
         image = acImage "db-import";
         environment = {
           AC_DATA_DIR = "/azerothcore/env/dist/data";
@@ -76,12 +83,12 @@
           AC_PLAYERBOTS_DATABASE_INFO = dbInfo "playerbots";
         };
         volumes = [etcVolume logsVolume];
-        # Waits for ac-database's healthcheck (podman.sdnotify = "healthy"
-        # above), matching compose's `condition: service_healthy`.
-        dependsOn = ["ac-database"];
+        # Waits for the database container's healthcheck (podman.sdnotify =
+        # "healthy" above), matching compose's `condition: service_healthy`.
+        dependsOn = ["${prefix}-database"];
       };
 
-      ac-authserver = {
+      "${prefix}-authserver" = {
         image = acImage "authserver";
         environment = {
           AC_LOGS_DIR = "/azerothcore/env/dist/logs";
@@ -97,15 +104,15 @@
         extraOptions = ["--tty"];
         # There's no oci-containers primitive for "wait until this other
         # container finished running" (podman.sdnotify only distinguishes
-        # started/healthy, and ac-db-import has no persistent health state
-        # to poll). dependsOn still orders the start attempts; if
-        # authserver comes up before the import has finished, it exits
-        # non-zero against the still-incomplete schema and the default
-        # Restart=on-failure retries it until ac-db-import is done.
-        dependsOn = ["ac-database" "ac-db-import"];
+        # started/healthy, and db-import has no persistent health state to
+        # poll). dependsOn still orders the start attempts; if authserver
+        # comes up before the import has finished, it exits non-zero
+        # against the still-incomplete schema and the default
+        # Restart=on-failure retries it until db-import is done.
+        dependsOn = ["${prefix}-database" "${prefix}-db-import"];
       };
 
-      ac-worldserver = {
+      "${prefix}-worldserver" = {
         image = acImage "worldserver";
         environment = {
           AC_DATA_DIR = "/azerothcore/env/dist/data";
@@ -181,10 +188,11 @@
           "8085:8085" # world port, reached by game clients
           "127.0.0.1:7878:7878" # SOAP admin console, not for clients
         ];
-        # Keeps stdin/tty attached so `podman attach ac-worldserver` gives a
-        # working GM console, e.g. for the wiki's `account create` step.
+        # Keeps stdin/tty attached so `podman attach <name>-worldserver`
+        # gives a working GM console, e.g. for the wiki's `account create`
+        # step.
         extraOptions = ["--interactive" "--tty"];
-        # ac-client-data-init deliberately excluded from dependsOn: podman's
+        # client-data-init deliberately excluded from dependsOn: podman's
         # Type=notify + sdnotify=conmon races conmon's readiness signal
         # against the container's own exit for a job this short (it just
         # checks a version file and returns), so systemd marks the unit
@@ -192,24 +200,24 @@
         # make that flakiness block worldserver every boot. The ordering
         # below (After only, via the plain systemd escape hatch) still runs
         # it first without depending on it succeeding.
-        dependsOn = ["ac-database" "ac-db-import"];
+        dependsOn = ["${prefix}-database" "${prefix}-db-import"];
       };
     };
 
     systemd.services = {
-      "podman-ac-client-data-init".serviceConfig.Restart = lib.mkForce "no";
-      # One-shot like ac-client-data-init above: without this it defaults to
+      "podman-${prefix}-client-data-init".serviceConfig.Restart = lib.mkForce "no";
+      # One-shot like client-data-init above: without this it defaults to
       # Restart=always, so it keeps re-running (successfully) after its job
       # is done until it trips systemd's start-limit-burst -- which then
-      # cascades into ac-worldserver refusing to start at all, since that
-      # unit depends on this one.
-      "podman-ac-db-import".serviceConfig.Restart = lib.mkForce "no";
-      "podman-ac-worldserver".after = ["podman-ac-client-data-init.service"];
+      # cascades into worldserver refusing to start at all, since that unit
+      # depends on this one.
+      "podman-${prefix}-db-import".serviceConfig.Restart = lib.mkForce "no";
+      "podman-${prefix}-worldserver".after = ["podman-${prefix}-client-data-init.service"];
 
       "ac-realmlist-config" = {
         description = "Configure AzerothCore realmlist address in database";
-        after = ["podman-ac-db-import.service" "podman-ac-database.service"];
-        requires = ["podman-ac-database.service"];
+        after = ["podman-${prefix}-db-import.service" "podman-${prefix}-database.service"];
+        requires = ["podman-${prefix}-database.service"];
         wantedBy = ["multi-user.target"];
         environment = {
           REALM_ADDRESS = lib.mkDefault "127.0.0.1";
@@ -222,12 +230,12 @@
         path = [pkgs.podman pkgs.coreutils];
         script = ''
           for _ in $(seq 1 30); do
-            if podman exec ac-database mysqladmin ping -uroot -p${dbPassword} --silent 2>/dev/null; then
+            if podman exec ${prefix}-database mysqladmin ping -uroot -p${dbPassword} --silent 2>/dev/null; then
               break
             fi
             sleep 2
           done
-          podman exec ac-database mysql -uroot -p${dbPassword} -e \
+          podman exec ${prefix}-database mysql -uroot -p${dbPassword} -e \
             "UPDATE acore_auth.realmlist SET name = '$REALM_NAME', address = '$REALM_ADDRESS', localAddress = '$REALM_ADDRESS' WHERE id = 1;"
         '';
       };
