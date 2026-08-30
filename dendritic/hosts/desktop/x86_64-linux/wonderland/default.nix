@@ -74,6 +74,11 @@
     };
 
     disko.devices.disk.main.device = "/dev/disk/by-id/nvme-eui.0025384b51424d22";
+    # security.polkit.enable alone doesn't set up the setuid pkexec wrapper
+    # (opt-in via enablePkexecWrapper) -- without it, pkexec resolves to the
+    # unprivileged nix store binary and tailscale-systray's up/down fail
+    # with "pkexec must be setuid root".
+    security.polkit.enablePkexecWrapper = true;
     # Root tmpfs's shared 2G default filled up: the WoW client alone is ~2GB
     # and briefly sat on it (not yet persisted the first time it was
     # extracted), leaving no room for anything else, including nix's own
