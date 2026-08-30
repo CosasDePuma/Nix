@@ -28,14 +28,6 @@
   in {
     imports = with inputs.self.nixosModules; [software-podman];
 
-    virtualisation.oci-containers.backend = lib.mkDefault "podman";
-
-    # netavark's built-in DNS resolves containers by name on this network,
-    # so the db-import/authserver/worldserver containers can reach the
-    # database container without hand-rolling a dedicated podman network to
-    # get the same thing docker-compose gives for free.
-    virtualisation.podman.defaultNetwork.settings.dns_enabled = lib.mkDefault true;
-
     virtualisation.oci-containers.containers = {
       "${prefix}-database" = {
         image = lib.mkDefault "docker.io/library/mysql:8.4";
@@ -57,12 +49,12 @@
       # One-shot: downloads the WoW client data (maps/dbc/vmaps/mmaps) the
       # servers need, then exits. Re-runs on every boot but the upstream
       # entrypoint skips the download once the volume is already populated.
-      "${prefix}-client-data-init" = {
+      "${prefix}-clientdatainit" = {
         image = acImage "client-data";
         volumes = ["ac-client-data:/azerothcore/env/dist/data"];
       };
 
-      "${prefix}-db-import" = {
+      "${prefix}-dbimport" = {
         image = acImage "db-import";
         environment = {
           AC_DATA_DIR = "/azerothcore/env/dist/data";
@@ -97,12 +89,12 @@
         extraOptions = ["--tty"];
         # There's no oci-containers primitive for "wait until this other
         # container finished running" (podman.sdnotify only distinguishes
-        # started/healthy, and db-import has no persistent health state to
+        # started/healthy, and dbimport has no persistent health state to
         # poll). dependsOn still orders the start attempts; if authserver
         # comes up before the import has finished, it exits non-zero
         # against the still-incomplete schema and the default
-        # Restart=on-failure retries it until db-import is done.
-        dependsOn = ["${prefix}-database" "${prefix}-db-import"];
+        # Restart=on-failure retries it until dbimport is done.
+        dependsOn = ["${prefix}-database" "${prefix}-dbimport"];
       };
 
       "${prefix}-worldserver" = {
@@ -185,7 +177,7 @@
         # gives a working GM console, e.g. for the wiki's `account create`
         # step.
         extraOptions = ["--interactive" "--tty"];
-        # client-data-init deliberately excluded from dependsOn: podman's
+        # clientdatainit deliberately excluded from dependsOn: podman's
         # Type=notify + sdnotify=conmon races conmon's readiness signal
         # against the container's own exit for a job this short (it just
         # checks a version file and returns), so systemd marks the unit
@@ -193,29 +185,29 @@
         # make that flakiness block worldserver every boot. The ordering
         # below (After only, via the plain systemd escape hatch) still runs
         # it first without depending on it succeeding.
-        dependsOn = ["${prefix}-database" "${prefix}-db-import"];
+        dependsOn = ["${prefix}-database" "${prefix}-dbimport"];
       };
     };
 
     systemd.services = {
-      "podman-${prefix}-client-data-init".serviceConfig.Restart = lib.mkForce "no";
-      # One-shot like client-data-init above: without this it defaults to
+      "podman-${prefix}-clientdatainit".serviceConfig.Restart = lib.mkForce "no";
+      # One-shot like clientdatainit above: without this it defaults to
       # Restart=always, so it keeps re-running (successfully) after its job
       # is done until it trips systemd's start-limit-burst -- which then
       # cascades into worldserver refusing to start at all, since that unit
       # depends on this one.
-      "podman-${prefix}-db-import".serviceConfig.Restart = lib.mkForce "no";
-      "podman-${prefix}-worldserver".after = ["podman-${prefix}-client-data-init.service"];
+      "podman-${prefix}-dbimport".serviceConfig.Restart = lib.mkForce "no";
+      "podman-${prefix}-worldserver".after = ["podman-${prefix}-clientdatainit.service"];
 
-      # Every authserver (re)start also retriggers db-import as its own
-      # dependency (dependsOn above) -- and db-import's reference data
+      # Every authserver (re)start also retriggers dbimport as its own
+      # dependency (dependsOn above) -- and dbimport's reference data
       # reseeds the realmlist row, silently undoing ac-realmlist-config's
       # fix if that only ran once at boot. Requiring it here re-runs it
       # before every authserver start attempt, not just the first.
       "podman-${prefix}-authserver" = {
         after = ["ac-realmlist-config.service"];
         requires = ["ac-realmlist-config.service"];
-        # Default restart pacing (near-instant) retriggers db-import and
+        # Default restart pacing (near-instant) retriggers dbimport and
         # ac-realmlist-config so many times per second on a genuine cold
         # start that THEY trip systemd's own start-limit-burst before ever
         # getting a clean run in -- a cascading failure between three
@@ -228,7 +220,7 @@
 
       "ac-realmlist-config" = {
         description = "Configure AzerothCore realmlist address in database";
-        after = ["podman-${prefix}-db-import.service" "podman-${prefix}-database.service"];
+        after = ["podman-${prefix}-dbimport.service" "podman-${prefix}-database.service"];
         requires = ["podman-${prefix}-database.service"];
         wantedBy = ["multi-user.target"];
         environment = {

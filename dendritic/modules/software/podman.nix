@@ -18,7 +18,13 @@
         dockerCompat = lib.mkDefault true;
         dockerSocket.enable = lib.mkDefault true;
         enable = lib.mkDefault true;
+        # netavark's built-in DNS resolves containers by name on the default
+        # network, so containers can reach each other by container name
+        # without hand-rolling a dedicated podman network to get the same
+        # thing docker-compose gives for free.
+        defaultNetwork.settings.dns_enabled = lib.mkDefault true;
       };
+      virtualisation.oci-containers.backend = lib.mkDefault "podman";
     };
   };
 }
