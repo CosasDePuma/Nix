@@ -214,6 +214,16 @@
       "podman-${prefix}-db-import".serviceConfig.Restart = lib.mkForce "no";
       "podman-${prefix}-worldserver".after = ["podman-${prefix}-client-data-init.service"];
 
+      # Every authserver (re)start also retriggers db-import as its own
+      # dependency (dependsOn above) -- and db-import's reference data
+      # reseeds the realmlist row, silently undoing ac-realmlist-config's
+      # fix if that only ran once at boot. Requiring it here re-runs it
+      # before every authserver start attempt, not just the first.
+      "podman-${prefix}-authserver" = {
+        after = ["ac-realmlist-config.service"];
+        requires = ["ac-realmlist-config.service"];
+      };
+
       "ac-realmlist-config" = {
         description = "Configure AzerothCore realmlist address in database";
         after = ["podman-${prefix}-db-import.service" "podman-${prefix}-database.service"];
@@ -223,10 +233,10 @@
           REALM_ADDRESS = lib.mkDefault "127.0.0.1";
           REALM_NAME = lib.mkDefault "AzerothCore";
         };
-        serviceConfig = {
-          Type = "oneshot";
-          RemainAfterExit = true;
-        };
+        # No RemainAfterExit: this needs to genuinely re-run every time
+        # something requires it (see podman-${prefix}-authserver above),
+        # not just report "already satisfied" after the first boot.
+        serviceConfig.Type = "oneshot";
         path = [pkgs.podman pkgs.coreutils];
         script = ''
           for _ in $(seq 1 30); do
