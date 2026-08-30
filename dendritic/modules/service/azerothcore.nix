@@ -235,8 +235,13 @@
             fi
             sleep 2
           done
+          # flag=0 clears REALM_FLAG_OFFLINE -- found the hard way: nothing
+          # here ever managed that column, so a stale flag (2, set by
+          # whatever originally seeded this row) sat there invisibly until
+          # authserver did a genuine cold start against it and refused to
+          # list the realm at all ("No valid realms specified").
           podman exec ${prefix}-database mysql -uroot -p${dbPassword} -e \
-            "UPDATE acore_auth.realmlist SET name = '$REALM_NAME', address = '$REALM_ADDRESS', localAddress = '$REALM_ADDRESS' WHERE id = 1;"
+            "UPDATE acore_auth.realmlist SET name = '$REALM_NAME', address = '$REALM_ADDRESS', localAddress = '$REALM_ADDRESS', flag = 0 WHERE id = 1;"
         '';
       };
     };
