@@ -48,7 +48,7 @@
       REALM_NAME = "Isekai of Warcraft";
     };
 
-    virtualisation.oci-containers.containers.ac-worldserver.environment.AC_MOTD =
+    virtualisation.oci-containers.containers."isekaiofwarcraft-worldserver".environment.AC_MOTD =
       "Welcome to Isekai of Warcraft! 5x XP, 2x drop, hardcore 1-79.";
 
     system.stateVersion = "26.11";
