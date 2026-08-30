@@ -1,9 +1,5 @@
 {inputs, ...}: {
-  flake.nixosModules.wonderland = {
-    lib,
-    pkgs,
-    ...
-  }: {
+  flake.nixosModules.wonderland = {config, ...}: {
     imports = with inputs.self.nixosModules; [
       # keep-sorted start
       boot-efi
@@ -32,33 +28,13 @@
       # keep-sorted end
     ];
 
-    home-manager.users.wizard = {pkgs, ...}: {
+    home-manager.users.wizard = {
       home.stateVersion = "26.11";
-      home.packages = [pkgs.tailscale-systray];
       home.file = let
         gameDir = "Games/WoW/ChromieCraft_3.3.5a";
       in {
         "${gameDir}/realmlist.wtf".text = "set realmlist wow.game.kike.wtf";
         "${gameDir}/Data/enUS/realmlist.wtf".text = "set realmlist wow.game.kike.wtf";
-      };
-      # tailscale's Linux CLI has no GUI of its own -- this gives the
-      # tray icon + pkexec-driven up/down that omarchy-shell's tailscale
-      # panel alone doesn't provide (login now happens interactively
-      # here instead of the old auto-connecting authKeyFile).
-      systemd.user.services.tailscale-systray = {
-        Unit = {
-          Description = "Tailscale systray";
-          PartOf = ["graphical-session.target"];
-          After = ["graphical-session.target"];
-          StartLimitIntervalSec = 60;
-          StartLimitBurst = 10;
-        };
-        Service = {
-          ExecStart = "${pkgs.tailscale-systray}/bin/tailscale-systray";
-          Restart = "on-failure";
-          RestartSec = "2s";
-        };
-        Install.WantedBy = ["graphical-session.target"];
       };
       imports = with inputs.self.homeManagerModules; [
         # keep-sorted start
@@ -77,29 +53,20 @@
       ];
     };
 
-    disko.devices.disk.main.device = "/dev/disk/by-id/nvme-eui.0025384b51424d22";
-    # security.polkit.enable alone doesn't set up the setuid pkexec wrapper
-    # (opt-in via enablePkexecWrapper) -- without it, pkexec resolves to the
-    # unprivileged nix store binary and tailscale-systray's up/down fail
-    # with "pkexec must be setuid root".
-    security.polkit.enablePkexecWrapper = true;
+    age.secrets."tailscale-preauth-key".file = ./.tailscale/preauth-key.age;
 
-    # `tailscale` in PATH is a symlink to the same argv[0]-dispatched
-    # multicall binary as `tailscaled`; pkexec canonicalizes the path
-    # before exec'ing it (TOCTOU safety), collapsing that symlink so
-    # `pkexec tailscale up` fails with "Tailscaled does not take
-    # non-flag arguments". `exec -a tailscale bin/tailscaled` alone
-    # doesn't fix it either: bin/tailscaled is itself a makeWrapper
-    # shebang script, and shebang invocation makes the kernel discard
-    # a custom argv[0] and replace $0 with the literal script path --
-    # so the "tailscale" identity never survives into its own
-    # `exec -a "$0" .../.tailscaled-wrapped`. Skip that layer and pin
-    # argv[0] directly against the real (unwrapped) binary instead.
-    environment.systemPackages = [
-      (lib.hiPrio (pkgs.writeShellScriptBin "tailscale" ''
-        exec -a tailscale ${pkgs.tailscale}/bin/.tailscaled-wrapped "$@"
-      ''))
-    ];
+    # Admin's own device: pulls in the router's advertised LAN route via
+    # tag:homelab on the preauth key (see the router's ACL) rather than
+    # advertising anything itself.
+    services.tailscale = {
+      authKeyFile = config.age.secrets."tailscale-preauth-key".path;
+      extraUpFlags = [
+        "--login-server=https://vpn.kike.wtf"
+        "--accept-routes"
+      ];
+    };
+
+    disko.devices.disk.main.device = "/dev/disk/by-id/nvme-eui.0025384b51424d22";
     # Root tmpfs's shared 2G default filled up: the WoW client alone is ~2GB
     # and briefly sat on it (not yet persisted the first time it was
     # extracted), leaving no room for anything else, including nix's own
