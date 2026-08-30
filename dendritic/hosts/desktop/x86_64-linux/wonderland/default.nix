@@ -84,15 +84,20 @@
     # with "pkexec must be setuid root".
     security.polkit.enablePkexecWrapper = true;
 
-    # `tailscale` in PATH is a symlink to the same multicall binary as
-    # `tailscaled` (argv[0]-dispatched); pkexec canonicalizes the path
-    # before exec'ing it for TOCTOU safety, so `pkexec tailscale up`
-    # collapses to the daemon binary and fails with "Tailscaled does not
-    # take non-flag arguments". A real (non-symlink) wrapper that pins
-    # argv[0] survives that canonicalization.
+    # `tailscale` in PATH is a symlink to the same argv[0]-dispatched
+    # multicall binary as `tailscaled`; pkexec canonicalizes the path
+    # before exec'ing it (TOCTOU safety), collapsing that symlink so
+    # `pkexec tailscale up` fails with "Tailscaled does not take
+    # non-flag arguments". `exec -a tailscale bin/tailscaled` alone
+    # doesn't fix it either: bin/tailscaled is itself a makeWrapper
+    # shebang script, and shebang invocation makes the kernel discard
+    # a custom argv[0] and replace $0 with the literal script path --
+    # so the "tailscale" identity never survives into its own
+    # `exec -a "$0" .../.tailscaled-wrapped`. Skip that layer and pin
+    # argv[0] directly against the real (unwrapped) binary instead.
     environment.systemPackages = [
       (lib.hiPrio (pkgs.writeShellScriptBin "tailscale" ''
-        exec -a tailscale ${pkgs.tailscale}/bin/tailscaled "$@"
+        exec -a tailscale ${pkgs.tailscale}/bin/.tailscaled-wrapped "$@"
       ''))
     ];
     # Root tmpfs's shared 2G default filled up: the WoW client alone is ~2GB
