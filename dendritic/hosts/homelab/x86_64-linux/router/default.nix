@@ -6,7 +6,7 @@
       [inputs.disko.nixosModules.default]
       ++ (with inputs.self.nixosModules; [
         # keep-sorted start
-        boot-serial-console
+        hardware-serial
         cpu-intel
         hardware-defaults
         network-dns

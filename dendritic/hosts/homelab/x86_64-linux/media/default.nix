@@ -8,20 +8,16 @@
       # keep-sorted start
       boot-efi
       boot-loader-grub
-      boot-serial-console
+      hardware-serial
       cpu-intel
       disko-impermanence
       hardware-defaults
       network-dns
       network-firewall
       network-interfaces
-      service-bazarr
       service-jellyfin
       service-komga
-      service-prowlarr
       service-qbittorrent
-      service-radarr
-      service-sonarr
       service-ssh
       settings-locale
       settings-nix
