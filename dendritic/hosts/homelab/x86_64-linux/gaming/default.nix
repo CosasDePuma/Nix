@@ -8,7 +8,7 @@
       # keep-sorted start
       boot-efi
       boot-loader-grub
-      boot-serial-console
+      hardware-serial
       cpu-intel
       disko-impermanence
       hardware-defaults
