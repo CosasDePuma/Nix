@@ -45,11 +45,11 @@
 
     systemd.services."ac-realmlist-config".environment = {
       REALM_ADDRESS = "wow.game.kike.wtf";
-      REALM_NAME = "World of Kikecraft";
+      REALM_NAME = "Isekai of Warcraft";
     };
 
     virtualisation.oci-containers.containers.ac-worldserver.environment.AC_MOTD =
-      "Welcome to World of Kikecraft! 5x XP, 2x drop, hardcore 1-79.";
+      "Welcome to Isekai of Warcraft! 5x XP, 2x drop, hardcore 1-79.";
 
     system.stateVersion = "26.11";
 
