@@ -158,6 +158,7 @@
             "me.${domain}"
             "home.${domain}"
             "game.${domain}"
+            "media.${domain}"
           ];
           extra_records = [
             # Homelab (.home.kike.wtf)
@@ -181,12 +182,24 @@
               type = "A";
               value = "192.168.1.4";
             }
+            {
+              name = "media.home.${domain}";
+              type = "A";
+              value = "10.0.10.3";
+            }
 
             # Gaming (.game.kike.wtf)
             {
               name = "wow.game.${domain}";
               type = "A";
               value = "10.0.10.10";
+            }
+
+            # Media (.media.kike.wtf)
+            {
+              name = "jellyfin.media.${domain}";
+              type = "A";
+              value = "10.0.10.3";
             }
           ];
         };
