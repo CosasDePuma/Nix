@@ -222,6 +222,15 @@
       "podman-${prefix}-authserver" = {
         after = ["ac-realmlist-config.service"];
         requires = ["ac-realmlist-config.service"];
+        # Default restart pacing (near-instant) retriggers db-import and
+        # ac-realmlist-config so many times per second on a genuine cold
+        # start that THEY trip systemd's own start-limit-burst before ever
+        # getting a clean run in -- a cascading failure between three
+        # units, found live while debugging why authserver stayed down
+        # even after the realmlist row itself was confirmed correct.
+        # Spacing attempts out gives the whole chain time to actually
+        # finish once instead of racing it forever.
+        serviceConfig.RestartSec = lib.mkForce 10;
       };
 
       "ac-realmlist-config" = {
