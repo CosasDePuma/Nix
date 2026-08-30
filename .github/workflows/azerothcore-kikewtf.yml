@@ -17,6 +17,8 @@ env:
   MOD_HARDCORE_REF: main
   MOD_AH_BOT_PLUS_REF: master
   MOD_DUNGEON_CLEAR_REF: master
+  MOD_AOE_LOOT_REF: master
+  MOD_DUNGEON_SCALE_REF: master
 
 jobs:
   build:
@@ -44,6 +46,8 @@ jobs:
           git clone --depth 1 --branch "$MOD_HARDCORE_REF" https://github.com/Zindokar/mod-hardcore.git
           git clone --depth 1 --branch "$MOD_AH_BOT_PLUS_REF" https://github.com/NathanHandley/mod-ah-bot-plus.git
           git clone --depth 1 --branch "$MOD_DUNGEON_CLEAR_REF" https://github.com/jrad7/mod-dungeon-clear.git
+          git clone --depth 1 --branch "$MOD_AOE_LOOT_REF" https://github.com/azerothcore/mod-aoe-loot.git
+          git clone --depth 1 --branch "$MOD_DUNGEON_SCALE_REF" https://github.com/NathanHandley/mod-dungeon-scale.git
 
       - name: Apply mod-spelldraft core patches
         run: |
