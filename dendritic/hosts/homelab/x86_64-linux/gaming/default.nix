@@ -8,10 +8,10 @@
       # keep-sorted start
       boot-efi
       boot-loader-grub
-      hardware-serial
       cpu-intel
       disko-impermanence
       hardware-defaults
+      hardware-serial
       network-dns
       network-firewall
       network-interfaces
@@ -45,8 +45,6 @@
 
     services.thermald.enable = false;
 
-    system.stateVersion = "26.11";
-
     systemd.services."ac-realmlist-config".environment = {
       REALM_ADDRESS = (lib.head config.networking.interfaces.eth0.ipv4.addresses).address;
       REALM_NAME = "Isekai of Warcraft";
@@ -60,7 +58,7 @@
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP9RzisL6wVQK3scDyEPEpFgrcdFYkW9LssnWlORGXof"
       ];
     };
-  
+
     virtualisation.oci-containers.containers."isekaiofwarcraft-worldserver".environment.AC_MOTD = "Welcome to Isekai of Warcraft! 5x XP, 2x drop, random speels and hardcore 1-79.";
   };
 

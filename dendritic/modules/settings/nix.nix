@@ -30,7 +30,7 @@
         };
       };
       nixpkgs.config.allowUnfree = lib.mkDefault true;
-      system.stateVersion = lib.mkDefault "26.05";
+      system.stateVersion = lib.mkDefault "26.11";
     };
   };
 }
