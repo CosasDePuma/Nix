@@ -125,7 +125,7 @@
             {
               name = "media.home.${domain}";
               type = "A";
-              value = "10.0.10.3";
+              value = "10.0.10.2";
             }
 
             # Gaming (.game.kike.wtf)
@@ -139,7 +139,7 @@
             {
               name = "jellyfin.media.${domain}";
               type = "A";
-              value = "10.0.10.3";
+              value = "10.0.10.2";
             }
           ];
         };
@@ -166,10 +166,6 @@
       };
 
       dnsmasq.settings = {
-        # More specific entries win over the wildcard: LAN/tailnet clients
-        # get sent straight to the router over the LAN instead of round-
-        # tripping out to the internet and back for its own public IP
-        # (which may not even hairpin back in on every ISP router anyway).
         address = [
           "/${domain}/10.0.10.1"
           "/vpn.${domain}/10.0.10.254"
