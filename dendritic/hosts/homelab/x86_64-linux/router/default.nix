@@ -97,7 +97,6 @@
         extraDomainNames = [
           "*.${domain}"
           "*.media.${domain}"
-          "*.home.${domain}"
         ];
       };
     };
@@ -114,12 +113,6 @@
           useACMEHost = domain;
           extraConfig = ''
             reverse_proxy http://10.0.10.2:25600
-          '';
-        };
-        "media.home.${domain}" = {
-          useACMEHost = domain;
-          extraConfig = ''
-            reverse_proxy http://10.0.10.2:8096
           '';
         };
         "vpn.${domain}" = {
@@ -173,7 +166,7 @@
               {
                 name = "media.home.${domain}";
                 type = "A";
-                value = "100.64.0.1";
+                value = "10.0.10.2";
               }
 
               # Gaming (.game.kike.wtf)
@@ -227,6 +220,7 @@
       dnsmasq.settings = {
         address = [
           "/${domain}/10.0.10.254"
+          "/media.home.${domain}/10.0.10.2"
           "/nas.home.${domain}/192.168.1.3"
           "/proxmox.home.${domain}/192.168.1.4"
           "/wow.game.${domain}/10.0.10.10"
