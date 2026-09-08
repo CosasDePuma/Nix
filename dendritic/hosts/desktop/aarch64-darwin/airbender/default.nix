@@ -38,8 +38,8 @@
         profile-work
         software-discord
         software-spotify
-        software-vscode
         software-warp
+        software-zed
         # keep-sorted end
       ];
     };
