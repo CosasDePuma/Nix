@@ -16,6 +16,7 @@
       config.programs.claude-code = {
         enable = lib.mkDefault true;
         enableMcpIntegration = lib.mkDefault true;
+        settings.includeCoAuthoredBy = lib.mkDefault false;
       };
     };
 

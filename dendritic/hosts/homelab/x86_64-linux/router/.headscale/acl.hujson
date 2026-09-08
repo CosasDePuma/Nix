@@ -3,7 +3,7 @@
     "router": "100.64.0.1/32",
     "homelab": "10.0.10.0/24",
     "wow-server": "10.0.10.10/32",
-    "media-server": "10.0.10.3/32",
+    "media-server": "10.0.10.2/32",
     "nas": "192.168.1.3/32",
     "proxmox": "192.168.1.4/32"
   },
@@ -36,11 +36,12 @@
       ]
     },
 
-    // 3. Media: acceso a Jellyfin (8096) y Komga (25600)
+    // 3. Media: acceso a Caddy en router (443) y directo a Jellyfin (8096) y Komga (25600)
     {
       "action": "accept",
       "src": ["tag:media"],
       "dst": [
+        "router:443",
         "media-server:8096,25600"
       ]
     }

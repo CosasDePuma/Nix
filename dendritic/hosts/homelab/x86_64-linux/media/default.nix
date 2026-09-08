@@ -8,10 +8,10 @@
       # keep-sorted start
       boot-efi
       boot-loader-grub
-      hardware-serial
       cpu-intel
       disko-impermanence
       hardware-defaults
+      hardware-serial
       network-dns
       network-firewall
       network-interfaces
@@ -26,16 +26,9 @@
       # keep-sorted end
     ];
 
-    disko.devices.disk.main.device = "/dev/sda";
-
-    # Proxmox VM, not real Intel hardware -- no RAPL sysfs for thermald to
-    # read, so it exits immediately every boot instead of doing anything.
-    services.thermald.enable = false;
-
     age.secrets."smb-creds".file = ./.smb/smb.creds.age;
-
+    disko.devices.disk.main.device = "/dev/sda";
     environment.systemPackages = with pkgs; [cifs-utils];
-
     fileSystems = builtins.listToAttrs (
       builtins.map
       (share: {
@@ -58,14 +51,13 @@
         "media"
       ]
     );
-
     networking = {
       hostName = "media";
       interfaces."eth0" = {
         useDHCP = false;
         ipv4.addresses = [
           {
-            address = "10.0.10.3";
+            address = "10.0.10.2";
             prefixLength = 24;
           }
         ];
@@ -75,9 +67,7 @@
         address = "10.0.10.254";
       };
     };
-
-    system.stateVersion = "26.11";
-
+    services.thermald.enable = false;
     users.users.media = {
       initialPassword = "media";
       isNormalUser = true;
