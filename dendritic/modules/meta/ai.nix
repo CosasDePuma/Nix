@@ -1,12 +1,15 @@
 {inputs, ...}: let
   aiModules = [
+    # keep-sorted start
     "software-antigravity"
+    "software-chatgpt"
     "software-claude"
     "software-herdr"
     "software-ollama"
     "software-opencode"
     "software-openspec"
     "software-pi"
+    # keep-sorted end
   ];
 in {
   flake = {
