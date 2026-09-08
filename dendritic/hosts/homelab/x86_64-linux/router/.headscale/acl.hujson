@@ -36,11 +36,12 @@
       ]
     },
 
-    // 3. Media: acceso a Jellyfin (8096) y Komga (25600)
+    // 3. Media: acceso a Caddy en router (443) y directo a Jellyfin (8096) y Komga (25600)
     {
       "action": "accept",
       "src": ["tag:media"],
       "dst": [
+        "router:443",
         "media-server:8096,25600"
       ]
     }

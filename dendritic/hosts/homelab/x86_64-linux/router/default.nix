@@ -14,6 +14,7 @@
       network-forwarding
       network-interfaces
       network-nftables
+      service-caddy
       service-ddclient
       service-dnsmasq
       service-headscale
@@ -83,65 +84,123 @@
       nftables.ruleset = builtins.readFile ./.nftables/tables.nft;
     };
     nixpkgs.config.allowUnfree = false;
-    services = {
-      headscale.settings = {
-        server_url = "https://vpn.${domain}";
-        tls_letsencrypt_hostname = "vpn.${domain}";
-        policy = {
-          mode = "file";
-          path = ./.headscale/acl.hujson;
+    security.acme = {
+      acceptTerms = true;
+      defaults.email = "admin@${domain}";
+      certs."${domain}" = {
+        inherit domain;
+        dnsProvider = "cloudflare";
+        dnsResolver = "1.1.1.1:53";
+        credentialFiles = {
+          "CLOUDFLARE_DNS_API_TOKEN_FILE" = config.age.secrets."cloudflare-key".path;
         };
-        dns = {
-          magic_dns = true;
-          base_domain = "me.${domain}";
-          search_domains = [
-            "me.${domain}"
-            "home.${domain}"
-            "game.${domain}"
-            "media.${domain}"
-          ];
-          extra_records = [
-            # Homelab (.home.kike.wtf)
-            {
-              name = "router.home.${domain}";
-              type = "A";
-              value = "100.64.0.1";
-            }
-            {
-              name = "router.home.${domain}";
-              type = "AAAA";
-              value = "fd7a:115c:a1e0::1";
-            }
-            {
-              name = "nas.home.${domain}";
-              type = "A";
-              value = "192.168.1.3";
-            }
-            {
-              name = "proxmox.home.${domain}";
-              type = "A";
-              value = "192.168.1.4";
-            }
-            {
-              name = "media.home.${domain}";
-              type = "A";
-              value = "10.0.10.2";
-            }
+        extraDomainNames = [
+          "*.${domain}"
+          "*.media.${domain}"
+          "*.home.${domain}"
+        ];
+      };
+    };
+    services = {
+      caddy.virtualHosts = {
+        "tv.media.${domain}" = {
+          useACMEHost = domain;
+          serverAliases = ["jellyfin.media.${domain}"];
+          extraConfig = ''
+            reverse_proxy http://10.0.10.2:8096
+          '';
+        };
+        "books.media.${domain}" = {
+          useACMEHost = domain;
+          extraConfig = ''
+            reverse_proxy http://10.0.10.2:25600
+          '';
+        };
+        "media.home.${domain}" = {
+          useACMEHost = domain;
+          extraConfig = ''
+            reverse_proxy http://10.0.10.2:8096
+          '';
+        };
+        "vpn.${domain}" = {
+          useACMEHost = domain;
+          extraConfig = ''
+            reverse_proxy http://127.0.0.1:8080
+          '';
+        };
+      };
 
-            # Gaming (.game.kike.wtf)
-            {
-              name = "wow.game.${domain}";
-              type = "A";
-              value = "10.0.10.10";
-            }
+      headscale = {
+        port = 8080;
+        address = "127.0.0.1";
+        settings = {
+          server_url = "https://vpn.${domain}";
+          policy = {
+            mode = "file";
+            path = ./.headscale/acl.hujson;
+          };
+          dns = {
+            magic_dns = true;
+            base_domain = "me.${domain}";
+            search_domains = [
+              "me.${domain}"
+              "home.${domain}"
+              "game.${domain}"
+              "media.${domain}"
+            ];
+            extra_records = [
+              # Homelab (.home.kike.wtf)
+              {
+                name = "router.home.${domain}";
+                type = "A";
+                value = "100.64.0.1";
+              }
+              {
+                name = "router.home.${domain}";
+                type = "AAAA";
+                value = "fd7a:115c:a1e0::1";
+              }
+              {
+                name = "nas.home.${domain}";
+                type = "A";
+                value = "192.168.1.3";
+              }
+              {
+                name = "proxmox.home.${domain}";
+                type = "A";
+                value = "192.168.1.4";
+              }
+              {
+                name = "media.home.${domain}";
+                type = "A";
+                value = "100.64.0.1";
+              }
 
-            # Media (.media.kike.wtf)
-            {
-              name = "jellyfin.media.${domain}";
-              type = "A";
-              value = "10.0.10.2";
-            }
-          ];
+              # Gaming (.game.kike.wtf)
+              {
+                name = "wow.game.${domain}";
+                type = "A";
+                value = "10.0.10.10";
+              }
+
+              # Media (.media.kike.wtf)
+              {
+                name = "tv.media.${domain}";
+                type = "A";
+                value = "100.64.0.1";
+              }
+              {
+                name = "books.media.${domain}";
+                type = "A";
+                value = "100.64.0.1";
+              }
+              {
+                name = "jellyfin.media.${domain}";
+                type = "A";
+                value = "100.64.0.1";
+              }
+            ];
+          };
         };
       };
       thermald.enable = false;
@@ -167,8 +226,10 @@
 
       dnsmasq.settings = {
         address = [
-          "/${domain}/10.0.10.1"
-          "/vpn.${domain}/10.0.10.254"
+          "/${domain}/10.0.10.254"
+          "/nas.home.${domain}/192.168.1.3"
+          "/proxmox.home.${domain}/192.168.1.4"
+          "/wow.game.${domain}/10.0.10.10"
         ];
         interface = [
           "vl10.homelab"
