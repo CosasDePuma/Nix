@@ -14,6 +14,7 @@
       software-burpsuite
       software-chatgpt
       software-cleanmymac
+      software-discord
       software-homebrew
       software-homemanager
       software-obsidian
@@ -37,7 +38,6 @@
         meta-terminal
         profile-cosasdepuma
         profile-work
-        software-discord
         software-spotify
         software-warp
         software-zed
