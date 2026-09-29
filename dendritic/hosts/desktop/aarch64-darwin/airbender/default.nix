@@ -13,6 +13,7 @@
       software-bitwarden
       software-burpsuite
       software-chatgpt
+      software-claude
       software-cleanmymac
       software-discord
       software-homebrew
