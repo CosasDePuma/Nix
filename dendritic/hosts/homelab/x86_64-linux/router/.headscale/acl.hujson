@@ -11,7 +11,8 @@
   "tagOwners": {
     "tag:homelab": ["pumita@"],
     "tag:gaming": ["pumita@"],
-    "tag:media": ["pumita@"]
+    "tag:media": ["pumita@"],
+    "tag:agents": ["pumita@"]
   },
 
   "acls": [
@@ -43,6 +44,15 @@
       "dst": [
         "router:443",
         "media-server:8096,25600"
+      ]
+    },
+
+    // 4. Agents: solo Rakazo a través de Caddy en router (443); el puerto 5173 directo no
+    {
+      "action": "accept",
+      "src": ["tag:agents"],
+      "dst": [
+        "router:443"
       ]
     }
   ]
