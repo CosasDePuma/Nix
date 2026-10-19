@@ -23,7 +23,7 @@
           {
             type = "tap";
             id = "vm-agents";
-            mac = "02:00:00:0a:00:14";
+            mac = "02:00:00:0a:00:03";
           }
         ];
         volumes = [
@@ -39,7 +39,7 @@
         hostName = "agents";
         interfaces.eth0.ipv4.addresses = [
           {
-            address = "10.0.10.20";
+            address = "10.0.10.3";
             prefixLength = 24;
           }
         ];

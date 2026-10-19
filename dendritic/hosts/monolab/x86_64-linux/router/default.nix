@@ -139,7 +139,7 @@
           "agents.${domain}" = {
             useACMEHost = domain;
             extraConfig = ''
-              reverse_proxy http://10.0.10.20:5173
+              reverse_proxy http://10.0.10.3:5173
             '';
           };
           "vpn.${domain}" = {
@@ -165,7 +165,6 @@
               search_domains = [
                 "me.${domain}"
                 "home.${domain}"
-                "game.${domain}"
                 "media.${domain}"
               ];
               extra_records = [
@@ -198,7 +197,7 @@
                 {
                   name = "agents.home.${domain}";
                   type = "A";
-                  value = "10.0.10.20";
+                  value = "10.0.10.3";
                 }
 
                 # Agents (.kike.wtf, via Caddy)
@@ -206,13 +205,6 @@
                   name = "agents.${domain}";
                   type = "A";
                   value = "100.64.0.1";
-                }
-
-                # Gaming (.game.kike.wtf)
-                {
-                  name = "wow.game.${domain}";
-                  type = "A";
-                  value = "10.0.10.10";
                 }
 
                 # Media (.media.kike.wtf)
@@ -236,7 +228,7 @@
           };
         };
 
-        # Subnet router only: gaming/services/etc. don't run tailscale
+        # Subnet router only: media/agents/etc. don't run tailscale
         # themselves, they're just reachable through the LAN route this
         # advertises. `headscale routes enable` still has to approve it once
         # the node registers, same as approving a new node.
@@ -258,11 +250,10 @@
         dnsmasq.settings = {
           address = [
             "/${domain}/10.0.10.254"
-            "/agents.home.${domain}/10.0.10.20"
+            "/agents.home.${domain}/10.0.10.3"
             "/media.home.${domain}/10.0.10.2"
             "/nas.home.${domain}/192.168.1.3"
             "/proxmox.home.${domain}/192.168.1.4"
-            "/wow.game.${domain}/10.0.10.10"
           ];
           interface = [
             "vl10.homelab"

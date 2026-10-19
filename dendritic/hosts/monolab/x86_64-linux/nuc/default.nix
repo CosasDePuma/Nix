@@ -9,7 +9,6 @@
       disko-impermanence
       hardware-defaults
       monolab-agents
-      monolab-gaming
       monolab-media
       monolab-router
       network-dns
@@ -75,7 +74,7 @@
         };
         # Every other VM is an untagged access port on the homelab VLAN.
         "30-vlan-homelab" = {
-          matchConfig.Name = ["vm-media" "vm-gaming" "vm-agents"];
+          matchConfig.Name = ["vm-media" "vm-agents"];
           networkConfig.Bridge = "br-vlans";
           bridgeVLANs = [
             {
