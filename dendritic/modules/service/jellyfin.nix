@@ -1,9 +1,5 @@
-{
-  lib,
-  pkgs,
-  ...
-}: {
-  flake.nixosModules.service-jellyfin = {
+{lib, ...}: {
+  flake.nixosModules.service-jellyfin = {pkgs, ...}: {
     services.jellyfin = {
       enable = lib.mkDefault true;
       openFirewall = lib.mkDefault true;
