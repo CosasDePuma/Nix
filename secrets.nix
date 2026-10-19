@@ -75,6 +75,15 @@ in {
   "dendritic/hosts/homelab/x86_64-linux/media/.smb/smb.creds.age".publicKeys = [pumita vmHomelabMedia];
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  # ┃                  Monolab                  ┃
+  # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  # Same recipients as homelab: the microVMs reuse those hosts' SSH keys.
+  "dendritic/hosts/monolab/x86_64-linux/router/.ddclient/cloudflare-key.age".publicKeys = [pumita vmHomelabRouter];
+  "dendritic/hosts/monolab/x86_64-linux/router/.tailscale/preauth-key.age".publicKeys = [pumita vmHomelabRouter];
+  "dendritic/hosts/monolab/x86_64-linux/media/.smb/smb.creds.age".publicKeys = [pumita vmHomelabMedia];
+
+  # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                Wonderland                 ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 

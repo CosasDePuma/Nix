@@ -1,0 +1,59 @@
+{
+  "hosts": {
+    "router": "100.64.0.1/32",
+    "homelab": "10.0.10.0/24",
+    "wow-server": "10.0.10.10/32",
+    "media-server": "10.0.10.2/32",
+    "nas": "192.168.1.3/32",
+    "proxmox": "192.168.1.4/32"
+  },
+
+  "tagOwners": {
+    "tag:homelab": ["pumita@"],
+    "tag:gaming": ["pumita@"],
+    "tag:media": ["pumita@"],
+    "tag:agents": ["pumita@"]
+  },
+
+  "acls": [
+    // 1. Homelab: acceso exclusivo a toda la infraestructura .home. (router, VLAN 10, NAS, Proxmox)
+    {
+      "action": "accept",
+      "src": ["tag:homelab"],
+      "dst": [
+        "router:*",
+        "homelab:*",
+        "nas:*",
+        "proxmox:*"
+      ]
+    },
+
+    // 2. Gaming: acceso exclusivamente al servidor WoW (AzerothCore: auth 3724, world 8085)
+    {
+      "action": "accept",
+      "src": ["tag:gaming"],
+      "dst": [
+        "wow-server:3724,8085"
+      ]
+    },
+
+    // 3. Media: acceso a Caddy en router (443) y directo a Jellyfin (8096) y Komga (25600)
+    {
+      "action": "accept",
+      "src": ["tag:media"],
+      "dst": [
+        "router:443",
+        "media-server:8096,25600"
+      ]
+    },
+
+    // 4. Agents: solo Rakazo a través de Caddy en router (443); el puerto 5173 directo no
+    {
+      "action": "accept",
+      "src": ["tag:agents"],
+      "dst": [
+        "router:443"
+      ]
+    }
+  ]
+}
