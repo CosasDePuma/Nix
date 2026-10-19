@@ -14,7 +14,7 @@
       system.stateVersion = lib.mkDefault 6;
     };
 
-    nixosModules.settings-nix = {
+    nixosModules.settings-nix = {options, ...}: {
       nix = {
         gc = {
           automatic = lib.mkDefault true;
@@ -29,7 +29,11 @@
           warn-dirty = lib.mkDefault false;
         };
       };
-      nixpkgs.config.allowUnfree = lib.mkDefault true;
+      # A system handed an external pkgs instance (e.g. a microVM sharing its
+      # host's) must not set nixpkgs.config; it inherits the host's instead.
+      nixpkgs = lib.mkIf (!options.nixpkgs.pkgs.isDefined) {
+        config.allowUnfree = lib.mkDefault true;
+      };
       system.stateVersion = lib.mkDefault "26.11";
     };
   };
