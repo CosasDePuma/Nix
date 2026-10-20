@@ -15,6 +15,7 @@
         service-ddclient
         service-dnsmasq
         service-headscale
+        service-homepage
         service-ssh
         settings-locale
         settings-nix
@@ -52,6 +53,7 @@
       age.secrets = {
         "cloudflare-key".file = ./.ddclient/cloudflare-key.age;
         "tailscale-preauth-key".file = ./.tailscale/preauth-key.age;
+        "homepage.env".file = ./.homepage/homepage.env.age;
       };
       # WAN-facing sysctls only: don't act on router-advertised IPv6 config
       # from upstream, and don't run SLAAC/temp-address autoconf on eth0.
@@ -121,7 +123,25 @@
         };
       };
       services = {
+        homepage-dashboard = let
+          homepage = builtins.fromJSON (builtins.readFile ./.homepage/homepage.json);
+        in {
+          inherit (homepage) services;
+          allowedHosts = domain;
+          environmentFiles = [config.age.secrets."homepage.env".path];
+          settings = {
+            inherit (homepage) layout;
+            title = "Kike's Homelab";
+            description = "A collection of services running on Kike's Homelab";
+          };
+        };
         caddy.virtualHosts = {
+          ${domain} = {
+            useACMEHost = domain;
+            extraConfig = ''
+              reverse_proxy http://127.0.0.1:${toString config.services.homepage-dashboard.listenPort}
+            '';
+          };
           "tv.media.${domain}" = {
             useACMEHost = domain;
             serverAliases = ["jellyfin.media.${domain}"];
@@ -199,7 +219,12 @@
                   value = "10.0.10.3";
                 }
 
-                # Agents (.kike.wtf, via Caddy)
+                # Homepage and agents (.kike.wtf, via Caddy)
+                {
+                  name = domain;
+                  type = "A";
+                  value = "100.64.0.1";
+                }
                 {
                   name = "agents.${domain}";
                   type = "A";

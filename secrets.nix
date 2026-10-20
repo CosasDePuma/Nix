@@ -83,6 +83,7 @@ in {
   # with the old disk, so its secret is encrypted to the new VM's key.
   "dendritic/hosts/monolab/x86_64-linux/router/.ddclient/cloudflare-key.age".publicKeys = [pumita vmHomelabRouter];
   "dendritic/hosts/monolab/x86_64-linux/router/.tailscale/preauth-key.age".publicKeys = [pumita vmHomelabRouter];
+  "dendritic/hosts/monolab/x86_64-linux/router/.homepage/homepage.env.age".publicKeys = [pumita vmHomelabRouter];
   "dendritic/hosts/monolab/x86_64-linux/media/.smb/smb.creds.age".publicKeys = [pumita monolabMedia];
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
