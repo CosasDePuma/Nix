@@ -21,6 +21,7 @@
         ++ lib.optionals (config.virtualisation.docker.enable or false) ["/var/lib/docker"]
         ++ lib.optionals (config.virtualisation.podman.enable or false) ["/var/lib/containers"]
         ++ lib.optionals (config.services.ollama.enable or false) ["/var/lib/ollama"]
+        ++ lib.optionals (config.virtualisation.oci-containers.containers ? rakazo-web) ["/var/lib/rakazo"]
         ++ lib.optionals (config.services.headscale.enable or false) ["/var/lib/headscale"]
         ++ lib.optionals (config.services.tailscale.enable or false) ["/var/lib/tailscale"]
         ++ lib.optionals (config.services.caddy.enable or false) ["/var/lib/caddy"]

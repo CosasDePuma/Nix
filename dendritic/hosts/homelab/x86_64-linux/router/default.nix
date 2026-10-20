@@ -115,6 +115,12 @@
             reverse_proxy http://10.0.10.2:25600
           '';
         };
+        "agents.${domain}" = {
+          useACMEHost = domain;
+          extraConfig = ''
+            reverse_proxy http://10.0.10.20:5173
+          '';
+        };
         "vpn.${domain}" = {
           useACMEHost = domain;
           extraConfig = ''
@@ -168,6 +174,18 @@
                 type = "A";
                 value = "10.0.10.2";
               }
+              {
+                name = "agents.home.${domain}";
+                type = "A";
+                value = "10.0.10.20";
+              }
+
+              # Agents (.kike.wtf, via Caddy)
+              {
+                name = "agents.${domain}";
+                type = "A";
+                value = "100.64.0.1";
+              }
 
               # Gaming (.game.kike.wtf)
               {
@@ -220,6 +238,7 @@
       dnsmasq.settings = {
         address = [
           "/${domain}/10.0.10.254"
+          "/agents.home.${domain}/10.0.10.20"
           "/media.home.${domain}/10.0.10.2"
           "/nas.home.${domain}/192.168.1.3"
           "/proxmox.home.${domain}/192.168.1.4"
