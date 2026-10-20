@@ -20,7 +20,11 @@
         ++ lib.optionals (config.virtualisation.libvirtd.enable or false) ["/var/lib/libvirt"]
         ++ lib.optionals (config.virtualisation.docker.enable or false) ["/var/lib/docker"]
         ++ lib.optionals (config.virtualisation.podman.enable or false) ["/var/lib/containers"]
+        ++ lib.optionals ((config.microvm.vms or {}) != {}) ["/var/lib/microvms"]
         ++ lib.optionals (config.services.ollama.enable or false) ["/var/lib/ollama"]
+        ++ lib.optionals (config.services.jellyfin.enable or false) [config.services.jellyfin.dataDir config.services.jellyfin.cacheDir]
+        ++ lib.optionals (config.services.komga.enable or false) [config.services.komga.stateDir]
+        ++ lib.optionals (config.services.qbittorrent.enable or false) [config.services.qbittorrent.profileDir]
         ++ lib.optionals (config.virtualisation.oci-containers.containers ? rakazo-web) ["/var/lib/rakazo"]
         ++ lib.optionals (config.services.headscale.enable or false) ["/var/lib/headscale"]
         ++ lib.optionals (config.services.tailscale.enable or false) ["/var/lib/tailscale"]
@@ -33,13 +37,20 @@
       # whatever the persisted dir actually contains -- sshd then fails to
       # find sshd_config at all. Persisting only the key files leaves the
       # rest of /etc/ssh as NixOS put it.
-      files = [
-        "/etc/machine-id"
-        "/etc/ssh/ssh_host_ed25519_key"
-        "/etc/ssh/ssh_host_ed25519_key.pub"
-        "/etc/ssh/ssh_host_rsa_key"
-        "/etc/ssh/ssh_host_rsa_key.pub"
-      ];
+      files =
+        # A declarative /etc/machine-id (e.g. microvm.nix derives one) is
+        # already stable; bind-mounting over its store symlink fails.
+        lib.optionals (!(config.environment.etc ? "machine-id")) ["/etc/machine-id"]
+        ++ [
+          "/etc/ssh/ssh_host_ed25519_key"
+          "/etc/ssh/ssh_host_ed25519_key.pub"
+          "/etc/ssh/ssh_host_rsa_key"
+          "/etc/ssh/ssh_host_rsa_key.pub"
+        ];
     };
+
+    # agenix decrypts during activation, which can run before the host keys
+    # above are bind-mounted into /etc/ssh; read the persisted copy instead.
+    age.identityPaths = ["/nix/persist/etc/ssh/ssh_host_ed25519_key"];
   };
 }

@@ -1,0 +1,111 @@
+{
+    "layout": {
+        "Hardware": {
+            "style": "row",
+            "columns": "2"
+        },
+        "Media": {
+            "style": "row",
+            "columns": "3"
+        },
+        "Agents": {
+            "style": "row",
+            "columns": "1"
+        }
+    },
+    "services": [
+        {
+            "Hardware": [
+                {
+                    "Router": {
+                        "icon": "sh-openwrt",
+                        "description": "Network management",
+                        "href": "http://192.168.1.1"
+                    }
+                },
+                {
+                    "TrueNAS": {
+                        "icon": "sh-truenas-core",
+                        "description": "Storage server",
+                        "href": "https://truenas.local"
+                    }
+                }
+            ]
+        },
+        {
+            "Media": [
+                {
+                    "Jellyfin": {
+                        "icon": "sh-jellyfin",
+                        "description": "Movies, series, anime and music server",
+                        "href": "https://tv.media.kike.wtf",
+                        "siteMonitor": "http://10.0.10.2:8096",
+                        "widget": {
+                            "type": "jellyfin",
+                            "url": "http://10.0.10.2:8096",
+                            "key": "{{HOMEPAGE_VAR_JELLYFIN_API}}",
+                            "fields": [
+                                "movies",
+                                "series",
+                                "episodes"
+                            ],
+                            "enableBlocks": true,
+                            "enableNowPlaying": false
+                        }
+                    }
+                },
+                {
+                    "Komga": {
+                        "icon": "sh-komga",
+                        "description": "Comic and manga server",
+                        "href": "https://books.media.kike.wtf",
+                        "siteMonitor": "http://10.0.10.2:25600",
+                        "widget": {
+                            "type": "komga",
+                            "url": "http://10.0.10.2:25600",
+                            "username": "{{HOMEPAGE_VAR_KOMGA_USER}}",
+                            "key": "{{HOMEPAGE_VAR_KOMGA_API}}",
+                            "fields": [
+                                "libraries",
+                                "series",
+                                "books"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "qBitTorrent": {
+                        "icon": "sh-qbittorrent",
+                        "description": "Torrent client",
+                        "href": "http://10.0.10.2:8080",
+                        "siteMonitor": "http://10.0.10.2:8080",
+                        "widget": {
+                            "type": "qbittorrent",
+                            "url": "http://10.0.10.2:8080",
+                            "username": "user",
+                            "password": "{{HOMEPAGE_VAR_QBITTORRENT_PASS}}",
+                            "enableLeechProgress": false,
+                            "fields": [
+                                "leech",
+                                "seed",
+                                "download"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Agents": [
+                {
+                    "Rakazo": {
+                        "icon": "mdi-robot-outline",
+                        "description": "Self-hosted AI agents",
+                        "href": "https://agents.kike.wtf",
+                        "siteMonitor": "http://10.0.10.3:5173"
+                    }
+                }
+            ]
+        }
+    ]
+}

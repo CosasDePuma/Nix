@@ -269,4 +269,4 @@ Both must pass cleanly. The formatter is managed by `treefmt` (`alejandra`, `dea
 ## Host Types
 
 - **Desktops**: Personal workstations (`dendritic/hosts/desktop/`), macOS (`aarch64-darwin`) or NixOS.
-- **Servers/Homelab**: Automation, media, proxy, router, gaming (`dendritic/hosts/homelab/`), always NixOS.
+- **Servers/Homelab**: A single bare-metal NixOS host (`barebone`) running each server as a microvm.nix guest (`router`, `media`, `agents`) in `dendritic/hosts/homelab/`. A guest's directory exports a `homelab-<name>` module that `barebone` imports; inside, guests import `system-microvm` instead of disk, boot or hardware modules.
