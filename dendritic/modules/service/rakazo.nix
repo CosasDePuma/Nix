@@ -252,6 +252,36 @@
             ${docker} network inspect rakazo-data >/dev/null 2>&1 || ${docker} network create --internal rakazo-data
           '';
         };
+
+        # The supervisor checks the computer image once at startup and keeps
+        # failing if it was missing then, so fetch it first, riding out
+        # transient registry errors (upstream gates it the same way).
+        rakazo-computer-image = {
+          description = "Pull the Rakazo computer image";
+          after = ["docker.service" "network-online.target"];
+          requires = ["docker.service"];
+          wants = ["network-online.target"];
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+          };
+          script = let
+            docker = "${config.virtualisation.docker.package}/bin/docker";
+            image = containers.rakazo-supervisor.environment.RAKAZO_COMPUTER_IMAGE;
+          in ''
+            for attempt in $(seq 1 10); do
+              ${docker} image inspect ${image} >/dev/null 2>&1 && exit 0
+              ${docker} pull ${image} && exit 0
+              echo "pull attempt $attempt failed, retrying" >&2
+              sleep $((attempt * 15))
+            done
+            exit 1
+          '';
+        };
+        docker-rakazo-supervisor = {
+          after = ["rakazo-computer-image.service"];
+          requires = ["rakazo-computer-image.service"];
+        };
       }
       (lib.genAttrs
         (map (name: "docker-rakazo-${name}") ["postgres" "supervisor" "api" "worker" "web"])
