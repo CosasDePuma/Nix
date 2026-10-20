@@ -43,6 +43,7 @@
                         "widget": {
                             "type": "jellyfin",
                             "url": "http://10.0.10.2:8096",
+                            "version": 2,
                             "key": "{{HOMEPAGE_VAR_JELLYFIN_API}}",
                             "fields": [
                                 "movies",
