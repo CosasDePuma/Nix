@@ -37,13 +37,20 @@
       # whatever the persisted dir actually contains -- sshd then fails to
       # find sshd_config at all. Persisting only the key files leaves the
       # rest of /etc/ssh as NixOS put it.
-      files = [
-        "/etc/machine-id"
-        "/etc/ssh/ssh_host_ed25519_key"
-        "/etc/ssh/ssh_host_ed25519_key.pub"
-        "/etc/ssh/ssh_host_rsa_key"
-        "/etc/ssh/ssh_host_rsa_key.pub"
-      ];
+      files =
+        # A declarative /etc/machine-id (e.g. microvm.nix derives one) is
+        # already stable; bind-mounting over its store symlink fails.
+        lib.optionals (!(config.environment.etc ? "machine-id")) ["/etc/machine-id"]
+        ++ [
+          "/etc/ssh/ssh_host_ed25519_key"
+          "/etc/ssh/ssh_host_ed25519_key.pub"
+          "/etc/ssh/ssh_host_rsa_key"
+          "/etc/ssh/ssh_host_rsa_key.pub"
+        ];
     };
+
+    # agenix decrypts during activation, which can run before the host keys
+    # above are bind-mounted into /etc/ssh; read the persisted copy instead.
+    age.identityPaths = ["/nix/persist/etc/ssh/ssh_host_ed25519_key"];
   };
 }
