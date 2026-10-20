@@ -10,6 +10,7 @@
         # keep-sorted start
         network-dns
         network-firewall
+        service-borgbackup
         service-jellyfin
         service-komga
         service-qbittorrent
