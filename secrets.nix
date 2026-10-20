@@ -1,8 +1,7 @@
 let
   pumita = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKh1YtKaItcNzC3RGez38zaJ0geelyrb6AFV73OqLchv pumita";
   vmHomelabRouter = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJKUXuzhBlJMwGCXAanz7KnTz8HOWccVgU4tJsilIPjY root@router";
-  vmHomelabMedia = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICBekVv5frPrfFD9JtEJGZp7YXmq3HqjGdZiznseUXgv root@media";
-  monolabMedia = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHml/Fav6DFyK6ht3ICCOutGe1zSG7aKH7MSDR4ZoysO root@media";
+  vmHomelabMedia = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHml/Fav6DFyK6ht3ICCOutGe1zSG7aKH7MSDR4ZoysO root@media";
   wonderland = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIYjbPn9PgJXtEpzkkBXiZV/TIShXl5Ny5Rb0oB7m6MP root@wonderland";
   #
   #  vm-homelab = {
@@ -63,28 +62,18 @@ in {
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
   "dendritic/hosts/homelab/x86_64-linux/router/.ddclient/cloudflare-key.age".publicKeys = [pumita vmHomelabRouter];
+  "dendritic/hosts/homelab/x86_64-linux/router/.homepage/homepage.env.age".publicKeys = [pumita vmHomelabRouter];
+  "dendritic/hosts/homelab/x86_64-linux/router/.tailscale/preauth-key.age".publicKeys = [pumita vmHomelabRouter];
   "dendritic/hosts/homelab/x86_64-linux/router/.wireguard/wireguard-key.age".publicKeys = [pumita vmHomelabRouter];
   # Client-side WireGuard profiles (not consumed by the router itself, kept
   # here as a decrypt-with-pumita-only backup for re-provisioning devices).
   "dendritic/hosts/homelab/x86_64-linux/router/.wireguard/wireguard-profiles.conf.age".publicKeys = [pumita];
-  "dendritic/hosts/homelab/x86_64-linux/router/.tailscale/preauth-key.age".publicKeys = [pumita vmHomelabRouter];
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                   Media                   ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
   "dendritic/hosts/homelab/x86_64-linux/media/.smb/smb.creds.age".publicKeys = [pumita vmHomelabMedia];
-
-  # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  # ┃                  Monolab                  ┃
-  # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-  # The router microVM reuses the homelab router's SSH key; media's was lost
-  # with the old disk, so its secret is encrypted to the new VM's key.
-  "dendritic/hosts/monolab/x86_64-linux/router/.ddclient/cloudflare-key.age".publicKeys = [pumita vmHomelabRouter];
-  "dendritic/hosts/monolab/x86_64-linux/router/.tailscale/preauth-key.age".publicKeys = [pumita vmHomelabRouter];
-  "dendritic/hosts/monolab/x86_64-linux/router/.homepage/homepage.env.age".publicKeys = [pumita vmHomelabRouter];
-  "dendritic/hosts/monolab/x86_64-linux/media/.smb/smb.creds.age".publicKeys = [pumita monolabMedia];
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                Wonderland                 ┃

@@ -1,5 +1,5 @@
 {inputs, ...}: {
-  flake.nixosModules.nuc = {
+  flake.nixosModules.barebone = {
     imports = with inputs.self.nixosModules; [
       inputs.microvm.nixosModules.host
       # keep-sorted start
@@ -8,9 +8,9 @@
       cpu-intel
       disko-impermanence
       hardware-defaults
-      monolab-agents
-      monolab-media
-      monolab-router
+      homelab-agents
+      homelab-media
+      homelab-router
       network-dns
       network-firewall
       network-interfaces
@@ -25,7 +25,7 @@
     disko.devices.disk.main.device = "/dev/disk/by-id/ata-CT2000MX500SSD1_2321E6DA4440";
 
     networking = {
-      hostName = "nuc";
+      hostName = "barebone";
       useDHCP = false;
       useNetworkd = true;
     };
@@ -90,8 +90,8 @@
     # The host only bridges; routing belongs to the router VM.
     boot.kernel.sysctl."net.ipv4.ip_forward" = 0;
 
-    users.users.nuc = {
-      initialPassword = "nuc";
+    users.users.barebone = {
+      initialPassword = "barebone";
       isNormalUser = true;
       extraGroups = ["wheel" "sshusers"];
       openssh.authorizedKeys.keys = [
@@ -100,5 +100,5 @@
     };
   };
 
-  flake.nixosConfigurations = inputs.self.lib.mkNixos "x86_64-linux" "nuc";
+  flake.nixosConfigurations = inputs.self.lib.mkNixos "x86_64-linux" "barebone";
 }
