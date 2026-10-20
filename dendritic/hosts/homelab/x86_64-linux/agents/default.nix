@@ -1,13 +1,13 @@
 {inputs, ...}: {
-  # A microVM, never a container: Rakazo's supervisor holds the Docker
-  # socket and runs LLM-generated code, so it gets its own kernel.
+  # A microVM, never a container: Paperclip's agents run LLM-generated code
+  # with their CLIs' full tool access, so they get their own kernel.
   flake.nixosModules.homelab-agents = {
     microvm.vms.agents.config = {
       imports = with inputs.self.nixosModules; [
         # keep-sorted start
         network-dns
         network-firewall
-        service-rakazo
+        service-paperclip
         service-ssh
         settings-locale
         settings-nix
@@ -23,7 +23,7 @@
           {
             type = "tap";
             id = "vm-agents";
-            mac = "02:00:00:0a:00:03";
+            mac = "02:00:00:0a:00:04";
           }
         ];
         volumes = [
@@ -39,7 +39,7 @@
         hostName = "agents";
         interfaces.eth0.ipv4.addresses = [
           {
-            address = "10.0.10.3";
+            address = "10.0.10.4";
             prefixLength = 24;
           }
         ];
@@ -47,6 +47,9 @@
           interface = "eth0";
           address = "10.0.10.254";
         };
+        # The router's dnsmasq answers *.kike.wtf with Caddy, so agent runs
+        # can reach Paperclip's own public URL (public DNS doesn't know it).
+        nameservers = ["10.0.10.254"];
       };
 
       users.users.agents = {
@@ -58,7 +61,11 @@
         ];
       };
 
-      virtualisation.oci-containers.containers.rakazo-web.environment.RAKAZO_HOST = "agents.kike.wtf";
+      virtualisation.oci-containers.containers.paperclip.environment = {
+        PAPERCLIP_PUBLIC_URL = "https://agents.kike.wtf";
+        # Homepage's siteMonitor probes the VM directly.
+        PAPERCLIP_ALLOWED_HOSTNAMES = "10.0.10.4";
+      };
     };
   };
 }
