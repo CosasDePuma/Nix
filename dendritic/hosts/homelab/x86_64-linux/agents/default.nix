@@ -58,7 +58,11 @@
         ];
       };
 
-      virtualisation.oci-containers.containers.paperclip.environment.PAPERCLIP_PUBLIC_URL = "https://agents.kike.wtf";
+      virtualisation.oci-containers.containers.paperclip.environment = {
+        PAPERCLIP_PUBLIC_URL = "https://agents.kike.wtf";
+        # Homepage's siteMonitor probes the VM directly.
+        PAPERCLIP_ALLOWED_HOSTNAMES = "10.0.10.4";
+      };
     };
   };
 }
