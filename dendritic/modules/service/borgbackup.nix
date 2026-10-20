@@ -33,6 +33,10 @@
       # Catch up on a run missed while the host was down.
       persistentTimer = lib.mkDefault true;
       encryption.mode = lib.mkDefault "none";
+      # Borg's "unknown unencrypted repository" guard only protects encrypted
+      # repos from being swapped for plain ones; it is moot when the repo is
+      # plain by design.
+      environment.BORG_UNKNOWN_UNENCRYPTED_REPO_ACCESS_IS_OK = lib.mkIf (config.services.borgbackup.jobs.backup.encryption.mode == "none") "yes";
       compression = lib.mkDefault "auto,zstd";
       paths =
         lib.optionals (jellyfin.enable or false) [jellyfin.dataDir]
