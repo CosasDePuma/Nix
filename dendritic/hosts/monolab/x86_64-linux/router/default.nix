@@ -7,7 +7,6 @@
       domain = "kike.wtf";
     in {
       imports = with inputs.self.nixosModules; [
-        inputs.agenix.nixosModules.default
         # keep-sorted start
         network-dns
         network-forwarding

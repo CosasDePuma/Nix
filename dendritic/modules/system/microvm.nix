@@ -9,6 +9,9 @@
     ...
   }: {
     imports = with inputs.self.nixosModules; [
+      # Bare-metal hosts get agenix from mkNixos; guests need it here so
+      # system-impermanence can point it at the persisted host key.
+      inputs.agenix.nixosModules.default
       network-interfaces
       system-impermanence
     ];
