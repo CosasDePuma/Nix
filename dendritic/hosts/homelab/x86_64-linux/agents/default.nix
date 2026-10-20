@@ -47,6 +47,9 @@
           interface = "eth0";
           address = "10.0.10.254";
         };
+        # The router's dnsmasq answers *.kike.wtf with Caddy, so agent runs
+        # can reach Paperclip's own public URL (public DNS doesn't know it).
+        nameservers = ["10.0.10.254"];
       };
 
       users.users.agents = {
