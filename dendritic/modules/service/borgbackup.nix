@@ -55,7 +55,25 @@
 
     systemd.services = lib.mkMerge [
       {
-        borgbackup-job-backup.unitConfig.RequiresMountsFor = [repo];
+        # The job's sandbox bind-mounts the repository, so it has to exist
+        # before the job's own init could create it, and borg refuses to init
+        # into an existing directory: initialise it here, outside the sandbox.
+        borgbackup-repo = {
+          description = "Initialise the borg repository";
+          unitConfig.RequiresMountsFor = [repo];
+          serviceConfig.Type = "oneshot";
+          script = ''
+            [ -e ${repo}/config ] && exit 0
+            rmdir ${repo} 2>/dev/null || true
+            mkdir -p "$(dirname ${repo})"
+            ${pkgs.borgbackup}/bin/borg init --encryption=${config.services.borgbackup.jobs.backup.encryption.mode} ${repo}
+          '';
+        };
+        borgbackup-job-backup = {
+          after = ["borgbackup-repo.service"];
+          requires = ["borgbackup-repo.service"];
+          unitConfig.RequiresMountsFor = [repo];
+        };
       }
       (lib.mkIf hasDumps {
         borgbackup-dumps = {
