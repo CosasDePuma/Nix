@@ -14,6 +14,7 @@
       network-dns
       network-firewall
       network-interfaces
+      network-wakeonlan
       service-ssh
       settings-locale
       settings-nix
