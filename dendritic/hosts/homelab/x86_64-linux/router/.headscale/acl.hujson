@@ -36,7 +36,7 @@
       ]
     },
 
-    // 3. Agents: solo Rakazo a través de Caddy en router (443); el puerto 5173 directo no
+    // 3. Agents: solo Paperclip y Rakazo a través de Caddy en router (443); los puertos 3100 y 5173 directos no
     {
       "action": "accept",
       "src": ["tag:agents"],

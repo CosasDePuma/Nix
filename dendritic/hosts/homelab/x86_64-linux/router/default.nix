@@ -158,6 +158,12 @@
           "agents.${domain}" = {
             useACMEHost = domain;
             extraConfig = ''
+              reverse_proxy http://10.0.10.4:3100
+            '';
+          };
+          "bots.${domain}" = {
+            useACMEHost = domain;
+            extraConfig = ''
               reverse_proxy http://10.0.10.3:5173
             '';
           };
@@ -216,10 +222,15 @@
                 {
                   name = "agents.home.${domain}";
                   type = "A";
+                  value = "10.0.10.4";
+                }
+                {
+                  name = "bots.home.${domain}";
+                  type = "A";
                   value = "10.0.10.3";
                 }
 
-                # Homepage and agents (.kike.wtf, via Caddy)
+                # Homepage, agents and bots (.kike.wtf, via Caddy)
                 {
                   name = domain;
                   type = "A";
@@ -227,6 +238,11 @@
                 }
                 {
                   name = "agents.${domain}";
+                  type = "A";
+                  value = "100.64.0.1";
+                }
+                {
+                  name = "bots.${domain}";
                   type = "A";
                   value = "100.64.0.1";
                 }
@@ -274,7 +290,8 @@
         dnsmasq.settings = {
           address = [
             "/${domain}/10.0.10.254"
-            "/agents.home.${domain}/10.0.10.3"
+            "/agents.home.${domain}/10.0.10.4"
+            "/bots.home.${domain}/10.0.10.3"
             "/media.home.${domain}/10.0.10.2"
             "/nas.home.${domain}/192.168.1.3"
             "/proxmox.home.${domain}/192.168.1.4"
