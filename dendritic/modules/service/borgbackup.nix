@@ -29,7 +29,9 @@
     hasDumps = hasPaperclip || hasRakazo || (headscale.enable or false);
   in {
     services.borgbackup.jobs.backup = {
-      startAt = lib.mkDefault "daily";
+      # Off the hour: a run cut short (e.g. by a midnight reboot) leaves a
+      # stale lock that blocks every later run until broken by hand.
+      startAt = lib.mkDefault "*-*-* 01:00:00";
       # Catch up on a run missed while the host was down.
       persistentTimer = lib.mkDefault true;
       encryption.mode = lib.mkDefault "none";
