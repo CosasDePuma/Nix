@@ -30,16 +30,20 @@
       microvm = {
         vcpu = 2;
         mem = 1024;
+        # vhost-net: every routed packet stays in the host kernel instead
+        # of qemu. Trusted guest only; agents/bots keep qemu's sandbox.
         interfaces = [
           {
             type = "tap";
             id = "vm-router-wan";
             mac = "02:00:00:0a:00:fe";
+            tap.vhost = true;
           }
           {
             type = "tap";
             id = "vm-router-lan";
             mac = "02:00:00:0a:01:fe";
+            tap.vhost = true;
           }
         ];
         volumes = [

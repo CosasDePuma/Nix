@@ -16,6 +16,7 @@
       network-firewall
       network-interfaces
       network-wakeonlan
+      service-reboot
       service-ssh
       settings-locale
       settings-nix
