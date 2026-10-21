@@ -2,6 +2,8 @@ let
   pumita = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKh1YtKaItcNzC3RGez38zaJ0geelyrb6AFV73OqLchv pumita";
   vmHomelabRouter = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJKUXuzhBlJMwGCXAanz7KnTz8HOWccVgU4tJsilIPjY root@router";
   vmHomelabMedia = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHml/Fav6DFyK6ht3ICCOutGe1zSG7aKH7MSDR4ZoysO root@media";
+  vmHomelabAgents = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICU/3jrUMw/HAq6lqtXdv6pWcc7Xyp+aAP6vCxSMMyVt root@agents";
+  vmHomelabBots = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKrZuY2WUSmexPm+yPeOidRBDrwOEyTPq/UR2s4ZYOFA root@bots";
   wonderland = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIYjbPn9PgJXtEpzkkBXiZV/TIShXl5Ny5Rb0oB7m6MP root@wonderland";
   #
   #  vm-homelab = {
@@ -70,10 +72,12 @@ in {
   "dendritic/hosts/homelab/x86_64-linux/router/.wireguard/wireguard-profiles.conf.age".publicKeys = [pumita];
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  # ┃                   Media                   ┃
+  # ┃                  Backups                  ┃
   # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-  "dendritic/hosts/homelab/x86_64-linux/media/.smb/smb.creds.age".publicKeys = [pumita vmHomelabMedia];
+  # NAS credentials, shared by every guest that imports homelab-backups
+  # (media also uses them for its media share).
+  "dendritic/hosts/homelab/x86_64-linux/backups/.smb/smb.creds.age".publicKeys = [pumita vmHomelabAgents vmHomelabBots vmHomelabMedia vmHomelabRouter];
 
   # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   # ┃                Wonderland                 ┃

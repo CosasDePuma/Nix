@@ -8,6 +8,7 @@
     in {
       imports = with inputs.self.nixosModules; [
         # keep-sorted start
+        homelab-backups
         network-dns
         network-forwarding
         network-nftables

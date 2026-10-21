@@ -5,6 +5,7 @@
     microvm.vms.agents.config = {
       imports = with inputs.self.nixosModules; [
         # keep-sorted start
+        homelab-backups
         network-dns
         network-firewall
         service-paperclip

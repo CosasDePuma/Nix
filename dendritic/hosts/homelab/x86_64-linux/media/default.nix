@@ -1,16 +1,12 @@
 {inputs, ...}: {
   # A microVM rather than a container: CIFS mounts need their own kernel.
   flake.nixosModules.homelab-media = {
-    microvm.vms.media.config = {
-      config,
-      pkgs,
-      ...
-    }: {
+    microvm.vms.media.config = {config, ...}: {
       imports = with inputs.self.nixosModules; [
         # keep-sorted start
+        homelab-backups
         network-dns
         network-firewall
-        service-borgbackup
         service-jellyfin
         service-komga
         service-qbittorrent
@@ -41,30 +37,19 @@
         ];
       };
 
-      age.secrets."smb-creds".file = ./.smb/smb.creds.age;
-      environment.systemPackages = with pkgs; [cifs-utils];
-      fileSystems = builtins.listToAttrs (
-        builtins.map
-        (share: {
-          name = "/mnt/${share}";
-          value = {
-            device = "//192.168.1.3/${share}";
-            fsType = "cifs";
-            options = [
-              "credentials=${config.age.secrets."smb-creds".path}"
-              "noauto"
-              "x-systemd.automount"
-              "x-systemd.device-timeout=5s"
-              "x-systemd.idle-timeout=60"
-              "x-systemd.mount-timeout=5s"
-            ];
-          };
-        })
-        [
-          "backups"
-          "media"
-        ]
-      );
+      # Same NAS credentials homelab-backups brings in for /mnt/backups.
+      fileSystems."/mnt/media" = {
+        device = "//192.168.1.3/media";
+        fsType = "cifs";
+        options = [
+          "credentials=${config.age.secrets."smb-creds".path}"
+          "noauto"
+          "x-systemd.automount"
+          "x-systemd.device-timeout=5s"
+          "x-systemd.idle-timeout=60"
+          "x-systemd.mount-timeout=5s"
+        ];
+      };
 
       networking = {
         hostName = "media";
