@@ -21,11 +21,14 @@
       microvm = {
         vcpu = 4;
         mem = 4096;
+        # vhost-net: the NAS traffic stays in the host kernel instead of
+        # qemu. Trusted guest only; agents/bots keep qemu's sandbox.
         interfaces = [
           {
             type = "tap";
             id = "vm-media";
             mac = "02:00:00:0a:00:02";
+            tap.vhost = true;
           }
         ];
         volumes = [
