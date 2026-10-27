@@ -18,9 +18,10 @@
         programs.opencode = {
           enable = lib.mkDefault true;
           enableMcpIntegration = lib.mkDefault true;
-          tui = {
-            theme = lib.mkDefault "opencode";
-          };
+          # OpenCode rewrites cli.json from its TUI, so keep its files writable
+          # and layer the declarative settings on top.
+          mutableSettings = lib.mkDefault true;
+          cli.theme.name = lib.mkDefault "opencode";
           settings = {
             autoshare = lib.mkDefault false;
             autoupdate = lib.mkDefault true;

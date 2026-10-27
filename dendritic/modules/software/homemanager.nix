@@ -12,6 +12,7 @@
             useGlobalPkgs = lib.mkDefault true;
             useUserPackages = lib.mkDefault true;
             backupFileExtension = lib.mkDefault "~";
+            overwriteBackup = lib.mkDefault true;
           };
         }
         (lib.mkIf (config.system.primaryUser != null) {
@@ -26,6 +27,7 @@
         useGlobalPkgs = lib.mkDefault true;
         useUserPackages = lib.mkDefault true;
         backupFileExtension = lib.mkDefault "~";
+        overwriteBackup = lib.mkDefault true;
       };
     };
   };
