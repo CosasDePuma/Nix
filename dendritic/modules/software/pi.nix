@@ -12,6 +12,10 @@
     }: let
       cfg = config.programs.pi-coding-agent;
       inherit (config.programs) mcp;
+      # programs.mcp fills every unset field with null/{}/[], which pi rejects.
+      piMcpServers =
+        lib.mapAttrs (_: lib.filterAttrs (_: v: v != null && v != {} && v != []))
+        mcp.servers;
     in {
       imports = with inputs.self.homeManagerModules; [software-mcp];
       config = {
@@ -38,8 +42,9 @@
               format = "json";
               empty = "{}";
               path = "${cfg.configDir}/mcp.json";
-              staticSettings = (pkgs.formats.json {}).generate "pi-mcp.json" {mcpServers = mcp.servers;};
-              jqOperation = "$dynamic * $static";
+              staticSettings = (pkgs.formats.json {}).generate "pi-mcp.json" {mcpServers = piMcpServers;};
+              # Replace each declared server whole so stale fields never linger.
+              jqOperation = "$dynamic | .mcpServers = ((.mcpServers // {}) + $static.mcpServers)";
             }
           )
         );
