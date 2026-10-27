@@ -16,6 +16,8 @@
       config.programs.codex = {
         enable = lib.mkDefault true;
         enableMcpIntegration = lib.mkDefault true;
+        # Codex persists trusted projects into config.toml, so it must stay writable.
+        mutableSettings = lib.mkDefault true;
       };
     };
 
