@@ -10,10 +10,7 @@
         "context7".url = "https://mcp.context7.com/mcp";
         "playwright" = {
           command = "${pkgs.playwright-mcp}/bin/playwright-mcp";
-          args = [
-            "--headless"
-            "--isolated"
-          ];
+          args = ["--isolated"];
         };
       };
     };
