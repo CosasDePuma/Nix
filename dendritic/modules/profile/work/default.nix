@@ -25,13 +25,8 @@
       ".ssh/keys/work.pub".text = builtins.readFile ./.ssh/keys/work.pub;
     };
 
-    programs = {
-      opencode.settings.plugin = [
-        (decode "edocnepo/nigulp#tig.knil.texa/NNIBYCLOIBIC/667:moc.atadttn.laeme.hss-tig@tig//:hss+tig")
-      ];
-      pi-coding-agent.settings.packages = [
-        (decode "ip/nigulp@tig.knil.texa/NNIBYCLOIBIC/667:moc.atadttn.laeme.hss-tig@tig//:hss")
-      ];
-    };
+    programs.pi-coding-agent.settings.packages = [
+      (decode "ip/nigulp@tig.knil.texa/NNIBYCLOIBIC/667:moc.atadttn.laeme.hss-tig@tig//:hss")
+    ];
   };
 }

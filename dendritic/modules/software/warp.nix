@@ -91,9 +91,6 @@ in {
             /usr/bin/chflags -R uchg "$autoupdateDir" 2>/dev/null || true
           '';
         })
-        (lib.mkIf (config.programs.opencode.enable or false) {
-          programs.opencode.settings.plugin = ["@warp-dot-dev/opencode-warp"];
-        })
         (lib.mkIf (config.programs.claude-code.enable or false) {
           programs.claude-code.plugins."warp" = "${pkgs.fetchFromGitHub claudeCodeWarp}/plugins/warp";
         })
