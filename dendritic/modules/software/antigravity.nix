@@ -4,17 +4,16 @@
   ...
 }: {
   flake = {
-    darwinModules.software-antigravity = {
-      homebrew.casks = [
-        "antigravity-cli"
-        "google-gemini"
-      ];
+    darwinModules.software-antigravity = {pkgs, ...}: {
+      environment.systemPackages = [inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.antigravity-cli];
+      homebrew.casks = ["google-gemini"];
     };
 
-    homeManagerModules.software-antigravity = {...}: {
+    homeManagerModules.software-antigravity = {pkgs, ...}: {
       imports = with inputs.self.homeManagerModules; [software-mcp];
       config.programs.antigravity-cli = {
         enable = lib.mkDefault true;
+        package = lib.mkDefault inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.antigravity-cli;
         enableMcpIntegration = lib.mkDefault true;
         settings = {
           context.fileName = lib.mkDefault [
@@ -34,7 +33,7 @@
     };
 
     nixosModules.software-antigravity = {pkgs, ...}: {
-      environment.systemPackages = with pkgs; [antigravity-cli];
+      environment.systemPackages = [inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.antigravity-cli];
     };
   };
 }

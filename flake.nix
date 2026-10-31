@@ -31,6 +31,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Daily-updated AI coding agents; no nixpkgs follow so its binary cache hits.
+    llm-agents.url = "github:numtide/llm-agents.nix";
+
     microvm = {
       url = "github:microvm-nix/microvm.nix";
       inputs.nixpkgs.follows = "nixpkgs";
