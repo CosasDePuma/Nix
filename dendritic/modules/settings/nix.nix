@@ -10,6 +10,34 @@
           warn-dirty = lib.mkDefault false;
         };
       };
+      # nix.enable is off, so nix-darwin's nix.gc / nix.optimise are unavailable;
+      # schedule the same housekeeping directly against the installer's Nix.
+      launchd.daemons = {
+        nix-gc.serviceConfig = {
+          ProgramArguments = ["/nix/var/nix/profiles/default/bin/nix-collect-garbage" "--delete-older-than" "7d"];
+          StartCalendarInterval = lib.mkDefault [
+            {
+              Weekday = 0;
+              Hour = 3;
+              Minute = 15;
+            }
+          ];
+          StandardErrorPath = lib.mkDefault "/var/log/nix-gc.log";
+          StandardOutPath = lib.mkDefault "/var/log/nix-gc.log";
+        };
+        nix-optimise.serviceConfig = {
+          ProgramArguments = ["/nix/var/nix/profiles/default/bin/nix-store" "--optimise"];
+          StartCalendarInterval = lib.mkDefault [
+            {
+              Weekday = 0;
+              Hour = 4;
+              Minute = 15;
+            }
+          ];
+          StandardErrorPath = lib.mkDefault "/var/log/nix-optimise.log";
+          StandardOutPath = lib.mkDefault "/var/log/nix-optimise.log";
+        };
+      };
       nixpkgs.config.allowUnfree = lib.mkDefault true;
       system.stateVersion = lib.mkDefault 6;
     };
