@@ -10,6 +10,7 @@
       onActivation = {
         autoUpdate = lib.mkDefault true;
         cleanup = lib.mkDefault "zap";
+        upgrade = lib.mkDefault true;
       };
     };
     environment.variables.HOMEBREW_NO_ANALYTICS = lib.mkDefault "1";
