@@ -1,8 +1,9 @@
 {lib, ...}: {
   flake = {
-    darwinModules.settings-nix = {
+    darwinModules.settings-nix = {pkgs, ...}: {
       nix = {
         enable = lib.mkDefault true;
+        package = lib.mkDefault pkgs.nixVersions.latest;
         gc = {
           automatic = lib.mkDefault true;
           options = lib.mkDefault "--delete-older-than 7d";
