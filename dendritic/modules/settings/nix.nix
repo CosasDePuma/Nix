@@ -1,41 +1,20 @@
 {lib, ...}: {
   flake = {
-    darwinModules.settings-nix = {
+    darwinModules.settings-nix = {pkgs, ...}: {
       nix = {
-        enable = lib.mkDefault false;
+        enable = lib.mkDefault true;
+        package = lib.mkDefault pkgs.nixVersions.latest;
+        gc = {
+          automatic = lib.mkDefault true;
+          options = lib.mkDefault "--delete-older-than 7d";
+        };
+        # auto-optimise-store is unsafe on darwin; run it as a scheduled job instead.
+        optimise.automatic = lib.mkDefault true;
         settings = {
           auto-optimise-store = lib.mkDefault false;
           experimental-features = ["nix-command" "flakes"];
           extra-platforms = ["aarch64-darwin"];
           warn-dirty = lib.mkDefault false;
-        };
-      };
-      # nix.enable is off, so nix-darwin's nix.gc / nix.optimise are unavailable;
-      # schedule the same housekeeping directly against the installer's Nix.
-      launchd.daemons = {
-        nix-gc.serviceConfig = {
-          ProgramArguments = ["/nix/var/nix/profiles/default/bin/nix-collect-garbage" "--delete-older-than" "7d"];
-          StartCalendarInterval = lib.mkDefault [
-            {
-              Weekday = 0;
-              Hour = 3;
-              Minute = 15;
-            }
-          ];
-          StandardErrorPath = lib.mkDefault "/var/log/nix-gc.log";
-          StandardOutPath = lib.mkDefault "/var/log/nix-gc.log";
-        };
-        nix-optimise.serviceConfig = {
-          ProgramArguments = ["/nix/var/nix/profiles/default/bin/nix-store" "--optimise"];
-          StartCalendarInterval = lib.mkDefault [
-            {
-              Weekday = 0;
-              Hour = 4;
-              Minute = 15;
-            }
-          ];
-          StandardErrorPath = lib.mkDefault "/var/log/nix-optimise.log";
-          StandardOutPath = lib.mkDefault "/var/log/nix-optimise.log";
         };
       };
       nixpkgs.config.allowUnfree = lib.mkDefault true;
