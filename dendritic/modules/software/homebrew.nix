@@ -2,7 +2,6 @@
   flake.darwinModules.software-homebrew = {
     homebrew = {
       enable = lib.mkDefault true;
-      caskArgs.no_quarantine = lib.mkDefault true;
       global = {
         autoUpdate = lib.mkDefault true;
         brewfile = lib.mkDefault true;
@@ -10,6 +9,7 @@
       onActivation = {
         autoUpdate = lib.mkDefault true;
         cleanup = lib.mkDefault "zap";
+        upgrade = lib.mkDefault true;
       };
     };
     environment.variables.HOMEBREW_NO_ANALYTICS = lib.mkDefault "1";

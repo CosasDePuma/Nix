@@ -1,7 +1,7 @@
 {inputs, ...}: {
   flake = {
-    darwinModules.software-pi = {
-      homebrew.brews = ["pi-coding-agent"];
+    darwinModules.software-pi = {pkgs, ...}: {
+      environment.systemPackages = [inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.pi];
     };
 
     homeManagerModules.software-pi = {
@@ -21,6 +21,7 @@
       config = {
         programs.pi-coding-agent = {
           enable = lib.mkDefault true;
+          package = lib.mkDefault inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.pi;
           # Pi writes its own settings (`pi config`), so keep settings.json writable.
           mutableSettings = lib.mkDefault true;
           settings = {
@@ -52,7 +53,7 @@
     };
 
     nixosModules.software-pi = {pkgs, ...}: {
-      environment.systemPackages = with pkgs; [pi-coding-agent];
+      environment.systemPackages = [inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.pi];
     };
   };
 }
