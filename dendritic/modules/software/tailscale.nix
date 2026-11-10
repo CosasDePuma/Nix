@@ -1,7 +1,7 @@
 {lib, ...}: {
   flake = {
     darwinModules.software-tailscale = {
-      homebrew.casks = ["tailscale"];
+      homebrew.casks = ["tailscale-app"];
     };
 
     nixosModules.software-tailscale = {
