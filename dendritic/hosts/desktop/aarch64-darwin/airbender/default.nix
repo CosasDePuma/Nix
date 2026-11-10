@@ -11,7 +11,6 @@
       settings-macos
       settings-nix
       software-bitwarden
-      software-burpsuite
       software-chatgpt
       software-claude
       software-cleanmymac
