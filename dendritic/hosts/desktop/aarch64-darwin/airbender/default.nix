@@ -23,6 +23,7 @@
       software-sudo
       software-tailscale
       software-unar
+      software-vscode
       software-warp
       software-whatsapp
       software-wireguard
