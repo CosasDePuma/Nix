@@ -15,7 +15,6 @@
     headscale = config.services.headscale;
     containers = config.virtualisation.oci-containers.containers;
 
-    hasPaperclip = containers ? paperclip;
     hasRakazo = containers ? rakazo-postgres;
 
     backend = config.virtualisation.oci-containers.backend;
@@ -25,8 +24,7 @@
     dumpDir = "/var/backup/borg";
     repo = config.services.borgbackup.jobs.backup.repo;
 
-    paperclipDir = "/var/lib/paperclip/data";
-    hasDumps = hasPaperclip || hasRakazo || (headscale.enable or false);
+    hasDumps = hasRakazo || (headscale.enable or false);
   in {
     services.borgbackup.jobs.backup = {
       # Off the hour: a run cut short (e.g. by a midnight reboot) leaves a
@@ -45,12 +43,9 @@
         ++ lib.optionals (komga.enable or false) [komga.stateDir]
         ++ lib.optionals (qbittorrent.enable or false) [qbittorrent.profileDir]
         ++ lib.optionals (headscale.enable or false) ["/var/lib/headscale"]
-        ++ lib.optionals hasPaperclip ["/var/lib/paperclip"]
         ++ lib.optionals hasRakazo ["/var/lib/rakazo"]
         ++ lib.optionals hasDumps [dumpDir];
-      exclude =
-        lib.optionals hasPaperclip ["${paperclipDir}/instances/*/db"]
-        ++ ["sh:**/node_modules"];
+      exclude = ["sh:**/node_modules"];
       prune.keep = {
         daily = lib.mkDefault 7;
         weekly = lib.mkDefault 4;
@@ -96,16 +91,6 @@
             ]
             ++ lib.optionals (headscale.enable or false) [
               "${pkgs.sqlite}/bin/sqlite3 ${headscale.settings.database.sqlite.path} \".backup '${dumpDir}/headscale.sqlite'\""
-            ]
-            ++ lib.optionals hasPaperclip [
-              # Upstream's own backup command, run where the embedded
-              # PostgreSQL lives; it writes into the container's data volume.
-              ''
-                rm -rf ${paperclipDir}/borg-dump
-                ${runtime} exec -u node -w /app paperclip pnpm -s paperclipai db:backup --dir /paperclip/borg-dump --filename-prefix paperclip
-                mv ${paperclipDir}/borg-dump/paperclip-*.sql.gz ${dumpDir}/paperclip.sql.gz
-                rm -rf ${paperclipDir}/borg-dump
-              ''
             ]
             ++ lib.optionals hasRakazo [
               "${runtime} exec rakazo-postgres pg_dumpall -U rakazo | ${pkgs.zstd}/bin/zstd -q -o ${dumpDir}/rakazo.sql.zst"

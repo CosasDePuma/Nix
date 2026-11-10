@@ -8,7 +8,6 @@
       cpu-intel
       disko-impermanence
       hardware-defaults
-      homelab-agents
       homelab-bots
       homelab-media
       homelab-router
@@ -77,7 +76,7 @@
         };
         # Every other VM is an untagged access port on the homelab VLAN.
         "30-vlan-homelab" = {
-          matchConfig.Name = ["vm-agents" "vm-bots" "vm-media"];
+          matchConfig.Name = ["vm-bots" "vm-media"];
           networkConfig.Bridge = "br-vlans";
           bridgeVLANs = [
             {

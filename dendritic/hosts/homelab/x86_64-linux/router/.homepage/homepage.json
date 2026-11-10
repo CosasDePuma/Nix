@@ -10,7 +10,7 @@
         },
         "Agents": {
             "style": "row",
-            "columns": "2"
+            "columns": "1"
         }
     },
     "services": [
@@ -98,14 +98,6 @@
         },
         {
             "Agents": [
-                {
-                    "Paperclip": {
-                        "icon": "mdi-paperclip",
-                        "description": "AI agent orchestration",
-                        "href": "https://agents.kike.wtf",
-                        "siteMonitor": "http://10.0.10.4:3100"
-                    }
-                },
                 {
                     "Rakazo": {
                         "icon": "mdi-robot-outline",

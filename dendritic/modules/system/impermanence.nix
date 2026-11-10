@@ -26,7 +26,6 @@
         ++ lib.optionals (config.services.komga.enable or false) [config.services.komga.stateDir]
         ++ lib.optionals (config.services.qbittorrent.enable or false) [config.services.qbittorrent.profileDir]
         ++ lib.optionals (config.virtualisation.oci-containers.containers ? rakazo-web) ["/var/lib/rakazo"]
-        ++ lib.optionals (config.virtualisation.oci-containers.containers ? paperclip) ["/var/lib/paperclip"]
         ++ lib.optionals ((config.services.borgbackup.jobs or {}) != {}) ["/root/.cache/borg" "/root/.config/borg"]
         ++ lib.optionals (config.services.headscale.enable or false) ["/var/lib/headscale"]
         ++ lib.optionals (config.services.tailscale.enable or false) ["/var/lib/tailscale"]

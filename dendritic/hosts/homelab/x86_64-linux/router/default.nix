@@ -31,7 +31,7 @@
         vcpu = 2;
         mem = 1024;
         # vhost-net: every routed packet stays in the host kernel instead
-        # of qemu. Trusted guest only; agents/bots keep qemu's sandbox.
+        # of qemu. Trusted guest only; bots keep qemu's sandbox.
         interfaces = [
           {
             type = "tap";
@@ -160,12 +160,6 @@
               reverse_proxy http://10.0.10.2:25600
             '';
           };
-          "agents.${domain}" = {
-            useACMEHost = domain;
-            extraConfig = ''
-              reverse_proxy http://10.0.10.4:3100
-            '';
-          };
           "bots.${domain}" = {
             useACMEHost = domain;
             extraConfig = ''
@@ -225,24 +219,14 @@
                   value = "10.0.10.2";
                 }
                 {
-                  name = "agents.home.${domain}";
-                  type = "A";
-                  value = "10.0.10.4";
-                }
-                {
                   name = "bots.home.${domain}";
                   type = "A";
                   value = "10.0.10.3";
                 }
 
-                # Homepage, agents and bots (.kike.wtf, via Caddy)
+                # Homepage and bots (.kike.wtf, via Caddy)
                 {
                   name = domain;
-                  type = "A";
-                  value = "100.64.0.1";
-                }
-                {
-                  name = "agents.${domain}";
                   type = "A";
                   value = "100.64.0.1";
                 }
@@ -273,7 +257,7 @@
           };
         };
 
-        # Subnet router only: media/agents/etc. don't run tailscale
+        # Subnet router only: media/bots don't run tailscale
         # themselves, they're just reachable through the LAN route this
         # advertises. `headscale routes enable` still has to approve it once
         # the node registers, same as approving a new node.
@@ -295,7 +279,6 @@
         dnsmasq.settings = {
           address = [
             "/${domain}/10.0.10.254"
-            "/agents.home.${domain}/10.0.10.4"
             "/bots.home.${domain}/10.0.10.3"
             "/media.home.${domain}/10.0.10.2"
             "/nas.home.${domain}/192.168.1.3"

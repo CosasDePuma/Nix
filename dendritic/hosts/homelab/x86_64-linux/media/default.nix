@@ -22,7 +22,7 @@
         vcpu = 4;
         mem = 4096;
         # vhost-net: the NAS traffic stays in the host kernel instead of
-        # qemu. Trusted guest only; agents/bots keep qemu's sandbox.
+        # qemu. Trusted guest only; bots keep qemu's sandbox.
         interfaces = [
           {
             type = "tap";
